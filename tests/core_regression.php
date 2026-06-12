@@ -85,6 +85,20 @@ check(
     'DataTable columns must register scoped column slots.'
 );
 
+$moduleController = source('src/Controllers/ModuleController.php');
+check(
+    !str_contains($moduleController, "->page('{{")
+        && !str_contains($moduleController, "->pageSize('{{")
+        && !str_contains($moduleController, "->itemCount('{{"),
+    'ModuleController pagination helpers must receive raw expressions to avoid nested template braces.'
+);
+
+$themeConfig = source('config/thinkrix.php');
+check(
+    preg_match("/'footer'\s*=>\s*\[\s*'visible'\s*=>\s*false,/s", $themeConfig) === 1,
+    'Thinkrix theme config must hide the global footer by default.'
+);
+
 require_once $root . '/src/Exceptions/ApiException.php';
 $exception = new Thinkrix\Exceptions\ApiException('invalid', 40022);
 check($exception->getErrorCode() === 40022, 'ApiException second integer argument must be treated as error code.');

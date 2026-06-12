@@ -40,7 +40,7 @@ class Setting extends Model
     /**
      * 获取设置值（带缓存）
      */
-    public static function getValue(string $key, $default = null)
+    public static function fetchValue(string $key, $default = null)
     {
         $cacheEnabled = config('thinkrix.cache.settings.enabled', true);
         $cachePrefix = config('thinkrix.cache.settings.prefix', 'thinkrix.setting.');

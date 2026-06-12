@@ -35,7 +35,7 @@ class DataTable extends Component
 
     public function rowKey(string $rowKey): static
     {
-        return $this->props(['rowKey' => "{{ {$rowKey} }}"]);
+        return $this->props(['rowKey' => "{{ row => row.{$rowKey} }}"]);
     }
 
     public function columns(array|string $columns): static

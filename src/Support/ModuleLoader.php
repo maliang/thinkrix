@@ -109,8 +109,7 @@ class ModuleLoader
             if ($modulePath === null) {
                 continue;
             }
-                $this->registerCommands($module->name, $modulePath);
-            }
+            $this->registerCommands($module->name, $modulePath);
         }
     }
 

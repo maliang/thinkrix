@@ -52,6 +52,10 @@ check(!str_contains($install, 'Db::name('), 'InstallCommand must not call the no
 check(str_contains($install, '$this->app->db->execute('), 'InstallCommand fallback SQL must execute through the application database instance.');
 check(str_contains($install, '$this->app->db->name('), 'InstallCommand queries must use the application database instance.');
 check(str_contains($install, 'Setting::setValue('), 'InstallCommand must use the ORM-compatible setting write API.');
+check(
+    preg_match("/'footer'\s*=>\s*\[\s*'visible'\s*=>\s*false,/s", $install) === 1,
+    'InstallCommand must hide the global footer by default.'
+);
 check(!str_contains($install, "\$password = 'password'"), 'InstallCommand must not create a fixed default password.');
 check(str_contains($install, "addOption('password'"), 'InstallCommand must accept an explicit administrator password.');
 check(str_contains($install, 'askHidden('), 'Interactive installation must request a hidden administrator password.');

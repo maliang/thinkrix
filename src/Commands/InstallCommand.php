@@ -63,23 +63,18 @@ class InstallCommand extends Command
         $this->createBasePermissions($output);
         $output->info('   权限创建完成。');
 
-        // 7. 初始化系统设置
-        $output->info('7. 初始化系统设置...');
-        $this->initializeSettings($output);
-        $output->info('   系统设置初始化完成。');
-
-        // 8. 创建默认菜单
-        $output->info('8. 创建默认菜单...');
+        // 7. 创建默认菜单
+        $output->info('7. 创建默认菜单...');
         $this->createDefaultMenus($output);
         $output->info('   默认菜单创建完成。');
 
-        // 9. 初始化通知分类
-        $output->info('9. 初始化通知分类...');
+        // 8. 初始化通知分类
+        $output->info('8. 初始化通知分类...');
         $this->initNotificationCategories($output);
         $output->info('   通知分类初始化完成。');
 
-        // 10. 创建管理员账户
-        $output->info('10. 创建超级管理员账户...');
+        // 9. 创建管理员账户
+        $output->info('9. 创建超级管理员账户...');
         [$username, $password] = $this->resolveAdminCredentials($input, $output);
         $admin = $this->createSuperAdmin($role, $username, $password, $output);
 
@@ -91,8 +86,8 @@ class InstallCommand extends Command
         $output->writeln('');
         $output->writeln("管理员用户名: {$admin->username}");
 
-        // 11. 配置 composer merge-plugin
-        $output->info('11. 配置 Composer 模块依赖合并...');
+        // 10. 配置 composer merge-plugin
+        $output->info('10. 配置 Composer 模块依赖合并...');
         $this->setupComposerMerge($output);
 
         return 0;
@@ -515,102 +510,6 @@ class InstallCommand extends Command
                 $this->createPermissionsRecursive($children, $created->id, $permission['module']);
             }
         }
-    }
-
-    protected function initializeSettings(Output $output): void
-    {
-        Setting::setValue('theme', [
-            'appTitle' => config('thinkrix.app_title', 'Thinkrix Admin'),
-            'logo' => config('thinkrix.logo', '/favicon.svg'),
-            'themeScheme' => 'light',
-            'grayscale' => false,
-            'colourWeakness' => false,
-            'recommendColor' => false,
-            'themeColor' => '#646cff',
-            'themeRadius' => 6,
-            'otherColor' => [
-                'info' => '#2080f0',
-                'success' => '#52c41a',
-                'warning' => '#faad14',
-                'error' => '#f5222d',
-            ],
-            'isInfoFollowPrimary' => true,
-            'layout' => [
-                'mode' => 'vertical',
-                'scrollMode' => 'content',
-            ],
-            'page' => [
-                'animate' => true,
-                'animateMode' => 'fade-slide',
-            ],
-            'header' => [
-                'height' => 56,
-                'inverted' => false,
-                'breadcrumb' => [
-                    'visible' => true,
-                    'showIcon' => true,
-                ],
-                'multilingual' => [
-                    'visible' => true,
-                ],
-                'globalSearch' => [
-                    'visible' => true,
-                ],
-            ],
-            'tab' => [
-                'visible' => true,
-                'cache' => true,
-                'height' => 44,
-                'mode' => 'chrome',
-                'closeTabByMiddleClick' => false,
-            ],
-            'fixedHeaderAndTab' => true,
-            'sider' => [
-                'inverted' => false,
-                'width' => 220,
-                'collapsedWidth' => 64,
-                'mixWidth' => 90,
-                'mixCollapsedWidth' => 64,
-                'mixChildMenuWidth' => 200,
-                'mixChildMenuBgColor' => '#ffffff',
-                'autoSelectFirstMenu' => false,
-            ],
-            'footer' => [
-                'visible' => true,
-                'height' => 48,
-                'fixed' => false,
-                'right' => true,
-            ],
-            'watermark' => [
-                'visible' => false,
-                'text' => config('thinkrix.app_title', 'Thinkrix Admin'),
-                'enableUserName' => false,
-                'enableTime' => false,
-                'timeFormat' => 'YYYY-MM-DD HH:mm',
-            ],
-            'tokens' => [
-                'light' => [
-                    'colors' => [
-                        'container' => 'rgb(255, 255, 255)',
-                        'layout' => 'rgb(247, 250, 252)',
-                        'inverted' => 'rgb(0, 20, 40)',
-                        'base-text' => 'rgb(31, 31, 31)',
-                    ],
-                    'boxShadow' => [
-                        'header' => '0 1px 2px rgb(0, 21, 41, 0.08)',
-                        'sider' => '2px 0 8px 0 rgb(29, 35, 41, 0.05)',
-                        'tab' => '0 1px 2px rgb(0, 21, 41, 0.08)',
-                    ],
-                ],
-                'dark' => [
-                    'colors' => [
-                        'container' => 'rgb(28, 28, 28)',
-                        'layout' => 'rgb(18, 18, 18)',
-                        'base-text' => 'rgb(224, 224, 224)',
-                    ],
-                ],
-            ],
-        ]);
     }
 
     protected function createDefaultMenus(Output $output): void

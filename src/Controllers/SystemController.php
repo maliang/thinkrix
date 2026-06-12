@@ -211,7 +211,7 @@ class SystemController extends Controller
     public function getThemeConfig(): array
     {
         $settingModel = $this->getSettingModel();
-        $themeConfig = $settingModel::getValue('theme', $this->getDefaultThemeConfig());
+        $themeConfig = $settingModel::fetchValue('theme', $this->getDefaultThemeConfig());
         return success($themeConfig);
     }
 

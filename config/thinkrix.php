@@ -311,7 +311,7 @@ return [
             'autoSelectFirstMenu' => false,
         ],
         'footer' => [
-            'visible' => true,
+            'visible' => false,
             'height' => 48,
             'fixed' => false,
             'right' => true,
