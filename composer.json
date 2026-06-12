@@ -1,6 +1,6 @@
 {
     "name": "lartrix/thinkrix",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "ThinkPHP 8 后台管理包，为 trix 前端提供 API 接口",
     "type": "library",
     "license": "MIT",
