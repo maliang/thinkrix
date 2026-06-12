@@ -50,10 +50,19 @@ class ModuleLoader
 
         foreach ($modules as $module) {
             $moduleName = $module->name;
-            $modulePath = $this->app->getRootPath() . 'app' . DIRECTORY_SEPARATOR . $moduleName;
 
-            // 模块目录不存在则跳过
-            if (!is_dir($modulePath)) {
+            // 依次在所有模块目录中查找
+            $modulePath = null;
+            $paths = config('thinkrix.modules.paths', ['Modules']);
+            $root = $this->app->getRootPath();
+            foreach ($paths as $p) {
+                $candidate = $root . $p . DIRECTORY_SEPARATOR . $moduleName;
+                if (is_dir($candidate)) {
+                    $modulePath = $candidate;
+                    break;
+                }
+            }
+            if ($modulePath === null) {
                 continue;
             }
 
@@ -87,8 +96,19 @@ class ModuleLoader
         }
 
         foreach ($modules as $module) {
-            $modulePath = $this->app->getRootPath() . 'app' . DIRECTORY_SEPARATOR . $module->name;
-            if (is_dir($modulePath)) {
+            $modulePath = null;
+            $paths = config('thinkrix.modules.paths', ['Modules']);
+            $root = $this->app->getRootPath();
+            foreach ($paths as $p) {
+                $candidate = $root . $p . DIRECTORY_SEPARATOR . $module->name;
+                if (is_dir($candidate)) {
+                    $modulePath = $candidate;
+                    break;
+                }
+            }
+            if ($modulePath === null) {
+                continue;
+            }
                 $this->registerCommands($module->name, $modulePath);
             }
         }

@@ -134,7 +134,8 @@ class ModuleGenerator
      */
     public function getModulePath(string $module): string
     {
-        return app()->getRootPath() . 'app' . DIRECTORY_SEPARATOR . $module;
+        $paths = config('thinkrix.modules.paths', ['Modules']);
+        return app()->getRootPath() . $paths[0] . DIRECTORY_SEPARATOR . $module;
     }
 
     /**

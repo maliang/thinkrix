@@ -28,7 +28,7 @@ class RemoveBackendCommand extends Command
             $output->error('模块名称只能包含字母、数字和下划线，且必须以字母开头。');
             return 1;
         }
-        $moduleDir = $this->app->getRootPath() . 'app' . DIRECTORY_SEPARATOR . $name;
+        $moduleDir = $this->app->getRootPath() . config('thinkrix.modules.backend_path', 'app') . DIRECTORY_SEPARATOR . $name;
 
         if (!is_dir($moduleDir)) {
             $output->error("二级后台模块 {$name} 不存在。");

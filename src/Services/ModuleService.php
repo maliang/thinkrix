@@ -59,17 +59,16 @@ class ModuleService extends BaseService
      *
      * 扫描 app/ 目录下的模块目录结构
      */
+    protected function getModulePaths(): array
+    {
+        $paths = config('thinkrix.modules.paths', ['Modules']);
+        $root = app()->getRootPath();
+        return array_map(fn($p) => $root . $p . DIRECTORY_SEPARATOR, $paths);
+    }
+
     public function syncModules(): void
     {
-        $modulesDir = app()->getRootPath() . 'app' . DIRECTORY_SEPARATOR;
-        $scanPaths = [$modulesDir];
-
-        // 也扫描项目根目录下的 Modules/ 目录（兼容 laravel-modules 结构）
-        $legacyDir = app()->getRootPath() . 'Modules' . DIRECTORY_SEPARATOR;
-        if (is_dir($legacyDir)) {
-            $scanPaths[] = $legacyDir;
-        }
-
+        $scanPaths = $this->getModulePaths();
         $existingNames = [];
 
         foreach ($scanPaths as $scanDir) {

@@ -65,7 +65,8 @@ class MakeBackendCommand extends Command
         }
 
         // 模块目录
-        $moduleDir = $this->app->getRootPath() . 'app' . DIRECTORY_SEPARATOR . $name;
+        $root = $this->app->getRootPath();
+        $moduleDir = $root . config('thinkrix.modules.backend_path', 'app') . DIRECTORY_SEPARATOR . $name;
         if (is_dir($moduleDir)) {
             $output->error("二级后台模块 {$name} 已存在。");
             return 1;
