@@ -187,6 +187,15 @@ class ModuleGenerator
             );
         }
 
+        // 始终生成 composer.json（模块可声明自身依赖）
+        $composerJsonContent = $this->stubResolver->resolve('composer.json.stub', $replacements);
+        if (!empty($composerJsonContent)) {
+            file_put_contents(
+                $modulePath . DIRECTORY_SEPARATOR . 'composer.json',
+                $composerJsonContent
+            );
+        }
+
         // 非 plain 模式下生成示例文件
         if (!$isPlain) {
             // 生成配置文件

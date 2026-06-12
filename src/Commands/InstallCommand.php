@@ -91,6 +91,10 @@ class InstallCommand extends Command
         $output->writeln('');
         $output->writeln("管理员用户名: {$admin->username}");
 
+        // 11. 配置 composer merge-plugin
+        $output->info('11. 配置 Composer 模块依赖合并...');
+        $this->setupComposerMerge($output);
+
         return 0;
     }
 
@@ -128,6 +132,44 @@ class InstallCommand extends Command
         } else {
             $output->writeln('<error>   配置发布失败。</error>');
         }
+    }
+
+    protected function setupComposerMerge(Output $output): void
+    {
+        $composerFile = $this->app->getRootPath() . 'composer.json';
+        if (!file_exists($composerFile)) {
+            $output->writeln('<comment>   composer.json 不存在，跳过。</comment>');
+            return;
+        }
+
+        $content = file_get_contents($composerFile);
+        $config = json_decode($content, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $output->writeln('<comment>   composer.json 解析失败，跳过。</comment>');
+            return;
+        }
+
+        $modulePaths = ['app/*/composer.json', 'Modules/*/composer.json'];
+        if (!isset($config['extra'])) {
+            $config['extra'] = [];
+        }
+        if (!isset($config['extra']['merge-plugin'])) {
+            $config['extra']['merge-plugin'] = [];
+        }
+        if (!isset($config['extra']['merge-plugin']['include'])) {
+            $config['extra']['merge-plugin']['include'] = [];
+        }
+
+        $existing = $config['extra']['merge-plugin']['include'];
+        $merged = array_values(array_unique(array_merge($existing, $modulePaths)));
+        if ($merged === $existing) {
+            $output->writeln('   merge-plugin 已配置，跳过。');
+            return;
+        }
+
+        $config['extra']['merge-plugin']['include'] = $merged;
+        file_put_contents($composerFile, json_encode($config, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n");
+        $output->info('   已添加 merge-plugin 配置到 composer.json');
     }
 
     protected function runMigrations(Output $output): bool

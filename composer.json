@@ -1,6 +1,6 @@
 {
     "name": "lartrix/thinkrix",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "ThinkPHP 8 后台管理包，为 trix 前端提供 API 接口",
     "type": "library",
     "license": "MIT",
@@ -15,7 +15,8 @@
         "topthink/framework": "^8.0",
         "topthink/think-migration": "^3.1",
         "topthink/think-orm": "^3.0|^4.0",
-        "phpoffice/phpspreadsheet": "^2.0|^3.0"
+        "phpoffice/phpspreadsheet": "^2.0|^3.0",
+        "wikimedia/composer-merge-plugin": "^2.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0",

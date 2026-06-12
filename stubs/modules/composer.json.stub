@@ -1,0 +1,19 @@
+{
+    "name": "app/{{LOWER_NAME}}-module",
+    "description": "{{TITLE}} - 模块描述",
+    "type": "thinkrix-module",
+    "require": {
+        "php": ">=8.1",
+        "lartrix/thinkrix": ">=1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\{{MODULE_NAME}}\\": ""
+        }
+    },
+    "extra": {
+        "thinkrix": {
+            "module": "{{MODULE_NAME}}"
+        }
+    }
+}

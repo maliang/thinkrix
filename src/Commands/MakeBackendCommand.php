@@ -95,6 +95,16 @@ class MakeBackendCommand extends Command
         ]);
         file_put_contents($moduleDir . DIRECTORY_SEPARATOR . 'module.json', $moduleJsonContent);
 
+        // 创建 composer.json（模块可声明第三方依赖）
+        $composerJsonContent = $this->parseStub($stubsDir . DIRECTORY_SEPARATOR . 'composer.json.stub', [
+            '{{NAME}}' => $name,
+            '{{TITLE}}' => $title,
+            '{{LOWER_NAME}}' => $lowerName,
+        ]);
+        if (!empty($composerJsonContent)) {
+            file_put_contents($moduleDir . DIRECTORY_SEPARATOR . 'composer.json', $composerJsonContent);
+        }
+
         // 创建其他存根文件
         $stubFiles = [
             'route/app.php' => 'routes.stub',
