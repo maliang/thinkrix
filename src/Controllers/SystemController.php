@@ -211,7 +211,7 @@ class SystemController extends Controller
     public function getThemeConfig(): array
     {
         $settingModel = $this->getSettingModel();
-        $themeConfig = $settingModel::get('theme', $this->getDefaultThemeConfig());
+        $themeConfig = $settingModel::getValue('theme', $this->getDefaultThemeConfig());
         return success($themeConfig);
     }
 
@@ -219,7 +219,7 @@ class SystemController extends Controller
     {
         $data = request()->post();
         $settingModel = $this->getSettingModel();
-        $settingModel::set('theme', $data);
+        $settingModel::setValue('theme', $data);
         return success('保存成功');
     }
 
