@@ -1,0 +1,16 @@
+# AGENTS.md - {{NAME}} 模块开发指南
+
+## 模块结构
+
+```
+app/{{NAME}}/
+├── controller/
+├── model/
+├── route/
+├── config.php
+└── module.json
+```
+
+## API 路由
+
+所有路由以 `{{API_PREFIX}}` 为前缀。

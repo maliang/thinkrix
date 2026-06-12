@@ -1,0 +1,8 @@
+<?php
+
+use think\facade\Route;
+
+// {{MODULE_NAME}} 模块路由
+Route::group('{{LOWER_NAME}}', function () {
+    //
+})->middleware(\Thinkrix\Middleware\HandleApiException::class);

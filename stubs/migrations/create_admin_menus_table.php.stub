@@ -1,0 +1,31 @@
+<?php
+
+use think\migration\Migrator;
+
+class CreateAdminMenusTable extends Migrator
+{
+    public function change()
+    {
+        $table = $this->table('admin_menus', ['id' => true, 'engine' => 'InnoDB', 'collation' => 'utf8mb4_unicode_ci']);
+        $table->addColumn('guard_name', 'string', ['limit' => 50, 'default' => 'admin', 'comment' => '所属guard'])
+            ->addColumn('parent_id', 'integer', ['null' => true, 'comment' => '父级菜单ID'])
+            ->addColumn('name', 'string', ['limit' => 255, 'comment' => '路由名称'])
+            ->addColumn('path', 'string', ['limit' => 255, 'comment' => '路由路径'])
+            ->addColumn('component', 'string', ['limit' => 255, 'null' => true, 'comment' => '组件路径'])
+            ->addColumn('redirect', 'string', ['limit' => 255, 'null' => true, 'comment' => '重定向'])
+            ->addColumn('title', 'string', ['limit' => 255, 'null' => true, 'comment' => '菜单标题'])
+            ->addColumn('icon', 'string', ['limit' => 255, 'null' => true, 'comment' => '菜单图标'])
+            ->addColumn('order', 'integer', ['default' => 0, 'comment' => '排序'])
+            ->addColumn('hide_in_menu', 'boolean', ['default' => false, 'comment' => '是否隐藏'])
+            ->addColumn('keep_alive', 'boolean', ['default' => false, 'comment' => '是否缓存'])
+            ->addColumn('permissions', 'text', ['null' => true, 'comment' => '所需权限'])
+            ->addColumn('use_json_renderer', 'boolean', ['default' => false, 'comment' => 'JSON渲染'])
+            ->addColumn('schema_source', 'string', ['limit' => 255, 'null' => true, 'comment' => 'Schema来源'])
+            ->addColumn('layout_type', 'string', ['limit' => 50, 'null' => true, 'comment' => '布局类型'])
+            ->addColumn('open_type', 'string', ['limit' => 50, 'null' => true, 'comment' => '打开方式'])
+            ->addColumn('href', 'string', ['limit' => 255, 'null' => true, 'comment' => '外部链接'])
+            ->addTimestamps()
+            ->addIndex(['name', 'guard_name'], ['unique' => true, 'name' => 'uk_name_guard'])
+            ->create();
+    }
+}

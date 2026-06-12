@@ -1,0 +1,17 @@
+<?php
+
+use think\migration\Seeder;
+
+/**
+ * {{CLASS_NAME}} 数据填充
+ */
+class {{CLASS_NAME}} extends Seeder
+{
+    /**
+     * 执行数据填充
+     */
+    public function run(): void
+    {
+        //
+    }
+}

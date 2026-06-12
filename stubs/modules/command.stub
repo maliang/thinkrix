@@ -1,0 +1,26 @@
+<?php
+
+namespace {{NAMESPACE}};
+
+use think\console\Command;
+use think\console\Input;
+use think\console\Output;
+
+/**
+ * {{CLASS_NAME}} 命令
+ */
+class {{CLASS_NAME}} extends Command
+{
+    protected function configure(): void
+    {
+        $this->setName('{{LOWER_NAME}}:{{TABLE_NAME}}')
+             ->setDescription('{{CLASS_NAME}} command');
+    }
+
+    protected function execute(Input $input, Output $output): int
+    {
+        $output->writeln('{{CLASS_NAME}} command executed.');
+
+        return 0;
+    }
+}

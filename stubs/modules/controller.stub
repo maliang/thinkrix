@@ -1,0 +1,52 @@
+<?php
+
+namespace {{NAMESPACE}};
+
+use think\Request;
+use think\Response;
+
+/**
+ * {{CLASS_NAME}} 控制器
+ */
+class {{CLASS_NAME}}
+{
+    /**
+     * 列表
+     */
+    public function index(Request $request): Response
+    {
+        return json(['code' => 0, 'msg' => 'success', 'data' => []]);
+    }
+
+    /**
+     * 创建
+     */
+    public function store(Request $request): Response
+    {
+        return json(['code' => 0, 'msg' => '创建成功', 'data' => null]);
+    }
+
+    /**
+     * 详情
+     */
+    public function show(Request $request, int $id): Response
+    {
+        return json(['code' => 0, 'msg' => 'success', 'data' => null]);
+    }
+
+    /**
+     * 更新
+     */
+    public function update(Request $request, int $id): Response
+    {
+        return json(['code' => 0, 'msg' => '更新成功', 'data' => null]);
+    }
+
+    /**
+     * 删除
+     */
+    public function destroy(Request $request, int $id): Response
+    {
+        return json(['code' => 0, 'msg' => '删除成功', 'data' => null]);
+    }
+}

@@ -1,0 +1,7 @@
+<?php
+
+namespace {{namespace}};
+
+class Index extends \Thinkrix\Controllers\AuthController
+{
+}

@@ -1,0 +1,22 @@
+<?php
+
+use think\migration\Migrator;
+
+class CreateAdminSettingsTable extends Migrator
+{
+    public function change()
+    {
+        $table = $this->table('admin_settings', ['id' => true, 'engine' => 'InnoDB', 'collation' => 'utf8mb4_unicode_ci']);
+        $table->addColumn('group', 'string', ['limit' => 100, 'default' => 'general', 'comment' => '分组'])
+            ->addColumn('key', 'string', ['limit' => 100, 'comment' => '键名'])
+            ->addColumn('title', 'string', ['limit' => 255, 'null' => true, 'comment' => '标题'])
+            ->addColumn('type', 'string', ['limit' => 50, 'default' => 'string', 'comment' => '类型'])
+            ->addColumn('value', 'text', ['null' => true, 'comment' => '值'])
+            ->addColumn('default_value', 'text', ['null' => true, 'comment' => '默认值'])
+            ->addColumn('description', 'text', ['null' => true, 'comment' => '描述'])
+            ->addColumn('sort', 'integer', ['default' => 0, 'comment' => '排序'])
+            ->addTimestamps()
+            ->addIndex(['key'], ['unique' => true, 'name' => 'uk_key'])
+            ->create();
+    }
+}

@@ -1,0 +1,6 @@
+<?php
+
+// {{MODULE_NAME}} 模块配置
+return [
+
+];

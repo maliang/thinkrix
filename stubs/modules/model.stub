@@ -1,0 +1,16 @@
+<?php
+
+namespace {{NAMESPACE}};
+
+use think\Model;
+
+/**
+ * {{CLASS_NAME}} 模型
+ */
+class {{CLASS_NAME}} extends Model
+{
+    /**
+     * 数据表名
+     */
+    protected $table = '{{TABLE_NAME}}';
+}

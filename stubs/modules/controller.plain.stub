@@ -1,0 +1,13 @@
+<?php
+
+namespace {{NAMESPACE}};
+
+use think\Request;
+
+/**
+ * {{CLASS_NAME}} 控制器
+ */
+class {{CLASS_NAME}}
+{
+    //
+}

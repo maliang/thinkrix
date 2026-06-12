@@ -1,0 +1,37 @@
+<?php
+
+namespace app\{{NAME}}\middleware;
+
+use Closure;
+use think\Request;
+
+class BackendContext
+{
+    public function handle(Request $request, Closure $next)
+    {
+        $config = app()->config;
+        $original = $config->get('thinkrix', []);
+        $backend = $config->get('module_{{LOWER_NAME}}.backend', []);
+
+        $overrides = [
+            'guard' => $backend['guard'] ?? '{{LOWER_NAME}}',
+            'path' => $backend['path'] ?? '{{PATH}}',
+            'api_prefix' => $backend['api_prefix'] ?? '{{API_PREFIX}}',
+            'app_title' => $backend['title'] ?? '{{TITLE}}',
+        ];
+
+        foreach (['models', 'tables'] as $key) {
+            if (!empty($backend[$key]) && is_array($backend[$key])) {
+                $overrides[$key] = $backend[$key];
+            }
+        }
+
+        $config->set(array_replace_recursive($original, $overrides), 'thinkrix');
+
+        try {
+            return $next($request);
+        } finally {
+            $config->set($original, 'thinkrix');
+        }
+    }
+}

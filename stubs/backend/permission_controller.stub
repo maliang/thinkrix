@@ -1,0 +1,7 @@
+<?php
+
+namespace {{namespace}};
+
+class Permission extends \Thinkrix\Controllers\PermissionController
+{
+}

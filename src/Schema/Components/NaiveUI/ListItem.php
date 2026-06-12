@@ -1,0 +1,21 @@
+<?php
+
+namespace Thinkrix\Schema\Components\NaiveUI;
+
+use Thinkrix\Schema\Components\Component;
+
+/**
+ * NListItem - Naive UI 列表项组件
+ */
+class ListItem extends Component
+{
+    public function __construct()
+    {
+        parent::__construct('NListItem');
+    }
+
+    public static function make(): static
+    {
+        return new static();
+    }
+}

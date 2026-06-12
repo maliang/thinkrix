@@ -1,0 +1,8 @@
+<?php
+
+namespace app\{{NAME}}\model;
+
+class AdminUser extends \Thinkrix\Models\AdminUser
+{
+    protected $table = '{{LOWER_NAME}}_admin_users';
+}

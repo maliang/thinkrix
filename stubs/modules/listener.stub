@@ -1,0 +1,17 @@
+<?php
+
+namespace {{NAMESPACE}};
+
+/**
+ * {{CLASS_NAME}} 事件监听器
+ */
+class {{CLASS_NAME}}
+{
+    /**
+     * 处理事件
+     */
+    public function handle(object $event): void
+    {
+        //
+    }
+}

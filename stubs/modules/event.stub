@@ -1,0 +1,19 @@
+<?php
+
+namespace {{NAMESPACE}};
+
+/**
+ * {{CLASS_NAME}} 事件类
+ */
+class {{CLASS_NAME}}
+{
+    /**
+     * 事件数据
+     */
+    public mixed $data;
+
+    public function __construct(mixed $data = null)
+    {
+        $this->data = $data;
+    }
+}

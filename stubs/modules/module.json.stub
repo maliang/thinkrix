@@ -1,0 +1,15 @@
+{
+    "name": "{{MODULE_NAME}}",
+    "alias": "{{LOWER_NAME}}",
+    "title": "{{TITLE}}",
+    "description": "",
+    "version": "1.0.0",
+    "author": "",
+    "providers": [],
+    "enabled": true,
+    "middleware": {
+        "route": [],
+        "global": []
+    },
+    "listeners": {}
+}

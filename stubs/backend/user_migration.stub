@@ -1,0 +1,58 @@
+<?php
+
+use think\migration\Migrator;
+
+class Create{{MIGRATION_NAME}}AdminUsersTable extends Migrator
+{
+    public function up(): void
+    {
+        $table = $this->table('{{LOWER_NAME}}_admin_users');
+        $table->addColumn('username', 'string', ['limit' => 20])
+            ->addColumn('password', 'string')
+            ->addColumn('nickname', 'string', ['limit' => 20, 'null' => true])
+            ->addColumn('avatar', 'string', ['null' => true])
+            ->addColumn('email', 'string', ['null' => true])
+            ->addColumn('phone', 'string', ['limit' => 20, 'null' => true])
+            ->addColumn('status', 'string', ['limit' => 10, 'default' => '1'])
+            ->addColumn('remark', 'string', ['null' => true])
+            ->addColumn('last_login_ip', 'string', ['limit' => 45, 'null' => true])
+            ->addColumn('last_login_time', 'datetime', ['null' => true])
+            ->addColumn('deleted_at', 'datetime', ['null' => true])
+            ->addTimestamps('created_at', 'updated_at')
+            ->addIndex(['username'], ['unique' => true])
+            ->create();
+
+        $userId = app('db')->name('{{LOWER_NAME}}_admin_users')->insertGetId([
+            'username' => '{{ADMIN_USERNAME}}',
+            'password' => '{{ADMIN_PASSWORD_HASH}}',
+            'nickname' => '超级管理员',
+            'status' => '1',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        $role = app('db')->name('roles')->where('name', 'super-admin')->where('guard_name', '{{LOWER_NAME}}')->find();
+        $roleId = $role['id'] ?? app('db')->name('roles')->insertGetId([
+            'name' => 'super-admin',
+            'title' => '超级管理员',
+            'guard_name' => '{{LOWER_NAME}}',
+            'status' => 1,
+            'is_system' => 1,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        app('db')->name('model_has_roles')->insert([
+            'role_id' => $roleId,
+            'model_type' => \app\{{NAME}}\model\AdminUser::class,
+            'model_id' => $userId,
+        ]);
+    }
+
+    public function down(): void
+    {
+        app('db')->name('model_has_roles')->where('model_type', \app\{{NAME}}\model\AdminUser::class)->delete();
+        app('db')->name('roles')->where('guard_name', '{{LOWER_NAME}}')->where('name', 'super-admin')->delete();
+        $this->table('{{LOWER_NAME}}_admin_users')->drop()->save();
+    }
+}

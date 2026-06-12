@@ -1,0 +1,26 @@
+<?php
+
+namespace {{NAMESPACE}};
+
+use think\Validate;
+
+/**
+ * {{CLASS_NAME}} 验证器
+ */
+class {{CLASS_NAME}} extends Validate
+{
+    /**
+     * 验证规则
+     */
+    protected $rule = [];
+
+    /**
+     * 错误提示
+     */
+    protected $message = [];
+
+    /**
+     * 验证场景
+     */
+    protected $scene = [];
+}

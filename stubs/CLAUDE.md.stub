@@ -1,0 +1,21 @@
+# CLAUDE.md - Thinkrix 项目开发指南
+
+## 项目结构
+
+- `app/` - 应用代码
+- `config/` - 配置文件
+- `route/` - 路由配置
+- `public/admin/` - 前端资源（通过 `php think thinkrix:publish` 发布）
+
+## 常用命令
+
+```bash
+php think thinkrix:install    # 安装 Thinkrix
+php think thinkrix:publish    # 发布前端资源
+php think thinkrix:make-backend  # 创建二级后台
+php think migrate:run         # 执行迁移
+```
+
+## Schema 组件
+
+使用 Thinkrix Schema Builder 构建 JSON Schema。

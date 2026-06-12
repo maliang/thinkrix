@@ -1,0 +1,7 @@
+<?php
+
+namespace {{namespace}};
+
+class Role extends \Thinkrix\Controllers\RoleController
+{
+}

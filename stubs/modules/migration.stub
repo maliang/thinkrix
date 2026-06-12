@@ -1,0 +1,29 @@
+<?php
+
+use think\migration\Migrator;
+use think\migration\db\Column;
+
+/**
+ * {{CLASS_NAME}} 迁移
+ */
+class {{CLASS_NAME}} extends Migrator
+{
+    /**
+     * 执行迁移
+     */
+    public function up(): void
+    {
+        $table = $this->table('{{TABLE_NAME}}');
+        $table->addColumn('created_at', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])
+              ->addColumn('updated_at', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])
+              ->create();
+    }
+
+    /**
+     * 回滚迁移
+     */
+    public function down(): void
+    {
+        $this->table('{{TABLE_NAME}}')->drop()->save();
+    }
+}

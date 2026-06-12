@@ -1,0 +1,26 @@
+<?php
+
+namespace Thinkrix\Schema\Components\NaiveUI;
+
+use Thinkrix\Schema\Components\Component;
+
+/**
+ * NElement - Naive UI 元素组件
+ */
+class Element extends Component
+{
+    public function __construct()
+    {
+        parent::__construct('NElement');
+    }
+
+    public static function make(): static
+    {
+        return new static();
+    }
+
+    public function tag(string $tag): static
+    {
+        return $this->props(['tag' => $tag]);
+    }
+}

@@ -1,0 +1,17 @@
+<?php
+
+return [
+    'backend' => [
+        'name' => '{{NAME}}',
+        'title' => '{{TITLE}}',
+        'path' => '{{PATH}}',
+        'api_prefix' => '{{API_PREFIX}}',
+        'guard' => '{{LOWER_NAME}}',
+        'models' => [
+            'user' => \app\{{NAME}}\model\AdminUser::class,
+        ],
+        'tables' => [
+            'users' => '{{LOWER_NAME}}_admin_users',
+        ],
+    ],
+];

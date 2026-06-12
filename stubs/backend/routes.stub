@@ -1,0 +1,32 @@
+<?php
+
+use think\facade\Route;
+
+Route::group('{{API_PREFIX}}', function () {
+    Route::post('login', '{{namespace}}\Index@login');
+
+    Route::group(function () {
+        Route::get('menus', '{{namespace}}\Menu@index');
+
+        Route::get('users', '{{namespace}}\User@index')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.user.list');
+        Route::post('users', '{{namespace}}\User@store')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.user.create');
+        Route::get('users/<id>', '{{namespace}}\User@show')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.user.list');
+        Route::put('users/<id>', '{{namespace}}\User@update')->middleware(\Thinkrix\Middleware\CheckPermission::class, '*=system.user.update', 'status=system.user.status', 'reset_password=system.user.password');
+        Route::delete('users/<id>', '{{namespace}}\User@destroy')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.user.delete');
+
+        Route::get('roles', '{{namespace}}\Role@index')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.role.list');
+        Route::post('roles', '{{namespace}}\Role@store')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.role.create');
+        Route::get('roles/<id>', '{{namespace}}\Role@show')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.role.list');
+        Route::put('roles/<id>', '{{namespace}}\Role@update')->middleware(\Thinkrix\Middleware\CheckPermission::class, '*=system.role.update', 'permissions=system.role.permissions');
+        Route::delete('roles/<id>', '{{namespace}}\Role@destroy')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.role.delete');
+
+        Route::get('permissions', '{{namespace}}\Permission@index')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.permission.list');
+        Route::post('permissions', '{{namespace}}\Permission@store')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.permission.create');
+        Route::get('permissions/<id>', '{{namespace}}\Permission@show')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.permission.list');
+        Route::put('permissions/<id>', '{{namespace}}\Permission@update')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.permission.update');
+        Route::delete('permissions/<id>', '{{namespace}}\Permission@destroy')->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.permission.delete');
+
+        Route::get('system', '{{namespace}}\System@headerRight');
+    })->middleware(\Thinkrix\Middleware\Authenticate::class);
+})->middleware(\app\{{NAME}}\middleware\BackendContext::class)
+    ->middleware(\Thinkrix\Middleware\HandleApiException::class);

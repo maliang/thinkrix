@@ -1,0 +1,27 @@
+<?php
+
+namespace {{NAMESPACE}};
+
+use Closure;
+use think\Request;
+use think\Response;
+
+/**
+ * {{CLASS_NAME}} 中间件
+ */
+class {{CLASS_NAME}}
+{
+    /**
+     * 处理请求
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        // 前置操作
+
+        $response = $next($request);
+
+        // 后置操作
+
+        return $response;
+    }
+}

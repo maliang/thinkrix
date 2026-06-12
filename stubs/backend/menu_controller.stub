@@ -1,0 +1,7 @@
+<?php
+
+namespace {{namespace}};
+
+class Menu extends \Thinkrix\Controllers\MenuController
+{
+}
