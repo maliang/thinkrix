@@ -229,6 +229,58 @@ class ModuleGenerator
                     $controllerContent
                 );
             }
+
+            // 生成安装命令
+            $installReplacements = array_merge($replacements, [
+                '{{NAMESPACE}}' => "app\\{$moduleName}\\command",
+                '{{CLASS_NAME}}' => 'InstallCommand',
+            ]);
+            $installContent = $this->stubResolver->resolve('install.stub', $installReplacements);
+            if (!empty($installContent)) {
+                file_put_contents(
+                    $modulePath . DIRECTORY_SEPARATOR . 'command' . DIRECTORY_SEPARATOR . 'InstallCommand.php',
+                    $installContent
+                );
+            }
+
+            // 生成卸载命令
+            $uninstallReplacements = array_merge($replacements, [
+                '{{NAMESPACE}}' => "app\\{$moduleName}\\command",
+                '{{CLASS_NAME}}' => 'UninstallCommand',
+            ]);
+            $uninstallContent = $this->stubResolver->resolve('uninstall.stub', $uninstallReplacements);
+            if (!empty($uninstallContent)) {
+                file_put_contents(
+                    $modulePath . DIRECTORY_SEPARATOR . 'command' . DIRECTORY_SEPARATOR . 'UninstallCommand.php',
+                    $uninstallContent
+                );
+            }
+
+            // 生成默认迁移文件
+            $migrationReplacements = array_merge($replacements, [
+                '{{CLASS_NAME}}' => 'Create' . $moduleName . 'Table',
+                '{{TABLE_NAME}}' => $lowerName,
+            ]);
+            $migrationContent = $this->stubResolver->resolve('migration.stub', $migrationReplacements);
+            if (!empty($migrationContent)) {
+                $migrationFile = date('YmdHis') . '_create_' . $lowerName . '_table.php';
+                file_put_contents(
+                    $modulePath . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations' . DIRECTORY_SEPARATOR . $migrationFile,
+                    $migrationContent
+                );
+            }
+
+            // 生成默认 Seeder 文件
+            $seederReplacements = array_merge($replacements, [
+                '{{CLASS_NAME}}' => 'DatabaseSeeder',
+            ]);
+            $seederContent = $this->stubResolver->resolve('seeder.stub', $seederReplacements);
+            if (!empty($seederContent)) {
+                file_put_contents(
+                    $modulePath . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'seeders' . DIRECTORY_SEPARATOR . 'DatabaseSeeder.php',
+                    $seederContent
+                );
+            }
         }
 
         return true;

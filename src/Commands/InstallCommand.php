@@ -264,6 +264,7 @@ class InstallCommand extends Command
             "CREATE TABLE IF NOT EXISTS `admin_menus` (
                 `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
                 `guard_name` varchar(50) NOT NULL DEFAULT 'admin' COMMENT '所属guard',
+                `module` varchar(255) DEFAULT NULL COMMENT '所属模块',
                 `parent_id` int UNSIGNED DEFAULT NULL COMMENT '父级菜单ID',
                 `name` varchar(255) NOT NULL COMMENT '路由名称',
                 `path` varchar(255) NOT NULL COMMENT '路由路径',
@@ -435,7 +436,7 @@ class InstallCommand extends Command
     protected function createBasePermissions(Output $output): void
     {
         $permissionTree = [
-            ['name' => 'system', 'title' => '系统管理', 'module' => 'system', 'sort' => 9999, 'children' => [
+            ['name' => 'system', 'title' => '系统管理', 'module' => 'thinkrix', 'sort' => 9999, 'children' => [
                 ['name' => 'system.user', 'title' => '用户管理', 'sort' => 1, 'children' => [
                     ['name' => 'system.user.list', 'title' => '用户列表', 'sort' => 1],
                     ['name' => 'system.user.create', 'title' => '创建用户', 'sort' => 2],
@@ -475,7 +476,7 @@ class InstallCommand extends Command
                     ['name' => 'system.dict.delete', 'title' => '删除字典', 'sort' => 4],
                 ]],
             ]],
-            ['name' => 'module', 'title' => '模块管理', 'module' => 'system', 'sort' => 9980, 'children' => [
+            ['name' => 'module', 'title' => '模块管理', 'module' => 'thinkrix', 'sort' => 9980, 'children' => [
                 ['name' => 'module.installed', 'title' => '已装模块', 'sort' => 1, 'children' => [
                     ['name' => 'module.installed.list', 'title' => '模块列表', 'sort' => 1],
                     ['name' => 'module.installed.enable', 'title' => '启用模块', 'sort' => 2],
@@ -515,15 +516,15 @@ class InstallCommand extends Command
     protected function createDefaultMenus(Output $output): void
     {
         $menus = [
-            ['name' => 'home', 'path' => '/home', 'title' => '首页', 'icon' => 'mdi:home', 'order' => 1, 'use_json_renderer' => true, 'schema_source' => '/dashboard'],
-            ['name' => 'system', 'path' => '/system', 'redirect' => '/system/user', 'title' => '系统管理', 'icon' => 'mdi:cog', 'order' => 9999, 'children' => [
-                ['name' => 'system.user', 'path' => 'user', 'title' => '成员管理', 'icon' => 'mdi:account-group', 'order' => 1, 'use_json_renderer' => true, 'schema_source' => '/users?action_type=list_ui'],
-                ['name' => 'system.role', 'path' => 'role', 'title' => '角色管理', 'icon' => 'mdi:account-key', 'order' => 2, 'use_json_renderer' => true, 'schema_source' => '/roles?action_type=list_ui'],
-                ['name' => 'system.menu', 'path' => 'menu', 'title' => '菜单管理', 'icon' => 'mdi:menu', 'order' => 3, 'use_json_renderer' => true, 'schema_source' => '/menus?action_type=list_ui'],
-                ['name' => 'system.permission', 'path' => 'permission', 'title' => '权限管理', 'icon' => 'mdi:shield-key', 'order' => 4, 'use_json_renderer' => true, 'schema_source' => '/permissions?action_type=list_ui'],
-                ['name' => 'system.setting', 'path' => 'setting', 'title' => '系统设置', 'icon' => 'mdi:cog-outline', 'order' => 5, 'use_json_renderer' => true, 'schema_source' => '/settings?action_type=form_ui'],
-                ['name' => 'system.dict', 'path' => 'dict', 'title' => '字典管理', 'icon' => 'mdi:book-open', 'order' => 6, 'use_json_renderer' => true, 'schema_source' => '/dicts/groups?action_type=list_ui'],
-                ['name' => 'system.module', 'path' => 'module', 'title' => '模块管理', 'icon' => 'mdi:puzzle', 'order' => 7, 'use_json_renderer' => true, 'schema_source' => '/modules?action_type=installed_ui'],
+            ['name' => 'home', 'path' => '/home', 'title' => '首页', 'icon' => 'mdi:home', 'order' => 1, 'use_json_renderer' => true, 'schema_source' => '/dashboard', 'module' => 'thinkrix'],
+            ['name' => 'system', 'path' => '/system', 'redirect' => '/system/user', 'title' => '系统管理', 'icon' => 'mdi:cog', 'order' => 9999, 'module' => 'thinkrix', 'children' => [
+                ['name' => 'system.user', 'path' => 'user', 'title' => '成员管理', 'icon' => 'mdi:account-group', 'order' => 1, 'use_json_renderer' => true, 'schema_source' => '/users?action_type=list_ui', 'module' => 'thinkrix'],
+                ['name' => 'system.role', 'path' => 'role', 'title' => '角色管理', 'icon' => 'mdi:account-key', 'order' => 2, 'use_json_renderer' => true, 'schema_source' => '/roles?action_type=list_ui', 'module' => 'thinkrix'],
+                ['name' => 'system.menu', 'path' => 'menu', 'title' => '菜单管理', 'icon' => 'mdi:menu', 'order' => 3, 'use_json_renderer' => true, 'schema_source' => '/menus?action_type=list_ui', 'module' => 'thinkrix'],
+                ['name' => 'system.permission', 'path' => 'permission', 'title' => '权限管理', 'icon' => 'mdi:shield-key', 'order' => 4, 'use_json_renderer' => true, 'schema_source' => '/permissions?action_type=list_ui', 'module' => 'thinkrix'],
+                ['name' => 'system.setting', 'path' => 'setting', 'title' => '系统设置', 'icon' => 'mdi:cog-outline', 'order' => 5, 'use_json_renderer' => true, 'schema_source' => '/settings?action_type=form_ui', 'module' => 'thinkrix'],
+                ['name' => 'system.dict', 'path' => 'dict', 'title' => '字典管理', 'icon' => 'mdi:book-open', 'order' => 6, 'use_json_renderer' => true, 'schema_source' => '/dicts/groups?action_type=list_ui', 'module' => 'thinkrix'],
+                ['name' => 'system.module', 'path' => 'module', 'title' => '模块管理', 'icon' => 'mdi:puzzle', 'order' => 7, 'use_json_renderer' => true, 'schema_source' => '/modules?action_type=installed_ui', 'module' => 'thinkrix'],
             ]],
         ];
 
@@ -551,6 +552,7 @@ class InstallCommand extends Command
             'use_json_renderer' => $data['use_json_renderer'] ?? false,
             'schema_source' => $data['schema_source'] ?? null,
             'redirect' => $data['redirect'] ?? null,
+            'module' => $data['module'] ?? null,
         ];
 
         $exists = Menu::where('name', $menuData['name'])->where('guard_name', $menuData['guard_name'])->find();

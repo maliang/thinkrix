@@ -11,5 +11,7 @@
         "route": [],
         "global": []
     },
-    "listeners": {}
+    "listeners": {},
+    "menus": [],
+    "permissions": []
 }

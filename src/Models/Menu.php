@@ -11,6 +11,7 @@ use think\model\relation\BelongsTo;
  *
  * @property int $id
  * @property string $guard_name
+ * @property string|null $module
  * @property int|null $parent_id
  * @property string $name
  * @property string $path
@@ -59,6 +60,7 @@ class Menu extends Model
         'title', 'icon', 'order', 'hide_in_menu', 'keep_alive', 'permissions',
         'use_json_renderer', 'schema_source', 'layout_type', 'open_type', 'href',
         'is_default_after_login', 'fixed_index_in_tab', 'requires_auth', 'active_menu',
+        'module',
     ];
 
     /**
