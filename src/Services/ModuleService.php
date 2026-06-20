@@ -166,11 +166,30 @@ class ModuleService extends BaseService
      */
     public function install(string $name): bool
     {
+        // 尝试从文件系统发现模块（不依赖 syncModules 前置调用）
         $module = Module::where('name', $name)->find();
-        if (!$module) { return false; }
+        if (!$module) {
+            $modulePath = $this->findModulePath($name);
+            if (!$modulePath) { return false; }
+            $moduleJsonPath = $modulePath . DIRECTORY_SEPARATOR . 'module.json';
+            if (!file_exists($moduleJsonPath)) { return false; }
+            $json = json_decode(file_get_contents($moduleJsonPath), true) ?: [];
+            $module = new Module([
+                'name' => $name,
+                'enabled' => false,
+                'title' => $json['title'] ?? $name,
+                'description' => $json['description'] ?? '',
+                'version' => $json['version'] ?? '1.0.0',
+                'author' => $json['author'] ?? '',
+                'website' => $json['website'] ?? $json['url'] ?? '',
+                'logo' => $json['logo'] ?? '',
+                'config' => $json,
+            ]);
+            $module->save();
+        }
         if ($module->enabled) { return true; }
 
-        $modulePath = $this->findModulePath($name);
+        $modulePath = $modulePath ?? $this->findModulePath($name);
         if (!$modulePath) { return false; }
 
         $moduleJsonPath = $modulePath . DIRECTORY_SEPARATOR . 'module.json';
