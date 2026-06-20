@@ -3,6 +3,6 @@
 use think\facade\Route;
 
 // {{MODULE_NAME}} 模块路由
-Route::group('{{LOWER_NAME}}', function () {
+Route::group('api/admin', function () {
     //
 })->middleware(\Thinkrix\Middleware\HandleApiException::class);

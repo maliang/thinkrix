@@ -285,7 +285,7 @@ class ModuleGeneratorTest extends TestCase
 
         // 检查命名空间
         $content = file_get_contents($filePath);
-        $this->assertStringContainsString('app\\Blog\\controller', $content);
+        $this->assertStringContainsString('Modules\\Blog\\controller', $content);
         $this->assertStringContainsString('User', $content);
     }
 
@@ -355,7 +355,7 @@ class ModuleGeneratorTest extends TestCase
         $this->assertFileExists($filePath);
 
         $content = file_get_contents($filePath);
-        $this->assertStringContainsString('app\\Blog\\command', $content);
+        $this->assertStringContainsString('Modules\\Blog\\command', $content);
         $this->assertStringContainsString('SyncData', $content);
     }
 

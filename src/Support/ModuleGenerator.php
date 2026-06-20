@@ -173,7 +173,7 @@ class ModuleGenerator
             '{{MODULE_NAME}}' => $moduleName,
             '{{TITLE}}'       => $options['title'] ?? $moduleName,
             '{{LOWER_NAME}}'  => $lowerName,
-            '{{NAMESPACE}}'   => "app\\{$moduleName}",
+            '{{NAMESPACE}}'   => "Modules\\{$moduleName}",
             '{{CLASS_NAME}}'  => $moduleName,
             '{{TABLE_NAME}}'  => '',
             '{{TIMESTAMP}}'   => date('YmdHis'),
@@ -219,7 +219,7 @@ class ModuleGenerator
 
             // 生成示例控制器
             $controllerReplacements = array_merge($replacements, [
-                '{{NAMESPACE}}' => "app\\{$moduleName}\\controller",
+                '{{NAMESPACE}}' => "Modules\\{$moduleName}\\controller",
                 '{{CLASS_NAME}}' => 'Index',
             ]);
             $controllerContent = $this->stubResolver->resolve('controller.stub', $controllerReplacements);
@@ -227,32 +227,6 @@ class ModuleGenerator
                 file_put_contents(
                     $modulePath . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'Index.php',
                     $controllerContent
-                );
-            }
-
-            // 生成安装命令
-            $installReplacements = array_merge($replacements, [
-                '{{NAMESPACE}}' => "app\\{$moduleName}\\command",
-                '{{CLASS_NAME}}' => 'InstallCommand',
-            ]);
-            $installContent = $this->stubResolver->resolve('install.stub', $installReplacements);
-            if (!empty($installContent)) {
-                file_put_contents(
-                    $modulePath . DIRECTORY_SEPARATOR . 'command' . DIRECTORY_SEPARATOR . 'InstallCommand.php',
-                    $installContent
-                );
-            }
-
-            // 生成卸载命令
-            $uninstallReplacements = array_merge($replacements, [
-                '{{NAMESPACE}}' => "app\\{$moduleName}\\command",
-                '{{CLASS_NAME}}' => 'UninstallCommand',
-            ]);
-            $uninstallContent = $this->stubResolver->resolve('uninstall.stub', $uninstallReplacements);
-            if (!empty($uninstallContent)) {
-                file_put_contents(
-                    $modulePath . DIRECTORY_SEPARATOR . 'command' . DIRECTORY_SEPARATOR . 'UninstallCommand.php',
-                    $uninstallContent
                 );
             }
 
@@ -316,10 +290,10 @@ class ModuleGenerator
         $className = $this->studlyCase($name);
 
         // 确定命名空间（migration 类型不需要命名空间目录）
-        $namespace = "app\\{$moduleName}\\{$directory}";
+        $namespace = "Modules\\{$moduleName}\\{$directory}";
         if ($type === 'migration' || $type === 'seeder') {
             // migration 和 seeder 使用 database 子目录，命名空间保持到 database 层
-            $namespace = "app\\{$moduleName}\\database";
+            $namespace = "Modules\\{$moduleName}\\database";
         }
 
         // 构建表名（snake_case）

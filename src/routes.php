@@ -148,6 +148,10 @@ Route::group($prefix, function () use (
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.enable');
             Route::put('<name>/disable', "{$moduleController}@disable")
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.disable');
+            Route::put('<name>/install', "{$moduleController}@install")
+                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.list');
+            Route::put('<name>/uninstall', "{$moduleController}@uninstall")
+                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.list');
         });
 
         // 设置管理

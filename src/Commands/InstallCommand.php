@@ -163,6 +163,22 @@ class InstallCommand extends Command
         }
 
         $config['extra']['merge-plugin']['include'] = $merged;
+
+        // 添加 Modules PSR-4 自动加载映射
+        if (!isset($config['autoload'])) {
+            $config['autoload'] = [];
+        }
+        if (!isset($config['autoload']['psr-4'])) {
+            $config['autoload']['psr-4'] = [];
+        }
+        if (!isset($config['autoload']['psr-4']["Modules\\"])) {
+            $config['autoload']['psr-4']["Modules\\"] = "Modules";
+            $modified = true;
+            $output->info('   已添加 Modules PSR-4 映射到 composer.json');
+        } else {
+            $output->writeln('   Modules PSR-4 映射已存在，跳过。');
+        }
+
         file_put_contents($composerFile, json_encode($config, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n");
         $output->info('   已添加 merge-plugin 配置到 composer.json');
     }

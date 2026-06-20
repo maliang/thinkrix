@@ -265,7 +265,7 @@ class ModuleLoader
 
         foreach ($files as $file) {
             try {
-                $className = 'app\\' . $moduleName . '\\command\\' . basename($file, '.php');
+                $className = 'Modules\\' . $moduleName . '\\command\\' . basename($file, '.php');
 
                 // class_exists 会触发自动加载，可能抛出语法错误
                 if (class_exists($className) && is_subclass_of($className, \think\console\Command::class)) {

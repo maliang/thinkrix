@@ -63,6 +63,8 @@ class ThinkrixService extends Service
         'thinkrix:module-publish-stubs' => \Thinkrix\Commands\Module\PublishStubsCommand::class,
         'thinkrix:module-publish-config' => \Thinkrix\Commands\Module\PublishConfigCommand::class,
         'thinkrix:module-route-list' => \Thinkrix\Commands\Module\RouteListCommand::class,
+        'thinkrix:module-install' => \Thinkrix\Commands\Module\InstallModuleCommand::class,
+        'thinkrix:module-uninstall' => \Thinkrix\Commands\Module\UninstallModuleCommand::class,
     ];
 
     /**

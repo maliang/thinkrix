@@ -75,6 +75,22 @@ class ModuleController extends Controller
         return success('禁用成功');
     }
 
+    public function install(string $name): array
+    {
+        if (!$this->moduleService->exists($name)) { error('模块不存在', null, 40102); }
+        $result = $this->moduleService->install($name);
+        if (!$result) { error('安装失败', null, 40000); }
+        return success('安装成功');
+    }
+
+    public function uninstall(string $name): array
+    {
+        if (!$this->moduleService->exists($name)) { error('模块不存在', null, 40102); }
+        $result = $this->moduleService->uninstall($name);
+        if (!$result) { error('卸载失败', null, 40000); }
+        return success('卸载成功');
+    }
+
     public function logo(string $name)
     {
         $root = app()->getRootPath();
@@ -146,6 +162,8 @@ class ModuleController extends Controller
                 ],
                 'handleEnable' => [FetchAction::make('/modules/{{ $event }}/enable')->put()->then([CallAction::make('$message.success', ['启用成功']), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "启用失败" }}'])])],
                 'handleDisable' => [FetchAction::make('/modules/{{ $event }}/disable')->put()->then([CallAction::make('$message.success', ['禁用成功']), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "禁用失败" }}'])])],
+                'handleInstall' => [FetchAction::make('/modules/{{ $event }}/install')->put()->then([CallAction::make('$message.success', ['安装成功']), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "安装失败" }}'])])],
+                'handleUninstall' => [FetchAction::make('/modules/{{ $event }}/uninstall')->put()->then([CallAction::make('$message.success', ['卸载成功']), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "卸载失败" }}'])])],
                 'handleOpenMarket' => [SetAction::make('marketVisible', true)],
                 'handleCloseMarket' => [SetAction::make('marketVisible', false)],
                 'handlePageChange' => [SetAction::make('pagination.page', '{{ $event }}'), CallAction::make('loadData')],
@@ -185,10 +203,13 @@ class ModuleController extends Controller
                             ['key' => 'author', 'title' => '作者', 'width' => 100],
                             ['key' => 'website', 'title' => '网址', 'width' => 120, 'ellipsis' => true, 'slot' => [Button::make()->if('slotData.row.website')->size('small')->props(['text' => true, 'type' => 'primary', 'tag' => 'a', 'href' => '{{ slotData.row.website }}', 'target' => '_blank'])->children(['访问'])]],
                             ['key' => 'enabled', 'title' => '状态', 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.enabled ? 'success' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.enabled ? '已启用' : '已禁用' }}"])]],
-                            ['key' => 'actions', 'title' => '操作', 'width' => 120, 'slot' => [
+                            ['key' => 'actions', 'title' => '操作', 'width' => 160, 'slot' => [
                                 Space::make()->children([
-                                    Button::make()->if('!slotData.row.enabled')->size('small')->type('primary')->props(['text' => true])->on('click', ['call' => 'handleEnable', 'args' => ['{{ slotData.row.name }}']])->text('启用'),
-                                    Popconfirm::make()->if('slotData.row.enabled')->on('positive-click', ['call' => 'handleDisable', 'args' => ['{{ slotData.row.name }}']])->slot('trigger', [Button::make()->size('small')->type('warning')->props(['text' => true])->text('禁用')])->children(['确定禁用该模块？']),
+                                    // 未安装：显示安装按钮
+                                    Button::make()->if('!slotData.row.enabled')->size('small')->type('primary')->props(['text' => true])->on('click', ['call' => 'handleInstall', 'args' => ['{{ slotData.row.name }}']])->text('安装'),
+                                    // 已安装：显示禁用和卸载
+                                    Button::make()->if('slotData.row.enabled')->size('small')->type('warning')->props(['text' => true])->on('click', ['call' => 'handleDisable', 'args' => ['{{ slotData.row.name }}']])->text('禁用'),
+                                    Popconfirm::make()->if('slotData.row.enabled')->on('positive-click', ['call' => 'handleUninstall', 'args' => ['{{ slotData.row.name }}']])->slot('trigger', [Button::make()->size('small')->type('error')->props(['text' => true])->text('卸载')])->children(['确定卸载该模块？将删除菜单和权限，并回滚数据库迁移。']),
                                 ]),
                             ]],
                         ]),
