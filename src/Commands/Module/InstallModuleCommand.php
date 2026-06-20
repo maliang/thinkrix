@@ -33,11 +33,21 @@ class InstallModuleCommand extends BaseModuleCommand
         $names = $input->getArgument('name');
         $moduleService = new ModuleService();
 
-        // 不传参数则扫描所有未安装的模块
+        // 不传参数则扫描所有模块目录
         if (empty($names)) {
-            $allModules = Module::where('enabled', false)->select();
-            foreach ($allModules as $m) {
-                $this->installSingle($m->name, $moduleService, $output);
+            $paths = config('thinkrix.modules.paths', ['Modules', 'app']);
+            $root = app()->getRootPath();
+            foreach ($paths as $p) {
+                $dir = $root . $p . DIRECTORY_SEPARATOR;
+                if (!is_dir($dir)) { continue; }
+                $items = scandir($dir);
+                foreach ($items as $item) {
+                    if ($item === '.' || $item === '..') { continue; }
+                    $moduleDir = $dir . $item;
+                    if (!is_dir($moduleDir)) { continue; }
+                    if (!file_exists($moduleDir . DIRECTORY_SEPARATOR . 'module.json')) { continue; }
+                    $this->installSingle($item, $moduleService, $output);
+                }
             }
             return 0;
         }

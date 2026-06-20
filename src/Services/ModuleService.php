@@ -171,9 +171,8 @@ class ModuleService extends BaseService
         if (!$module) {
             $modulePath = $this->findModulePath($name);
             if (!$modulePath) { return false; }
-            $moduleJsonPath = $modulePath . DIRECTORY_SEPARATOR . 'module.json';
-            if (!file_exists($moduleJsonPath)) { return false; }
-            $json = json_decode(file_get_contents($moduleJsonPath), true) ?: [];
+            $json = $this->readModuleJson($modulePath);
+            if ($json === null) { return false; }
             $module = new Module([
                 'name' => $name,
                 'enabled' => false,
@@ -192,18 +191,19 @@ class ModuleService extends BaseService
         $modulePath = $modulePath ?? $this->findModulePath($name);
         if (!$modulePath) { return false; }
 
-        $moduleJsonPath = $modulePath . DIRECTORY_SEPARATOR . 'module.json';
-        if (file_exists($moduleJsonPath)) {
-            $json = json_decode(file_get_contents($moduleJsonPath), true) ?: [];
-            $this->registerMenus($json, $name);
-            $this->registerPermissions($json, $name);
-        }
+        // 注册菜单和权限
+        $json = $this->readModuleJson($modulePath) ?? [];
+        $this->registerMenus($json, $name);
+        $this->registerPermissions($json, $name);
 
+        // 先启用模块（迁移/填充命令依赖 enabled 状态）
+        $module->enable();
+        $module->save();
+
+        // 独立进程执行迁移和填充（避免类名冲突）
         $this->runModuleMigrate($name);
         $this->runModuleSeed($name);
 
-        $module->enable();
-        $module->save();
         Event::trigger('thinkrix.module.installed', $module);
         return true;
     }
@@ -272,29 +272,20 @@ class ModuleService extends BaseService
 
     protected function runModuleMigrate(string $name, bool $rollback = false): void
     {
-        try {
-            $console = app('console');
-            $command = $console->find('thinkrix:module-migrate');
-            $args = [$name];
-            if ($rollback) { $args[] = '--rollback'; }
-            $input = new \think\console\Input(array_merge(['thinkrix:module-migrate'], $args));
-            $output = new \think\console\Output();
-            $command->run($input, $output);
-        } catch (\Throwable $e) {
-            // 迁移失败不影响主流程
-        }
+        $arg = $rollback ? ' --rollback' : '';
+        passthru('php think thinkrix:module-migrate ' . escapeshellarg($name) . $arg, $exitCode);
     }
 
     protected function runModuleSeed(string $name): void
     {
-        try {
-            $console = app('console');
-            $command = $console->find('thinkrix:module-seed');
-            $input = new \think\console\Input(['thinkrix:module-seed', $name]);
-            $output = new \think\console\Output();
-            $command->run($input, $output);
-        } catch (\Throwable $e) {
-            // 填充失败不影响主流程
-        }
+        passthru('php think thinkrix:module-seed ' . escapeshellarg($name), $exitCode);
+    }
+
+    protected function readModuleJson(string $modulePath): ?array
+    {
+        $path = $modulePath . DIRECTORY_SEPARATOR . 'module.json';
+        if (!file_exists($path)) { return null; }
+        $json = json_decode(file_get_contents($path), true);
+        return is_array($json) ? $json : null;
     }
 }
