@@ -33,7 +33,7 @@ class UserController extends CrudController
         return config('thinkrix.models.user', \Thinkrix\Models\AdminUser::class);
     }
 
-    protected function getResourceName(): string { return '用户'; }
+    protected function getResourceName(): string { return __t('user.resource_name'); }
 
     protected function getTable(): string
     {
@@ -41,20 +41,20 @@ class UserController extends CrudController
     }
 
     protected function getListWith(): array { return ['roles']; }
-    protected function getExportFilenamePrefix(): string { return '用户列表'; }
+    protected function getExportFilenamePrefix(): string { return __t('user.export_prefix'); }
 
     protected function getExportColumns(): array
     {
         return [
             ['key' => 'id', 'title' => 'ID'],
-            ['key' => 'username', 'title' => '用户名'],
-            ['key' => 'nickname', 'title' => '昵称'],
-            ['key' => 'email', 'title' => '邮箱'],
-            ['key' => 'phone', 'title' => '手机号'],
-            ['key' => 'roles', 'title' => '角色'],
-            ['key' => 'status', 'title' => '状态'],
-            ['key' => 'last_login_time', 'title' => '最后登录时间'],
-            ['key' => 'created_at', 'title' => '创建时间'],
+            ['key' => 'username', 'title' => __t('system.login.form.username')],
+            ['key' => 'nickname', 'title' => __t('user.column.nickname')],
+            ['key' => 'email', 'title' => __t('user.column.email')],
+            ['key' => 'phone', 'title' => __t('system.login.form.phone')],
+            ['key' => 'roles', 'title' => __t('user.column.roles')],
+            ['key' => 'status', 'title' => __t('module.column.status')],
+            ['key' => 'last_login_time', 'title' => __t('user.column.last_login_time')],
+            ['key' => 'created_at', 'title' => __t('system.column.created_at')],
         ];
     }
 
@@ -169,7 +169,7 @@ class UserController extends CrudController
         $model->status = $data['status'];
         $model->save();
         $this->afterStatusUpdate($model, (string) $data['status'] === '1');
-        return success('状态更新成功', ['status' => $model->status]);
+        return success(__t('crud.status_updated'), ['status' => $model->status]);
     }
 
     protected function afterStatusUpdate($model, bool $status): void
@@ -195,57 +195,57 @@ class UserController extends CrudController
         $model->password = $data['password'];
         $model->save();
         $this->authService->revokeAllTokens($model);
-        return success('密码重置成功');
+        return success(__t('auth.password_reset_ok'));
     }
 
     protected function listUi(): array
     {
         $userForm = OptForm::make('formData')
             ->fields([
-                ['用户名', 'username', Input::make()->props(['placeholder' => '请输入用户名', 'disabled' => '{{ !!editingId }}'])],
-                ['昵称', 'nickname', Input::make()->props(['placeholder' => '请输入昵称'])],
-                ['邮箱', 'email', Input::make()->props(['placeholder' => '请输入邮箱'])],
-                ['手机号', 'phone', Input::make()->props(['placeholder' => '请输入手机号'])],
-                ['密码', 'password', Input::make()->props(['type' => 'password', 'showPasswordOn' => 'click', 'placeholder' => '请输入密码']), '', '!editingId'],
-                ['角色', 'roles', Select::make()->props(['multiple' => true, 'placeholder' => '请选择角色', 'options' => '{{ roleOptions }}']), []],
-                ['备注', 'remark', Input::make()->props(['type' => 'textarea', 'placeholder' => '请输入备注'])],
-                ['状态', 'status', SwitchC::make()->props(['checkedValue' => '1', 'uncheckedValue' => '0']), '1'],
+                [__t('system.login.form.username'), 'username', Input::make()->props(['placeholder' => __t('user.placeholder.username'), 'disabled' => '{{ !!editingId }}'])],
+                [__t('user.column.nickname'), 'nickname', Input::make()->props(['placeholder' => __t('user.placeholder.nickname')])],
+                [__t('user.column.email'), 'email', Input::make()->props(['placeholder' => __t('user.placeholder.email')])],
+                [__t('system.login.form.phone'), 'phone', Input::make()->props(['placeholder' => __t('user.placeholder.phone')])],
+                [__t('system.login.form.password'), 'password', Input::make()->props(['type' => 'password', 'showPasswordOn' => 'click', 'placeholder' => __t('system.login.placeholder.password')]), '', '!editingId'],
+                [__t('user.column.roles'), 'roles', Select::make()->props(['multiple' => true, 'placeholder' => __t('user.placeholder.roles'), 'options' => '{{ roleOptions }}']), []],
+                [__t('user.form.remark'), 'remark', Input::make()->props(['type' => 'textarea', 'placeholder' => __t('user.placeholder.remark')])],
+                [__t('module.column.status'), 'status', SwitchC::make()->props(['checkedValue' => '1', 'uncheckedValue' => '0']), '1'],
             ])
             ->buttons([
-                Button::make()->on('click', SetAction::make('formVisible', false))->text('取消'),
-                Button::make()->type('primary')->props(['loading' => '{{ submitting }}'])->on('click', ['call' => 'handleSubmit'])->text('确定'),
+                Button::make()->on('click', SetAction::make('formVisible', false))->text(__t('ui.button.cancel')),
+                Button::make()->type('primary')->props(['loading' => '{{ submitting }}'])->on('click', ['call' => 'handleSubmit'])->text(__t('ui.button.confirm')),
             ]);
 
         $resetPwdForm = OptForm::make()
             ->fields([
-                ['新密码', 'newPassword', Input::make()->props(['type' => 'password', 'showPasswordOn' => 'click', 'placeholder' => '请输入新密码（至少6位）'])],
+                [__t('system.login.form.new_password'), 'newPassword', Input::make()->props(['type' => 'password', 'showPasswordOn' => 'click', 'placeholder' => __t('user.placeholder.new_password')])],
             ])
             ->buttons([
-                Button::make()->on('click', SetAction::make('resetPwdVisible', false))->text('取消'),
+                Button::make()->on('click', SetAction::make('resetPwdVisible', false))->text(__t('ui.button.cancel')),
                 Button::make()->type('primary')->props(['loading' => '{{ resetPwdSubmitting }}'])->on('click', [
                     SetAction::make('resetPwdSubmitting', true),
                     FetchAction::make('/users/{{ resetPwdUserId }}')
                         ->put()
                         ->body(['action_type' => 'reset_password', 'password' => '{{ newPassword }}'])
-                        ->then([CallAction::make('$message.success', ['密码重置成功']), SetAction::make('resetPwdVisible', false)])
+                        ->then([CallAction::make('$message.success', [__t('crud.message.password_reset_ok')]), SetAction::make('resetPwdVisible', false)])
                         ->catch([CallAction::make('$message.error', ['{{ $error.message || "密码重置失败" }}'])])
                         ->finally([SetAction::make('resetPwdSubmitting', false)]),
-                ])->text('确定'),
+                ])->text(__t('ui.button.confirm')),
             ]);
 
-        $schema = CrudPage::make('用户管理')
+        $schema = CrudPage::make(__t('user.page.title'))
             ->apiPrefix('/users')
             ->columns($this->getTableColumns())
             ->scrollX(1200)->defaultPageSize(15)
             ->search([
-                ['关键词', 'keyword', Input::make()->props(['placeholder' => '用户名/昵称/邮箱/手机号', 'clearable' => true])],
-                ['状态', 'status', Select::make()->props(['placeholder' => '全部', 'clearable' => true, 'style' => ['width' => '120px'],
-                    'options' => [['label' => '启用', 'value' => '1'], ['label' => '禁用', 'value' => '0']]])],
+                [__t('dict.search.keyword'), 'keyword', Input::make()->props(['placeholder' => __t('user.search.placeholder'), 'clearable' => true])],
+                [__t('module.column.status'), 'status', Select::make()->props(['placeholder' => __t('user.filter.all'), 'clearable' => true, 'style' => ['width' => '120px'],
+                    'options' => [['label' => __t('ui.tag.enabled'), 'value' => '1'], ['label' => __t('ui.tag.disabled'), 'value' => '0']]])],
             ])
             ->toolbarLeft(['columnSelector', 'batchDelete',
                 Button::make()->type('primary')->on('click', [
                     SetAction::batch(['editingId' => null, 'formData.username' => '', 'formData.nickname' => '', 'formData.email' => '', 'formData.phone' => '', 'formData.password' => '', 'formData.roles' => [], 'formData.remark' => '', 'formData.status' => '1', 'formVisible' => true]),
-                ])->text('新增'),
+                ])->text(__t('permission.button.create')),
             ])
             ->toolbarRight(['exportCurrent', 'exportAll', 'print'])
             ->data([
@@ -259,15 +259,15 @@ class UserController extends CrudController
                     SetAction::make('submitting', true),
                     IfAction::make('editingId')
                         ->then(FetchAction::make('{{ "/users/" + editingId }}')->put()->body('{{ formData }}')
-                            ->then([CallAction::make('$message.success', ['更新成功']), SetAction::make('formVisible', false), CallAction::make('loadData')])
+                            ->then([CallAction::make('$message.success', [__t('crud.message.updated')]), SetAction::make('formVisible', false), CallAction::make('loadData')])
                             ->catch([CallAction::make('$message.error', ['{{ $error.message || "操作失败" }}'])])->finally([SetAction::make('submitting', false)]))
                         ->else(FetchAction::make('/users')->post()->body('{{ formData }}')
-                            ->then([CallAction::make('$message.success', ['创建成功']), SetAction::make('formVisible', false), CallAction::make('loadData')])
+                            ->then([CallAction::make('$message.success', [__t('crud.message.created')]), SetAction::make('formVisible', false), CallAction::make('loadData')])
                             ->catch([CallAction::make('$message.error', ['{{ $error.message || "操作失败" }}'])])->finally([SetAction::make('submitting', false)])),
                 ],
             ])
-            ->modal('form', '{{ editingId ? "编辑用户" : "新增用户" }}', $userForm, ['width' => '500px'])
-            ->modal('resetPwd', '重置密码 - {{ resetPwdUserName }}', $resetPwdForm, ['width' => '400px']);
+            ->modal('form', '{{ editingId ? "' . __t('user.title.edit') . '" : "' . __t('user.title.create') . '" }}', $userForm, ['width' => '500px'])
+            ->modal('resetPwd', __t('user.title.reset_password'), $resetPwdForm, ['width' => '400px']);
 
         return success($schema->build());
     }
@@ -276,24 +276,24 @@ class UserController extends CrudController
     {
         return [
             ['key' => 'id', 'title' => 'ID', 'width' => 80],
-            ['key' => 'username', 'title' => '用户名'],
-            ['key' => 'nickname', 'title' => '昵称'],
-            ['key' => 'email', 'title' => '邮箱'],
-            ['key' => 'phone', 'title' => '手机号'],
-            ['key' => 'roles', 'title' => '角色', 'width' => 150, 'slot' => [
+            ['key' => 'username', 'title' => __t('system.login.form.username')],
+            ['key' => 'nickname', 'title' => __t('user.column.nickname')],
+            ['key' => 'email', 'title' => __t('user.column.email')],
+            ['key' => 'phone', 'title' => __t('system.login.form.phone')],
+            ['key' => 'roles', 'title' => __t('user.column.roles'), 'width' => 150, 'slot' => [
                 Space::make()->props(['size' => 'small'])->children([
                     Tag::make()->for('role in slotData.row.roles', '{{ role.id }}')->props(['type' => 'info', 'size' => 'small'])->children(['{{ role.title || role.name }}']),
                 ]),
             ]],
-            ['key' => 'status', 'title' => '状态', 'width' => 80, 'slot' => [
+            ['key' => 'status', 'title' => __t('module.column.status'), 'width' => 80, 'slot' => [
                 SwitchC::make()->props(['value' => '{{ slotData.row.status === "1" }}'])
                     ->on('update:value', FetchAction::make('/users/{{ slotData.row.id }}')->put()->body(['action_type' => 'status', 'status' => '{{ $event ? "1" : "0" }}'])
-                        ->then([CallAction::make('$message.success', ['状态更新成功']), CallAction::make('loadData')])
+                        ->then([CallAction::make('$message.success', [__t('crud.message.status_updated')]), CallAction::make('loadData')])
                         ->catch([CallAction::make('$message.error', ['{{ $error.message || "状态更新失败" }}'])])),
             ]],
-            ['key' => 'last_login_time', 'title' => '最后登录', 'width' => 180],
-            ['key' => 'created_at', 'title' => '创建时间', 'width' => 180],
-            ['key' => 'actions', 'title' => '操作', 'width' => 220, 'fixed' => 'right', 'slot' => [
+            ['key' => 'last_login_time', 'title' => __t('user.column.last_login_time'), 'width' => 180],
+            ['key' => 'created_at', 'title' => __t('system.column.created_at'), 'width' => 180],
+            ['key' => 'actions', 'title' => __t('module.column.actions'), 'width' => 220, 'fixed' => 'right', 'slot' => [
                 Space::make()->children([
                     Button::make()->size('small')->props(['type' => 'primary', 'text' => true])->on('click', [
                         SetAction::make('editingId', '{{ slotData.row.id }}'),
@@ -305,18 +305,18 @@ class UserController extends CrudController
                         SetAction::make('formData.remark', '{{ slotData.row.remark || "" }}'),
                         SetAction::make('formData.status', '{{ slotData.row.status }}'),
                         SetAction::make('formVisible', true),
-                    ])->text('编辑'),
+                    ])->text(__t('permission.button.edit')),
                     Button::make()->size('small')->props(['type' => 'warning', 'text' => true])->on('click', [
                         SetAction::make('resetPwdUserId', '{{ slotData.row.id }}'),
                         SetAction::make('resetPwdUserName', '{{ slotData.row.username }}'),
                         SetAction::make('newPassword', ''),
                         SetAction::make('resetPwdVisible', true),
-                    ])->text('重置密码'),
-                    Popconfirm::make()->props(['positiveText' => '确定', 'negativeText' => '取消'])
+                    ])->text(__t('system.login.reset_password')),
+                    Popconfirm::make()->props(['positiveText' => __t('ui.button.confirm'), 'negativeText' => __t('ui.button.cancel')])
                         ->on('positive-click', FetchAction::make('/users/{{ slotData.row.id }}')->delete()
-                            ->then([CallAction::make('$message.success', ['删除成功']), CallAction::make('loadData')])
+                            ->then([CallAction::make('$message.success', [__t('crud.message.deleted')]), CallAction::make('loadData')])
                             ->catch([CallAction::make('$message.error', ['{{ $error.message || "删除失败" }}'])]))
-                        ->slot('trigger', [Button::make()->size('small')->props(['type' => 'error', 'text' => true])->text('删除')])
+                        ->slot('trigger', [Button::make()->size('small')->props(['type' => 'error', 'text' => true])->text(__t('permission.button.delete'))])
                         ->children(['确定要删除用户 {{ slotData.row.username }} 吗？']),
                 ]),
             ]],
@@ -345,13 +345,13 @@ class UserController extends CrudController
     {
         $user = $this->getUser();
         $infoItems = [
-            ['用户名', $user->username],
-            ['昵称', $user->nickname ?: '-'],
-            ['邮箱', $user->email ?: '-'],
-            ['手机', $user->phone ?: '-'],
-            ['角色', implode(', ', $user->getRoleNames())],
-            ['状态', $user->isActive() ? '启用' : '禁用'],
-            ['最后登录', $user->last_login_time ?: '-'],
+            [__t('system.login.form.username'), $user->username],
+            [__t('user.column.nickname'), $user->nickname ?: '-'],
+            [__t('user.column.email'), $user->email ?: '-'],
+            [__t('user.column.phone'), $user->phone ?: '-'],
+            [__t('user.column.roles'), implode(', ', $user->getRoleNames())],
+            [__t('module.column.status'), $user->isActive() ? __t('ui.tag.enabled') : __t('ui.tag.disabled')],
+            [__t('user.column.last_login_time'), $user->last_login_time ?: '-'],
         ];
         $infoHtml = '';
         foreach ($infoItems as $item) {
@@ -378,12 +378,12 @@ class UserController extends CrudController
         $user = $this->getUser();
         $form = OptForm::make('form')
             ->fields([
-                ['昵称', 'nickname', Input::make()->props(['placeholder' => '请输入昵称']), $user->nickname],
-                ['邮箱', 'email', Input::make()->props(['placeholder' => '请输入邮箱']), $user->email],
-                ['手机号', 'phone', Input::make()->props(['placeholder' => '请输入手机号']), $user->phone],
+                [__t('user.column.nickname'), 'nickname', Input::make()->props(['placeholder' => __t('user.placeholder.nickname')]), $user->nickname],
+                [__t('user.column.email'), 'email', Input::make()->props(['placeholder' => __t('user.placeholder.email')]), $user->email],
+                [__t('system.login.form.phone'), 'phone', Input::make()->props(['placeholder' => __t('user.placeholder.phone')]), $user->phone],
             ])
             ->buttons([
-                Button::make()->type('primary')->props(['loading' => '{{ submitting }}'])->on('click', ['call' => 'handleSubmit'])->text('保存'),
+                Button::make()->type('primary')->props(['loading' => '{{ submitting }}'])->on('click', ['call' => 'handleSubmit'])->text(__t('ui.button.save')),
             ]);
         return success($form->toArray());
     }
@@ -404,7 +404,7 @@ class UserController extends CrudController
         if (!empty($updates)) {
             $user->save($updates);
         }
-        return success('保存成功');
+        return success(__t('system.config_saved'));
     }
 
     /**
@@ -414,12 +414,12 @@ class UserController extends CrudController
     {
         $form = OptForm::make('form')
             ->fields([
-                ['当前密码', 'current_password', Input::make()->props(['type' => 'password', 'showPasswordOn' => 'click', 'placeholder' => '请输入当前密码'])],
-                ['新密码', 'new_password', Input::make()->props(['type' => 'password', 'showPasswordOn' => 'click', 'placeholder' => '请输入新密码（至少6位）'])],
-                ['确认密码', 'confirm_password', Input::make()->props(['type' => 'password', 'showPasswordOn' => 'click', 'placeholder' => '请再次输入新密码'])],
+                ['当前密码', 'current_password', Input::make()->props(['type' => 'password', 'showPasswordOn' => 'click', 'placeholder' => __t('user.placeholder.current_password')])],
+                [__t('system.login.form.new_password'), 'new_password', Input::make()->props(['type' => 'password', 'showPasswordOn' => 'click', 'placeholder' => __t('user.placeholder.new_password')])],
+                [__t('system.login.form.confirm_pwd'), 'confirm_password', Input::make()->props(['type' => 'password', 'showPasswordOn' => 'click', 'placeholder' => __t('user.placeholder.confirm_password')])],
             ])
             ->buttons([
-                Button::make()->type('primary')->props(['loading' => '{{ submitting }}'])->on('click', ['call' => 'handleSubmit'])->text('确认修改'),
+                Button::make()->type('primary')->props(['loading' => '{{ submitting }}'])->on('click', ['call' => 'handleSubmit'])->text(__t('user.button.confirm_modify')),
             ]);
         return success($form->toArray());
     }
@@ -438,10 +438,10 @@ class UserController extends CrudController
         ]);
 
         if (!password_verify($data['current_password'], $user->password)) {
-            return error('当前密码不正确');
+            return error(__t('auth.password_incorrect'));
         }
         if ($data['new_password'] !== $data['confirm_password']) {
-            return error('两次输入的密码不一致');
+            return error(__t('auth.password_mismatch'));
         }
 
         $user->password = $data['new_password'];
@@ -450,6 +450,6 @@ class UserController extends CrudController
         // 撤销所有 Token，强制重新登录
         $this->authService->revokeAllTokens($user);
 
-        return success('密码修改成功，请重新登录');
+        return success(__t('auth.password_changed'));
     }
 }

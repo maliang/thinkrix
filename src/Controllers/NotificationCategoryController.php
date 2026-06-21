@@ -12,7 +12,7 @@ class NotificationCategoryController extends CrudController
         return config('thinkrix.notification.category_model', \Thinkrix\Models\NotificationCategory::class);
     }
 
-    protected function getResourceName(): string { return '通知分类'; }
+    protected function getResourceName(): string { return __t('notification.category.resource'); }
 
     protected function applyResourceScope($query): void
     {

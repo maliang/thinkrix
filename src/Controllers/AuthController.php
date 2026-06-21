@@ -4,6 +4,7 @@ namespace Thinkrix\Controllers;
 
 use think\Request;
 use Thinkrix\Services\AuthService;
+use Thinkrix\Models\Setting;
 
 class AuthController extends Controller
 {
@@ -28,10 +29,10 @@ class AuthController extends Controller
         $result = $this->authService->login($data['username'], $data['password']);
 
         if (!$result) {
-            error('用户名或密码错误', null, 40001);
+            error(__t('auth.failed'), null, 40001);
         }
 
-        return success('登录成功', [
+        return success(__t('auth.login_ok'), [
             'token' => $result['token']['plainTextToken'],
         ]);
     }
@@ -42,7 +43,7 @@ class AuthController extends Controller
     public function logout(): array
     {
         $this->authService->logout($this->getUser());
-        return success('登出成功');
+        return success(__t('auth.logout_ok'));
     }
 
     /**
@@ -51,7 +52,7 @@ class AuthController extends Controller
     public function refresh(): array
     {
         $token = $this->authService->refresh($this->getUser());
-        return success('刷新成功', ['token' => $token['plainTextToken']]);
+        return success(__t('auth.refresh_ok'), ['token' => $token['plainTextToken']]);
     }
 
     /**
@@ -89,9 +90,9 @@ class AuthController extends Controller
     {
         $result = $this->authService->revokeToken($this->getUser(), $id);
         if (!$result) {
-            error('Token 不存在', null, 40004);
+            error(__t('auth.token_not_found'), null, 40004);
         }
-        return success('撤销成功');
+        return success(__t('auth.revoke_ok'));
     }
 
     /**
@@ -99,10 +100,11 @@ class AuthController extends Controller
      */
     public function config(): array
     {
+        $theme = Setting::fetchValue('theme', []);
         return success([
             'apiPrefix' => '/' . ltrim(config('thinkrix.api_prefix', 'api/admin'), '/'),
-            'appTitle' => config('thinkrix.app_title', 'Thinkrix Admin'),
-            'logo' => config('thinkrix.logo'),
+            'appTitle' => $theme['appTitle'] ?? 'Thinkrix Admin',
+            'logo' => $theme['logo'] ?? '',
         ]);
     }
 }

@@ -61,34 +61,34 @@ class ModuleController extends Controller
 
     public function enable(string $name): array
     {
-        if (!$this->moduleService->exists($name)) { error('模块不存在', null, 40102); }
+        if (!$this->moduleService->exists($name)) { error(__t('module.not_found'), null, 40102); }
         $result = $this->moduleService->enable($name);
-        if (!$result) { error('启用失败', null, 40000); }
-        return success('启用成功');
+        if (!$result) { error(__t('module.enable_failed'), null, 40000); }
+        return success(__t('module.enable_ok'));
     }
 
     public function disable(string $name): array
     {
-        if (!$this->moduleService->exists($name)) { error('模块不存在', null, 40102); }
+        if (!$this->moduleService->exists($name)) { error(__t('module.not_found'), null, 40102); }
         $result = $this->moduleService->disable($name);
-        if (!$result) { error('禁用失败', null, 40000); }
-        return success('禁用成功');
+        if (!$result) { error(__t('module.disable_failed'), null, 40000); }
+        return success(__t('module.disable_ok'));
     }
 
     public function install(string $name): array
     {
-        if (!$this->moduleService->exists($name)) { error('模块不存在', null, 40102); }
+        if (!$this->moduleService->exists($name)) { error(__t('module.not_found'), null, 40102); }
         $result = $this->moduleService->install($name);
-        if (!$result) { error('安装失败', null, 40000); }
-        return success('安装成功');
+        if (!$result) { error(__t('module.install_failed'), null, 40000); }
+        return success(__t('module.install_ok'));
     }
 
     public function uninstall(string $name): array
     {
-        if (!$this->moduleService->exists($name)) { error('模块不存在', null, 40102); }
+        if (!$this->moduleService->exists($name)) { error(__t('module.not_found'), null, 40102); }
         $result = $this->moduleService->uninstall($name);
-        if (!$result) { error('卸载失败', null, 40000); }
-        return success('卸载成功');
+        if (!$result) { error(__t('module.uninstall_failed'), null, 40000); }
+        return success(__t('module.uninstall_ok'));
     }
 
     public function logo(string $name)
@@ -104,17 +104,17 @@ class ModuleController extends Controller
             }
         }
 
-        if (!$modulePath) { return json(['code' => 404, 'msg' => '模块不存在'], 404); }
+        if (!$modulePath) { return json(['code' => 404, 'msg' => __t('module.message.not_found')], 404); }
 
         $moduleJsonPath = $modulePath . DIRECTORY_SEPARATOR . 'module.json';
-        if (!file_exists($moduleJsonPath)) { return json(['code' => 404, 'msg' => '模块配置不存在'], 404); }
+        if (!file_exists($moduleJsonPath)) { return json(['code' => 404, 'msg' => __t('module.config.not_found')], 404); }
 
         $moduleJson = json_decode(file_get_contents($moduleJsonPath), true);
         $logoFile = $moduleJson['logo'] ?? '';
-        if (empty($logoFile)) { return json(['code' => 404, 'msg' => 'Logo 未配置'], 404); }
+        if (empty($logoFile)) { return json(['code' => 404, 'msg' => __t('module.logo.not_configured')], 404); }
 
         $fullPath = $modulePath . DIRECTORY_SEPARATOR . $logoFile;
-        if (!file_exists($fullPath)) { return json(['code' => 404, 'msg' => 'Logo 文件不存在'], 404); }
+        if (!file_exists($fullPath)) { return json(['code' => 404, 'msg' => __t('module.logo.file_not_found')], 404); }
 
         $extension = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
         $mimeTypes = [
@@ -131,8 +131,8 @@ class ModuleController extends Controller
 
     protected function marketUi(): array
     {
-        $schema = Card::make()->props(['title' => '模块市场'])->children([
-            Result::make()->props(['status' => 'info', 'title' => '敬请期待', 'description' => '模块市场正在开发中，即将上线...'])
+        $schema = Card::make()->props(['title' => __t('module.market.title')])->children([
+            Result::make()->props(['status' => 'info', 'title' => __t('module.market.coming_soon'), 'description' => __t('module.market.coming_soon_desc')])
                 ->slot('icon', [SvgIcon::make('carbon:store')->props(['class' => 'text-6xl text-primary'])]),
         ]);
         return success($schema->toArray());
@@ -142,7 +142,7 @@ class ModuleController extends Controller
     {
         $routePrefix = '/' . config('thinkrix.api_prefix', 'api/admin');
         $schema = Card::make()->props([
-                'title' => '已安装模块',
+                'title' => __t('module.installed.title'),
                 'style' => ['height' => '100%', 'display' => 'flex', 'flexDirection' => 'column'],
                 'contentStyle' => ['flex' => '1 1 0%', 'overflow' => 'hidden', 'display' => 'flex', 'flexDirection' => 'column'],
             ])
@@ -160,10 +160,10 @@ class ModuleController extends Controller
                         ->catch([CallAction::make('$message.error', ['{{ $error.message || "加载失败" }}'])])
                         ->finally([SetAction::make('loading', false)]),
                 ],
-                'handleEnable' => [FetchAction::make('/modules/{{ $event }}/enable')->put()->then([CallAction::make('$message.success', ['启用成功']), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "启用失败" }}'])])],
-                'handleDisable' => [FetchAction::make('/modules/{{ $event }}/disable')->put()->then([CallAction::make('$message.success', ['禁用成功']), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "禁用失败" }}'])])],
-                'handleInstall' => [FetchAction::make('/modules/{{ $event }}/install')->put()->then([CallAction::make('$message.success', ['安装成功']), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "安装失败" }}'])])],
-                'handleUninstall' => [FetchAction::make('/modules/{{ $event }}/uninstall')->put()->then([CallAction::make('$message.success', ['卸载成功']), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "卸载失败" }}'])])],
+                'handleEnable' => [FetchAction::make('/modules/{{ $event }}/enable')->put()->then([CallAction::make('$message.success', [__t('module.message.enabled')]), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "启用失败" }}'])])],
+                'handleDisable' => [FetchAction::make('/modules/{{ $event }}/disable')->put()->then([CallAction::make('$message.success', [__t('module.message.disabled')]), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "禁用失败" }}'])])],
+                'handleInstall' => [FetchAction::make('/modules/{{ $event }}/install')->put()->then([CallAction::make('$message.success', [__t('module.message.installed')]), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "安装失败" }}'])])],
+                'handleUninstall' => [FetchAction::make('/modules/{{ $event }}/uninstall')->put()->then([CallAction::make('$message.success', [__t('module.message.uninstalled')]), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "卸载失败" }}'])])],
                 'handleOpenMarket' => [SetAction::make('marketVisible', true)],
                 'handleCloseMarket' => [SetAction::make('marketVisible', false)],
                 'handlePageChange' => [SetAction::make('pagination.page', '{{ $event }}'), CallAction::make('loadData')],
@@ -197,19 +197,19 @@ class ModuleController extends Controller
                                 Avatar::make()->if('slotData.row.logo')->props(['src' => '{{ routePrefix + "/modules/" + slotData.row.name + "/logo" }}', 'size' => 32, 'objectFit' => 'contain']),
                                 SvgIcon::make('carbon:cube')->if('!slotData.row.logo')->props(['class' => 'text-2xl text-primary']),
                             ]],
-                            ['key' => 'name', 'title' => '模块名称', 'width' => 150],
-                            ['key' => 'version', 'title' => '版本', 'width' => 80],
-                            ['key' => 'description', 'title' => '描述', 'ellipsis' => true],
-                            ['key' => 'author', 'title' => '作者', 'width' => 100],
-                            ['key' => 'website', 'title' => '网址', 'width' => 120, 'ellipsis' => true, 'slot' => [Button::make()->if('slotData.row.website')->size('small')->props(['text' => true, 'type' => 'primary', 'tag' => 'a', 'href' => '{{ slotData.row.website }}', 'target' => '_blank'])->children(['访问'])]],
-                            ['key' => 'enabled', 'title' => '状态', 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.enabled ? 'success' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.enabled ? '已启用' : '已禁用' }}"])]],
-                            ['key' => 'actions', 'title' => '操作', 'width' => 160, 'slot' => [
+                            ['key' => 'name', 'title' => __t('module.column.name'), 'width' => 150],
+                            ['key' => 'version', 'title' => __t('module.column.version'), 'width' => 80],
+                            ['key' => 'description', 'title' => __t('module.column.description'), 'ellipsis' => true],
+                            ['key' => 'author', 'title' => __t('module.column.author'), 'width' => 100],
+                            ['key' => 'website', 'title' => __t('module.column.website'), 'width' => 120, 'ellipsis' => true, 'slot' => [Button::make()->if('slotData.row.website')->size('small')->props(['text' => true, 'type' => 'primary', 'tag' => 'a', 'href' => '{{ slotData.row.website }}', 'target' => '_blank'])->children([__t('module.button.visit')])]],
+                            ['key' => 'enabled', 'title' => __t('module.column.status'), 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.enabled ? 'success' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.enabled ? __t('module.tag.installed') : __t('module.tag.not_installed') }}"])]],
+                            ['key' => 'actions', 'title' => __t('module.column.actions'), 'width' => 160, 'slot' => [
                                 Space::make()->children([
                                     // 未安装：显示安装按钮
-                                    Button::make()->if('!slotData.row.enabled')->size('small')->type('primary')->props(['text' => true])->on('click', ['call' => 'handleInstall', 'args' => ['{{ slotData.row.name }}']])->text('安装'),
+                                    Button::make()->if('!slotData.row.enabled')->size('small')->type('primary')->props(['text' => true])->on('click', ['call' => 'handleInstall', 'args' => ['{{ slotData.row.name }}']])->text(__t('module.button.install')),
                                     // 已安装：显示禁用和卸载
-                                    Button::make()->if('slotData.row.enabled')->size('small')->type('warning')->props(['text' => true])->on('click', ['call' => 'handleDisable', 'args' => ['{{ slotData.row.name }}']])->text('禁用'),
-                                    Popconfirm::make()->if('slotData.row.enabled')->on('positive-click', ['call' => 'handleUninstall', 'args' => ['{{ slotData.row.name }}']])->slot('trigger', [Button::make()->size('small')->type('error')->props(['text' => true])->text('卸载')])->children(['确定卸载该模块？将删除菜单和权限，并回滚数据库迁移。']),
+                                    Button::make()->if('slotData.row.enabled')->size('small')->type('warning')->props(['text' => true])->on('click', ['call' => 'handleDisable', 'args' => ['{{ slotData.row.name }}']])->text(__t('ui.tag.disabled')),
+                                    Popconfirm::make()->if('slotData.row.enabled')->on('positive-click', ['call' => 'handleUninstall', 'args' => ['{{ slotData.row.name }}']])->slot('trigger', [Button::make()->size('small')->type('error')->props(['text' => true])->text(__t('module.button.uninstall'))])->children(['确定卸载该模块？将删除菜单和权限，并回滚数据库迁移。']),
                                 ]),
                             ]],
                         ]),
@@ -223,11 +223,11 @@ class ModuleController extends Controller
                         ]),
                     ]),
                 ]),
-                Modal::make()->props(['show' => '{{ marketVisible }}', 'title' => '模块商城', 'style' => 'width: 800px', 'preset' => 'card'])
+                Modal::make()->props(['show' => '{{ marketVisible }}', 'title' => __t('module.market.button'), 'style' => 'width: 800px', 'preset' => 'card'])
                     ->on('update:show', ['call' => 'handleCloseMarket'])
                     ->children([
                         Spin::make()->props(['show' => '{{ marketLoading }}'])->children([
-                            Result::make()->props(['status' => 'info', 'title' => '敬请期待', 'description' => '模块市场正在开发中，即将上线...'])
+                            Result::make()->props(['status' => 'info', 'title' => __t('module.market.coming_soon'), 'description' => __t('module.market.coming_soon_desc')])
                                 ->slot('icon', [SvgIcon::make('carbon:store')->props(['class' => 'text-6xl text-primary'])]),
                         ]),
                     ]),

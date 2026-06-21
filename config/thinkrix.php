@@ -15,8 +15,8 @@ return [
     | 系统信息
     |--------------------------------------------------------------------------
     */
-    'app_title' => env('THINKRIX_APP_TITLE', 'Thinkrix Admin'),
-    'logo' => env('THINKRIX_LOGO', '/admin/favicon.svg'),
+    'locale' => env('THINKRIX_LOCALE', 'zh-CN'),
+    'fallback_locale' => 'en-US',
     'copyright' => env('THINKRIX_COPYRIGHT', '© ' . date('Y') . ' Thinkrix Admin. All rights reserved.'),
 
     /*

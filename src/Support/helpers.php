@@ -41,3 +41,37 @@ if (!function_exists('error')) {
         throw new ApiException($msg, $data, $code);
     }
 }
+
+if (!function_exists('__t')) {
+    /**
+     * 语言翻译
+     *
+     * 优先查找当前 locale，找不到则回退到默认语言（zh-cn），
+     * 再找不到则返回 key 本身。
+     * 支持参数替换：__t('auth.failed')、__t('welcome :name', ['name' => '张三'])
+     *
+     * @param string $key     翻译键名
+     * @param array  $replace 替换参数
+     * @return string
+     */
+    function __t(string $key, array $replace = []): string
+    {
+        try {
+            $lang = app()->lang;
+            // 1. 当前 locale
+            $result = $lang->get($key, $replace);
+            if ($result !== $key) {
+                return $result;
+            }
+            // 2. 回退到默认语言
+            $default = config('thinkrix.fallback_locale', 'zh-cn');
+            $result = $lang->get($key, $replace, $default);
+            if ($result !== $key) {
+                return $result;
+            }
+            return $key;
+        } catch (\Throwable $e) {
+            return $key;
+        }
+    }
+}

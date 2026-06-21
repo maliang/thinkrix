@@ -75,6 +75,8 @@ Route::group($prefix, function () use (
         Route::group('system', function () use ($systemController) {
             Route::post('theme-config', "{$systemController}@saveThemeConfig")
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.setting.update');
+            Route::get('translations', "{$systemController}@translations");
+            Route::post('locale', "{$systemController}@setLocale");
         });
 
         // 布局相关

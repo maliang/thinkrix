@@ -46,7 +46,7 @@ class AdminUser extends Model
 
     protected $fillable = [
         'username', 'password', 'nickname', 'avatar', 'email', 'phone',
-        'status', 'remark', 'last_login_ip', 'last_login_time',
+        'status', 'remark', 'last_login_ip', 'last_login_time', 'locale',
     ];
 
     // 自动密码哈希

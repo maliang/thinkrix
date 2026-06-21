@@ -28,18 +28,18 @@ class HomeController extends Controller
 
         $schema = Html::div()->props(['class' => 'p-4'])->children([
             // 统计卡片
-            Card::make()->bordered(false)->props(['title' => '仪表盘', 'style' => ['marginBottom' => '16px']])->children([
+            Card::make()->bordered(false)->props(['title' => __t('system.dashboard.title'), 'style' => ['marginBottom' => '16px']])->children([
                 Flex::make()->props(['gap' => 16])->children([
-                    $this->buildStatCard('用户总数', $userCount, 'carbon:user-avatar', '#1890ff'),
-                    $this->buildStatCard('活跃用户', $activeUserCount, 'carbon:user-avatar-filled', '#52c41a'),
-                    $this->buildStatCard('角色数量', $roleCount, 'carbon:account', '#faad14'),
+                    $this->buildStatCard(__t('system.dashboard.total_users'), $userCount, 'carbon:user-avatar', '#1890ff'),
+                    $this->buildStatCard(__t('system.dashboard.active_users'), $activeUserCount, 'carbon:user-avatar-filled', '#52c41a'),
+                    $this->buildStatCard(__t('system.dashboard.total_roles'), $roleCount, 'carbon:account', '#faad14'),
                 ]),
             ]),
             // 欢迎信息
             Card::make()->bordered(false)->children([
                 Flex::make()->vertical()->children([
-                    Text::make()->strong()->props(['style' => ['fontSize' => '20px']])->children(['欢迎使用 Thinkrix 后台管理系统']),
-                    Text::make()->depth(3)->children(['基于 ThinkPHP 8 和 Trix 前端的后台管理解决方案']),
+                    Text::make()->strong()->props(['style' => ['fontSize' => '20px']])->children([__t('system.dashboard.welcome')]),
+                    Text::make()->depth(3)->children([__t('system.dashboard.welcome_desc')]),
                 ]),
             ]),
         ]);

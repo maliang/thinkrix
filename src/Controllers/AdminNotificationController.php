@@ -54,7 +54,7 @@ class AdminNotificationController extends Controller
             }
         }
 
-        return success('通知已发送');
+        return success(__t('notification.sent'));
     }
 
     /**
@@ -89,7 +89,7 @@ class AdminNotificationController extends Controller
         foreach ($guards as $guard) {
             $result[] = [
                 'value' => $guard,
-                'label' => $guard === 'admin' ? '主后台' : $guard,
+                'label' => $guard === 'admin' ? __t('admin.notification.main_backend') : $guard,
             ];
         }
 

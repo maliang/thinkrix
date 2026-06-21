@@ -223,6 +223,7 @@ class InstallCommand extends Command
                 `remark` varchar(255) DEFAULT NULL COMMENT '备注',
                 `last_login_ip` varchar(45) DEFAULT NULL COMMENT '最后登录IP',
                 `last_login_time` datetime DEFAULT NULL COMMENT '最后登录时间',
+                `locale` varchar(10) DEFAULT 'zh-CN' COMMENT '语言偏好',
                 `deleted_at` datetime DEFAULT NULL COMMENT '软删除',
                 `created_at` datetime DEFAULT NULL,
                 `updated_at` datetime DEFAULT NULL,

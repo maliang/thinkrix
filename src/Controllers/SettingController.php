@@ -69,36 +69,37 @@ class SettingController extends Controller
                 Cache::delete($cachePrefix . $item['key']);
             }
         }
-        return success('更新成功');
+        return success(__t('crud.updated'));
     }
 
     protected function formUi(): array
     {
-        $schema = Card::make()->title('系统设置')->children([
+        $schema = Card::make()->title(__t('system.setting.title'))->children([
             Form::make()->props(['model' => '{{ formData }}', 'labelPlacement' => 'left', 'labelWidth' => 120])->children([
-                FormItem::make()->label('系统名称')->children([Input::make()->model('formData.app_title')->placeholder('请输入系统名称')]),
-                FormItem::make()->label('Logo 地址')->children([Input::make()->model('formData.logo')->placeholder('请输入 Logo 地址')]),
-                FormItem::make()->label('版权信息')->children([Input::make()->model('formData.copyright')->placeholder('请输入版权信息')]),
+                FormItem::make()->label(__t('system.setting.form.app_title'))->children([Input::make()->model('formData.app_title')->placeholder(__t('system.setting.placeholder.app_title'))]),
+                FormItem::make()->label(__t('system.setting.form.logo_url'))->children([Input::make()->model('formData.logo')->placeholder(__t('system.setting.placeholder.logo_url'))]),
+                FormItem::make()->label(__t('system.setting.form.copyright'))->children([Input::make()->model('formData.copyright')->placeholder(__t('system.setting.placeholder.copyright'))]),
                 FormItem::make()->children([
                     Space::make()->children([
-                        Button::make()->type('primary')->children(['保存设置'])->on('click', [
+                        Button::make()->type('primary')->children([__t('system.button.save')])->on('click', [
                             'fetch' => '/settings', 'method' => 'PUT',
                             'body' => ['settings' => [
                                 ['key' => 'app_title', 'value' => '{{ formData.app_title }}'],
                                 ['key' => 'logo', 'value' => '{{ formData.logo }}'],
                                 ['key' => 'copyright', 'value' => '{{ formData.copyright }}'],
                             ]],
-                            'then' => [['call' => '$message.success', 'args' => ['保存成功']]],
+                            'then' => [['call' => '$message.success', 'args' => [__t('system.message.config_saved')]]],
                         ]),
                     ]),
                 ]),
             ]),
         ])->toArray();
 
+        $theme = \Thinkrix\Models\Setting::fetchValue('theme', []);
         $schema['data'] = [
             'formData' => [
-                'app_title' => config('thinkrix.app_title', 'Thinkrix Admin'),
-                'logo' => config('thinkrix.logo', '/admin/favicon.svg'),
+                'app_title' => $theme['appTitle'] ?? 'Thinkrix Admin',
+                'logo' => $theme['logo'] ?? '',
                 'copyright' => config('thinkrix.copyright', '© ' . date('Y') . ' Thinkrix Admin. All rights reserved.'),
             ],
         ];

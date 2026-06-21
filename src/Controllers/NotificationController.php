@@ -11,7 +11,7 @@ class NotificationController extends CrudController
         return config('thinkrix.notification.message_model', \Thinkrix\Models\NotificationMessage::class);
     }
 
-    protected function getResourceName(): string { return '通知消息'; }
+    protected function getResourceName(): string { return __t('notification.resource_name'); }
 
     protected function getDefaultOrder(): array { return ['created_at', 'desc']; }
 
@@ -32,12 +32,12 @@ class NotificationController extends CrudController
     {
         $model = $this->findOrFail($id);
         if ($model->user_id === null) {
-            throw new \Thinkrix\Exceptions\ApiException('共享广播不支持单用户修改已读状态', 40022);
+            throw new \Thinkrix\Exceptions\ApiException(__t('notification.message.broadcast_readonly'), 40022);
         }
         $model->is_read = true;
         $model->read_at = date('Y-m-d H:i:s');
         $model->save();
-        return success('标记为已读');
+        return success(__t('notification.marked_read'));
     }
 
     public function markAllAsRead(): array
@@ -48,7 +48,7 @@ class NotificationController extends CrudController
             ->where('user_id', $this->getUser()->id);
         $query
             ->update(['is_read' => true, 'read_at' => date('Y-m-d H:i:s')]);
-        return success('全部标记为已读');
+        return success(__t('notification.all_marked_read'));
     }
 
     protected function findOrFail(int $id)
@@ -88,7 +88,7 @@ class NotificationController extends CrudController
             $deleted += (int) $model->delete();
         }
 
-        return success('批量删除成功', ['deleted' => $deleted]);
+        return success(__t('crud.batch_deleted'), ['deleted' => $deleted]);
     }
 
     protected function prepareUpdateData(array $validated): array
@@ -100,7 +100,7 @@ class NotificationController extends CrudController
     protected function beforeDelete($model): void
     {
         if ($model->user_id === null) {
-            throw new \Thinkrix\Exceptions\ApiException('共享广播不能由单个接收用户删除', 40022);
+            throw new \Thinkrix\Exceptions\ApiException(__t('notification.message.broadcast_delete'), 40022);
         }
     }
 

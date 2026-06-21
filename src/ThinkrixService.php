@@ -9,6 +9,7 @@ use Thinkrix\Services\DataDictService;
 use Thinkrix\Services\ModuleService;
 use Thinkrix\Services\PermissionService;
 use Thinkrix\Services\RealtimeService;
+use Thinkrix\Services\TranslationService;
 
 class ThinkrixService extends Service
 {
@@ -22,10 +23,24 @@ class ThinkrixService extends Service
 
         // 注册单例服务
         $this->app->bind(AuthService::class, AuthService::class);
+
+        // 注册包内语言文件
+        $extend = $this->app->config->get('lang.extend_list', []);
+        $langDir = __DIR__ . '/../lang/';
+        foreach (['zh-cn', 'en-us'] as $locale) {
+            $file = $langDir . $locale . '.php';
+            if (file_exists($file)) {
+                if (!isset($extend[$locale]) || !in_array($file, $extend[$locale])) {
+                    $extend[$locale][] = $file;
+                }
+            }
+        }
+        $this->app->config->set($extend, 'lang.extend_list');
         $this->app->bind(DataDictService::class, DataDictService::class);
         $this->app->bind(ModuleService::class, ModuleService::class);
         $this->app->bind(PermissionService::class, PermissionService::class);
         $this->app->bind(RealtimeService::class, RealtimeService::class);
+        $this->app->bind(TranslationService::class, TranslationService::class);
 
         // 注册 ModuleLoader 单例
         $this->app->bind(\Thinkrix\Support\ModuleLoader::class, function (\think\App $app) {
@@ -87,12 +102,18 @@ class ThinkrixService extends Service
     }
 
     /**
-     * 合并配置
+     * 合并配置（项目配置优先级高于包内默认配置）
      */
     protected function mergeConfigFrom(string $path, string $key): void
     {
         $config = $this->app->config;
-        $config->load($path, $key);
+        // 先加载包内默认配置
+        $package = include $path;
+        if (!is_array($package)) { $package = []; }
+        // 再加载项目已发布的配置（ThinkPHP 启动时已自动加载）
+        $user = $config->get($key, []);
+        $merged = array_replace_recursive($package, $user);
+        $config->set($merged, $key);
     }
 
 }

@@ -33,7 +33,7 @@ class RoleController extends CrudController
     {
         return config('thinkrix.models.role', \Thinkrix\Models\Role::class);
     }
-    protected function getResourceName(): string { return '角色'; }
+    protected function getResourceName(): string { return __t('user.column.roles'); }
     protected function getTable(): string { return config('thinkrix.tables.roles', 'roles'); }
     protected function getDefaultOrder(): array { return ['id', 'asc']; }
     protected function getListWith(): array { return ['permissions']; }
@@ -119,7 +119,7 @@ class RoleController extends CrudController
     protected function beforeDelete($model): void
     {
         if ($model->isSystemRole()) {
-            throw new \Thinkrix\Exceptions\ApiException('不能删除系统内置角色', 40100);
+            throw new \Thinkrix\Exceptions\ApiException(__t('role.message.cannot_delete_system'), 40100);
         }
     }
 
@@ -129,7 +129,7 @@ class RoleController extends CrudController
         $data = request()->put();
         $this->validate($data, ['permissions' => 'require|array']);
         $this->permissionService->syncRolePermissions($model, $data['permissions']);
-        return success('权限更新成功');
+        return success(__t('permission.updated'));
     }
 
     protected function listUi(): array
@@ -142,50 +142,50 @@ class RoleController extends CrudController
 
         $roleForm = OptForm::make('formData')
             ->fields([
-                ['角色标识', 'name', Input::make()->props(['placeholder' => '请输入角色标识（英文）', 'disabled' => '{{ !!editingId }}'])],
-                ['角色名称', 'title', Input::make()->props(['placeholder' => '请输入角色名称'])],
-                ['描述', 'description', Input::make()->props(['type' => 'textarea', 'placeholder' => '请输入角色描述'])],
-                ['权限', 'permissions', $permissionTree, []],
-                ['状态', 'status', SwitchC::make(), true],
+                [__t('role.column.name'), 'name', Input::make()->props(['placeholder' => __t('role.placeholder.name'), 'disabled' => '{{ !!editingId }}'])],
+                [__t('role.column.title'), 'title', Input::make()->props(['placeholder' => __t('role.placeholder.title')])],
+                [__t('module.column.description'), 'description', Input::make()->props(['type' => 'textarea', 'placeholder' => __t('role.placeholder.description')])],
+                [__t('role.column.permissions'), 'permissions', $permissionTree, []],
+                [__t('module.column.status'), 'status', SwitchC::make(), true],
             ])
             ->buttons([
-                Button::make()->on('click', SetAction::make('formVisible', false))->text('取消'),
-                Button::make()->type('primary')->props(['loading' => '{{ submitting }}'])->on('click', ['call' => 'handleSubmit'])->text('确定'),
+                Button::make()->on('click', SetAction::make('formVisible', false))->text(__t('ui.button.cancel')),
+                Button::make()->type('primary')->props(['loading' => '{{ submitting }}'])->on('click', ['call' => 'handleSubmit'])->text(__t('ui.button.confirm')),
             ]);
 
-        $schema = CrudPage::make('角色管理')->apiPrefix('/roles')
+        $schema = CrudPage::make(__t('role.title'))->apiPrefix('/roles')
             ->columns([
                 ['key' => 'id', 'title' => 'ID', 'width' => 80],
-                ['key' => 'name', 'title' => '角色标识'],
-                ['key' => 'title', 'title' => '角色名称'],
-                ['key' => 'description', 'title' => '描述'],
-                ['key' => 'status', 'title' => '状态', 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.status ? 'success' : 'error' }}", 'size' => 'small'])->children(["{{ slotData.row.status ? '启用' : '禁用' }}"])]],
-                ['key' => 'is_system', 'title' => '系统角色', 'width' => 100, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.is_system ? 'warning' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.is_system ? '是' : '否' }}"])]],
-                ['key' => 'actions', 'title' => '操作', 'width' => 150, 'fixed' => 'right', 'slot' => [
+                ['key' => 'name', 'title' => __t('role.column.name')],
+                ['key' => 'title', 'title' => __t('role.column.title')],
+                ['key' => 'description', 'title' => __t('module.column.description')],
+                ['key' => 'status', 'title' => __t('module.column.status'), 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.status ? 'success' : 'error' }}", 'size' => 'small'])->children(["{{ slotData.row.status ? __t('ui.tag.enabled') : __t('ui.tag.disabled') }}"])]],
+                ['key' => 'is_system', 'title' => __t('role.column.is_system'), 'width' => 100, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.is_system ? 'warning' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.is_system ? __t('ui.button.yes') : __t('ui.button.no') }}"])]],
+                ['key' => 'actions', 'title' => __t('module.column.actions'), 'width' => 150, 'fixed' => 'right', 'slot' => [
                     Space::make()->children([
-                        Button::make()->size('small')->props(['type' => 'primary', 'text' => true])->on('click', [SetAction::make('editingId', '{{ slotData.row.id }}'), SetAction::make('formData.name', '{{ slotData.row.name }}'), SetAction::make('formData.title', '{{ slotData.row.title || "" }}'), SetAction::make('formData.description', '{{ slotData.row.description || "" }}'), SetAction::make('formData.permissions', '{{ (slotData.row.permissions || []).map(p => p.name) }}'), SetAction::make('formData.status', '{{ slotData.row.status }}'), SetAction::make('formVisible', true)])->text('编辑'),
-                        Popconfirm::make()->if('!slotData.row.is_system')->props(['positiveText' => '确定', 'negativeText' => '取消'])
-                            ->on('positive-click', FetchAction::make('/roles/{{ slotData.row.id }}')->delete()->then([CallAction::make('$message.success', ['删除成功']), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "删除失败" }}'])]))
-                            ->slot('trigger', [Button::make()->size('small')->props(['type' => 'error', 'text' => true])->text('删除')])
-                            ->children(['确定要删除该角色吗？']),
+                        Button::make()->size('small')->props(['type' => 'primary', 'text' => true])->on('click', [SetAction::make('editingId', '{{ slotData.row.id }}'), SetAction::make('formData.name', '{{ slotData.row.name }}'), SetAction::make('formData.title', '{{ slotData.row.title || "" }}'), SetAction::make('formData.description', '{{ slotData.row.description || "" }}'), SetAction::make('formData.permissions', '{{ (slotData.row.permissions || []).map(p => p.name) }}'), SetAction::make('formData.status', '{{ slotData.row.status }}'), SetAction::make('formVisible', true)])->text(__t('permission.button.edit')),
+                        Popconfirm::make()->if('!slotData.row.is_system')->props(['positiveText' => __t('ui.button.confirm'), 'negativeText' => __t('ui.button.cancel')])
+                            ->on('positive-click', FetchAction::make('/roles/{{ slotData.row.id }}')->delete()->then([CallAction::make('$message.success', [__t('crud.message.deleted')]), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "删除失败" }}'])]))
+                            ->slot('trigger', [Button::make()->size('small')->props(['type' => 'error', 'text' => true])->text(__t('permission.button.delete'))])
+                            ->children([__t('role.confirm.delete')]),
                     ]),
                 ]],
             ])
             ->scrollX(1000)->pagination(false)
-            ->search([['关键词', 'keyword', Input::make()->props(['placeholder' => '角色标识/名称', 'clearable' => true])]])
-            ->toolbarLeft([Button::make()->type('primary')->on('click', [SetAction::batch(['editingId' => null, 'formData.name' => '', 'formData.title' => '', 'formData.description' => '', 'formData.permissions' => [], 'formData.status' => true, 'formVisible' => true])])->text('新增')])
+            ->search([[__t('dict.search.keyword'), 'keyword', Input::make()->props(['placeholder' => __t('role.search.placeholder'), 'clearable' => true])]])
+            ->toolbarLeft([Button::make()->type('primary')->on('click', [SetAction::batch(['editingId' => null, 'formData.name' => '', 'formData.title' => '', 'formData.description' => '', 'formData.permissions' => [], 'formData.status' => true, 'formVisible' => true])])->text(__t('permission.button.create'))])
             ->data(['formData' => $roleForm->getDefaultData(), 'editingId' => null, 'submitting' => false])
             ->methods(['handleSubmit' => [
                 SetAction::make('submitting', true),
                 IfAction::make('editingId')
                     ->then(FetchAction::make('{{ "/roles/" + editingId }}')->put()->body('{{ formData }}')
-                        ->then([CallAction::make('$message.success', ['更新成功']), SetAction::make('formVisible', false), CallAction::make('loadData')])
+                        ->then([CallAction::make('$message.success', [__t('crud.message.updated')]), SetAction::make('formVisible', false), CallAction::make('loadData')])
                         ->catch([CallAction::make('$message.error', ['{{ $error.message || "操作失败" }}'])])->finally([SetAction::make('submitting', false)]))
                     ->else(FetchAction::make('/roles')->post()->body('{{ formData }}')
-                        ->then([CallAction::make('$message.success', ['创建成功']), SetAction::make('formVisible', false), CallAction::make('loadData')])
+                        ->then([CallAction::make('$message.success', [__t('crud.message.created')]), SetAction::make('formVisible', false), CallAction::make('loadData')])
                         ->catch([CallAction::make('$message.error', ['{{ $error.message || "操作失败" }}'])])->finally([SetAction::make('submitting', false)])),
             ]])
-            ->modal('form', '{{ editingId ? "编辑角色" : "新增角色" }}', $roleForm, ['width' => '600px']);
+            ->modal('form', '{{ editingId ? "' . __t('role.title.edit') . '" : "' . __t('role.title.create') . '" }}', $roleForm, ['width' => '600px']);
 
         return success($schema->build());
     }

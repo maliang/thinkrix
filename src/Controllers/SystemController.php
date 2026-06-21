@@ -25,6 +25,7 @@ use Thinkrix\Schema\Components\Common\ThemeButton;
 use Thinkrix\Schema\Components\Common\UserAvatar;
 use Thinkrix\Schema\Components\Common\HeaderNotification;
 use Thinkrix\Schema\Components\Common\HeaderCustomItem;
+use Thinkrix\Services\TranslationService;
 
 class SystemController extends Controller
 {
@@ -37,7 +38,7 @@ class SystemController extends Controller
         $indexPath = $rootPath . 'public' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'index.html';
 
         if (!file_exists($indexPath)) {
-            return json(['code' => 404, 'msg' => '前端资源未发布，请先发布资源'], 404);
+            return json(['code' => 404, 'msg' => __t('system.entry.assets_not_publish')], 404);
         }
 
         $html = file_get_contents($indexPath);
@@ -50,10 +51,13 @@ class SystemController extends Controller
 
     protected function getEntryConfig(): array
     {
+        $theme = $this->getThemeSettings();
         return [
             'apiPrefix' => '/' . ltrim(config('thinkrix.api_prefix', 'api/admin'), '/'),
-            'appTitle' => config('thinkrix.app_title', 'Thinkrix Admin'),
-            'logo' => config('thinkrix.logo'),
+            'appTitle' => $theme['appTitle'] ?? 'Thinkrix Admin',
+            'logo' => $theme['logo'] ?? '',
+            'locale' => config('thinkrix.locale', 'zh-CN'),
+            'fallbackLocale' => config('thinkrix.fallback_locale', 'en-US'),
         ];
     }
 
@@ -62,17 +66,28 @@ class SystemController extends Controller
         return config('thinkrix.models.setting', \Thinkrix\Models\Setting::class);
     }
 
+    /**
+     * 获取完整主题配置（DB + 默认值合并）
+     */
+    protected function getThemeSettings(): array
+    {
+        $settingModel = $this->getSettingModel();
+        return $settingModel::fetchValue('theme', $this->getDefaultThemeConfig());
+    }
+
     public function loginPage(): array
     {
-        $appTitle = config('thinkrix.app_title', 'Thinkrix Admin');
+        $theme = $this->getThemeSettings();
+        $appTitle = $theme['appTitle'] ?? 'Thinkrix Admin';
         $appSubtitle = 'JSON 驱动的后台管理系统';
-        $copyright = config('thinkrix.copyright', 'Thinkrix Admin');
+        $copyright = $theme['copyright'] ?? config('thinkrix.copyright', 'Thinkrix Admin');
+        $logo = $theme['logo'] ?? '';
 
         $schema = Html::div()
             ->data($this->getLoginPageData())
             ->props(['style' => ['minHeight' => '100vh', 'display' => 'flex', 'flexDirection' => 'column', 'justifyContent' => 'center', 'alignItems' => 'center', 'position' => 'relative', 'overflow' => 'hidden', 'background' => '#f8f9fc']])
             ->children([
-                Html::make('img')->props(['src' => config('thinkrix.logo'), 'style' => ['width' => '48px', 'marginBottom' => '24px', 'zIndex' => 10]]),
+                Html::make('img')->props(['src' => $logo, 'style' => ['width' => '48px', 'marginBottom' => '24px', 'zIndex' => 10]]),
                 Card::make()->bordered(false)->props(['style' => ['width' => '400px', 'borderRadius' => '20px', 'boxShadow' => '0 25px 50px -12px rgba(0,0,0,0.25)', 'zIndex' => 10], 'contentStyle' => ['padding' => '40px']])
                     ->children([
                         Flex::make()->align('center')->justify('center')->props(['style' => ['marginBottom' => '32px']])->children([
@@ -80,10 +95,10 @@ class SystemController extends Controller
                         ]),
                         Html::div()->if("mode === 'login'")->children([
                             Form::make()->model('form')->rules('rules')->showLabel(false)->children([
-                                FormItem::make()->path('username')->children([Input::make()->model('form.username')->placeholder('用户名')->size('large')->clearable()]),
-                                FormItem::make()->path('password')->children([Input::make()->model('form.password')->type('password')->placeholder('密码')->size('large')->showPasswordOn('click')->clearable()]),
+                                FormItem::make()->path('username')->children([Input::make()->model('form.username')->placeholder(__t('system.login.form.username'))->size('large')->clearable()]),
+                                FormItem::make()->path('password')->children([Input::make()->model('form.password')->type('password')->placeholder(__t('system.login.form.password'))->size('large')->showPasswordOn('click')->clearable()]),
                                 Button::make()->type('primary')->props(['block' => true, 'size' => 'large', 'loading' => '{{ loading }}', 'style' => ['height' => '44px']])
-                                    ->on('click', ['script' => 'state.loading = true; try { await $methods.login(state.form.username, state.form.password); } finally { state.loading = false; }'])->text('登 录'),
+                                    ->on('click', ['script' => 'state.loading = true; try { await $methods.login(state.form.username, state.form.password); } finally { state.loading = false; }'])->text(__t('system.login.title')),
                             ]),
                         ]),
                     ]),
@@ -101,8 +116,8 @@ class SystemController extends Controller
             'loading' => false,
             'rememberMe' => false,
             'rules' => [
-                'username' => [['required' => true, 'message' => '请输入用户名', 'trigger' => 'blur']],
-                'password' => [['required' => true, 'message' => '请输入密码', 'trigger' => 'blur'], ['min' => 6, 'message' => '密码长度不能少于6位', 'trigger' => 'blur']],
+                'username' => [['required' => true, 'message' => __t('user.placeholder.username'), 'trigger' => 'blur']],
+                'password' => [['required' => true, 'message' => __t('system.login.placeholder.password'), 'trigger' => 'blur'], ['min' => 6, 'message' => __t('system.login.message.password_min'), 'trigger' => 'blur']],
             ],
         ];
     }
@@ -110,10 +125,10 @@ class SystemController extends Controller
     public function forbidden(): array
     {
         $schema = Flex::make()->vertical()->justify('center')->align('center')->props(['class' => 'min-h-screen'])->children([
-            Result::make()->status('403')->title('403')->description('抱歉，您没有权限访问此页面')
+            Result::make()->status('403')->title('403')->description(__t('system.error.403_desc'))
                 ->slot('footer', [Flex::make()->justify('center')->props(['class' => 'gap-4'])->children([
-                    Button::make()->type('primary')->on('click', ['call' => '$router.push', 'args' => ['/']])->text('返回首页'),
-                    Button::make()->on('click', ['call' => '$router.back'])->text('返回上一页'),
+                    Button::make()->type('primary')->on('click', ['call' => '$router.push', 'args' => ['/']])->text(__t('system.button.back_home')),
+                    Button::make()->on('click', ['call' => '$router.back'])->text(__t('system.button.back_prev')),
                 ])]),
         ]);
         return success($schema->toArray());
@@ -122,10 +137,10 @@ class SystemController extends Controller
     public function notFound(): array
     {
         $schema = Flex::make()->vertical()->justify('center')->align('center')->props(['class' => 'min-h-screen'])->children([
-            Result::make()->status('404')->title('404')->description('抱歉，您访问的页面不存在')
+            Result::make()->status('404')->title('404')->description(__t('system.error.404_desc'))
                 ->slot('footer', [Flex::make()->justify('center')->props(['class' => 'gap-4'])->children([
-                    Button::make()->type('primary')->on('click', ['call' => '$router.push', 'args' => ['/']])->text('返回首页'),
-                    Button::make()->on('click', ['call' => '$router.back'])->text('返回上一页'),
+                    Button::make()->type('primary')->on('click', ['call' => '$router.push', 'args' => ['/']])->text(__t('system.button.back_home')),
+                    Button::make()->on('click', ['call' => '$router.back'])->text(__t('system.button.back_prev')),
                 ])]),
         ]);
         return success($schema->toArray());
@@ -197,11 +212,11 @@ class SystemController extends Controller
         }
 
         $children[] = UserAvatar::make()->menuItems([
-            ['key' => 'profile', 'label' => '个人中心', 'icon' => 'ph:user', 'action' => 'modal', 'modal' => ['title' => '个人中心', 'width' => 600, 'uiApi' => '/user/profile/ui']],
-            ['key' => 'settings', 'label' => '账号设置', 'icon' => 'ph:gear', 'action' => 'modal', 'modal' => ['title' => '账号设置', 'width' => 500, 'uiApi' => '/user/settings/ui', 'submitApi' => '/user/settings']],
-            ['key' => 'password', 'label' => '修改密码', 'icon' => 'ph:lock-key', 'action' => 'modal', 'modal' => ['title' => '修改密码', 'width' => 400, 'uiApi' => '/user/password/ui', 'submitApi' => '/user/password']],
+            ['key' => 'profile', 'label' => __t('system.avatar.profile'), 'icon' => 'ph:user', 'action' => 'modal', 'modal' => ['title' => __t('system.avatar.profile'), 'width' => 600, 'uiApi' => '/user/profile/ui']],
+            ['key' => 'settings', 'label' => __t('system.avatar.settings'), 'icon' => 'ph:gear', 'action' => 'modal', 'modal' => ['title' => __t('system.avatar.settings'), 'width' => 500, 'uiApi' => '/user/settings/ui', 'submitApi' => '/user/settings']],
+            ['key' => 'password', 'label' => __t('system.avatar.password'), 'icon' => 'ph:lock-key', 'action' => 'modal', 'modal' => ['title' => __t('system.avatar.password'), 'width' => 400, 'uiApi' => '/user/password/ui', 'submitApi' => '/user/password']],
             ['key' => 'divider1', 'divider' => true],
-            ['key' => 'logout', 'label' => '退出登录', 'icon' => 'ph:sign-out', 'action' => 'logout'],
+            ['key' => 'logout', 'label' => __t('system.avatar.logout'), 'icon' => 'ph:sign-out', 'action' => 'logout'],
         ]);
 
         $schema = Html::div()->props(['class' => 'h-full flex-y-center gap-4px'])->children($children);
@@ -210,9 +225,7 @@ class SystemController extends Controller
 
     public function getThemeConfig(): array
     {
-        $settingModel = $this->getSettingModel();
-        $themeConfig = $settingModel::fetchValue('theme', $this->getDefaultThemeConfig());
-        return success($themeConfig);
+        return success($this->getThemeSettings());
     }
 
     public function saveThemeConfig(): array
@@ -220,11 +233,38 @@ class SystemController extends Controller
         $data = request()->post();
         $settingModel = $this->getSettingModel();
         $settingModel::setValue('theme', $data);
-        return success('保存成功');
+        return success(__t('system.config_saved'));
     }
 
     public function getDefaultThemeConfig(): array
     {
         return config('thinkrix.theme', []);
+    }
+
+    /**
+     * 获取翻译
+     * GET /api/admin/system/translations?locale=zh-cn
+     */
+    public function translations(): array
+    {
+        $locale = $this->input('locale', config('thinkrix.locale', 'zh-CN'));
+        $locale = strtolower(str_replace('_', '-', $locale));
+        $service = app(TranslationService::class);
+        return success($service->getTranslations($locale));
+    }
+
+    /**
+     * 设置用户语言偏好
+     * POST /api/admin/system/locale
+     */
+    public function setLocale(): array
+    {
+        $locale = $this->input('locale', 'zh-CN');
+        $user = $this->getUser();
+        if ($user) {
+            $user->locale = $locale;
+            $user->save();
+        }
+        return success(__t('system.locale_saved'));
     }
 }

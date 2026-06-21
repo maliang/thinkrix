@@ -81,6 +81,9 @@ class ModuleLoader
             // 注册事件监听器
             $this->registerListeners($moduleName, $modulePath, $moduleJson);
 
+            // 注册模块语言包
+            $this->registerModuleLang($moduleName, $modulePath);
+
         }
     }
 
@@ -237,6 +240,26 @@ class ModuleLoader
                 Event::listen($event, $listener);
             }
         }
+    }
+
+    /**
+     * 注册模块语言包
+     */
+    protected function registerModuleLang(string $moduleName, string $modulePath): void
+    {
+        $langDir = $modulePath . DIRECTORY_SEPARATOR . 'lang';
+        if (!is_dir($langDir)) { return; }
+
+        $extend = $this->app->config->get('lang.extend_list', []);
+        foreach (['zh-cn', 'en-us'] as $locale) {
+            $file = $langDir . DIRECTORY_SEPARATOR . $locale . '.php';
+            if (file_exists($file)) {
+                if (!isset($extend[$locale]) || !in_array($file, $extend[$locale])) {
+                    $extend[$locale][] = $file;
+                }
+            }
+        }
+        $this->app->config->set($extend, 'lang.extend_list');
     }
 
     /**
