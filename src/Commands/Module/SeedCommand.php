@@ -13,36 +13,40 @@ use Thinkrix\Commands\Module\Support\ModuleSeedRun;
  * 执行指定模块 database/seeders/ 目录下的所有 Seeder 文件。
  *
  * 用法：
- *   php think thinkrix:module-seed Blog
+ *   php think thinkrix:module-seed                  # 填充全部模块
+ *   php think thinkrix:module-seed Blog             # 填充单个
+ *   php think thinkrix:module-seed Blog Shop        # 一次填充多个
  */
 class SeedCommand extends BaseModuleCommand
 {
-    /**
-     * 配置命令名称、描述、参数
-     */
     protected function configure()
     {
         $this->setName('thinkrix:module-seed')
-            ->setDescription('执行模块数据填充')
-            ->addArgument('module', Argument::REQUIRED, '目标模块名称');
+            ->setDescription('执行模块数据填充（不传参数则填充全部模块）')
+            ->addArgument('module', Argument::OPTIONAL | Argument::IS_ARRAY, '模块名称（可多个，不传则填充全部）');
     }
 
-    /**
-     * 执行命令逻辑
-     *
-     * @param Input $input 输入实例
-     * @param Output $output 输出实例
-     * @return int 退出码（0=成功，1=失败）
-     */
     protected function execute(Input $input, Output $output): int
     {
-        $module = $input->getArgument('module');
-        $generator = $this->getGenerator();
+        $modules = $input->getArgument('module');
 
-        // 将模块名转换为 StudlyCase
+        if (empty($modules)) {
+            return $this->seedAllModules($output);
+        }
+
+        $hasError = false;
+        foreach ($modules as $module) {
+            $result = $this->seedModule($module, $output);
+            if ($result !== 0) { $hasError = true; }
+        }
+        return $hasError ? 1 : 0;
+    }
+
+    protected function seedModule(string $module, Output $output): int
+    {
+        $generator = $this->getGenerator();
         $moduleName = $generator->studlyCase($module);
 
-        // 验证模块存在
         if (!$this->validateModuleExists($moduleName, $output)) {
             return 1;
         }
@@ -55,7 +59,6 @@ class SeedCommand extends BaseModuleCommand
             return 0;
         }
 
-        // 获取 seeder 文件
         $files = glob($seederPath . DIRECTORY_SEPARATOR . '*.php');
         sort($files);
 
@@ -77,5 +80,28 @@ class SeedCommand extends BaseModuleCommand
 
         $output->writeln("<info>Seeding complete for module [{$moduleName}].</info>");
         return 0;
+    }
+
+    protected function seedAllModules(Output $output): int
+    {
+        $paths = config('thinkrix.modules.paths', ['Modules', 'app']);
+        $root = app()->getRootPath();
+        $hasError = false;
+
+        foreach ($paths as $p) {
+            $dir = $root . $p . DIRECTORY_SEPARATOR;
+            if (!is_dir($dir)) { continue; }
+            $items = scandir($dir);
+            foreach ($items as $item) {
+                if ($item === '.' || $item === '..') { continue; }
+                $moduleDir = $dir . $item;
+                if (!is_dir($moduleDir)) { continue; }
+                if (!file_exists($moduleDir . DIRECTORY_SEPARATOR . 'module.json')) { continue; }
+                $result = $this->seedModule($item, $output);
+                if ($result !== 0) { $hasError = true; }
+            }
+        }
+
+        return $hasError ? 1 : 0;
     }
 }
