@@ -98,6 +98,7 @@ return [
         'message' => [
             'config_saved' => 'Settings saved',
             'locale_saved' => 'Language preference saved',
+            'locale_invalid' => 'Unsupported language',
             'theme_saved' => 'Theme configuration saved',
             'builtin_not_deletable' => 'System built-in group cannot be deleted',
         ],

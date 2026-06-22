@@ -57,19 +57,8 @@ if (!function_exists('__t')) {
     function __t(string $key, array $replace = []): string
     {
         try {
-            $lang = app()->lang;
-            // 1. 当前 locale
-            $result = $lang->get($key, $replace);
-            if ($result !== $key) {
-                return $result;
-            }
-            // 2. 回退到默认语言
-            $default = config('thinkrix.fallback_locale', 'zh-cn');
-            $result = $lang->get($key, $replace, $default);
-            if ($result !== $key) {
-                return $result;
-            }
-            return $key;
+            $locale = app()->lang->getLangSet() ?: config('thinkrix.locale', 'zh-CN');
+            return app(\Thinkrix\Services\TranslationService::class)->translate($key, $replace, $locale);
         } catch (\Throwable $e) {
             return $key;
         }

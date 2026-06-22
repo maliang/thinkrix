@@ -103,6 +103,7 @@ return [
         'message' => [
             'config_saved' => '保存成功',
             'locale_saved' => '语言设置已保存',
+            'locale_invalid' => '不支持的语言',
             'theme_saved' => '主题配置已保存',
             'builtin_not_deletable' => '系统内置分组不允许删除',
         ],

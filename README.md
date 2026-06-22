@@ -78,6 +78,25 @@ php think thinkrix:install
 
 ---
 
+## 增加语言
+
+语言种类由 Thinkrix 后端配置提供，不需要修改或重新编译 Trix 前端。例如增加日语：
+
+```php
+// config/thinkrix.php
+'languages' => [
+    'zh-CN' => ['label' => '中文', 'file' => 'zh-cn', 'naive_locale' => 'zh-CN'],
+    'en-US' => ['label' => 'English', 'file' => 'en-us', 'naive_locale' => 'en-US'],
+    'ja-JP' => ['label' => '日本語', 'file' => 'ja-jp', 'naive_locale' => 'en-US'],
+],
+```
+
+然后创建项目语言文件 `config/lang/ja-jp.php`。它可以同时包含后端 Schema 文案和 Trix 界面翻译；项目语言会覆盖包内同名键。切换语言后，前端会从 `/translations` 动态加载语言包并缓存，无需增加前端语言模块。
+
+`naive_locale` 控制 Naive UI 日期、分页等内置文案的基础语言，目前支持 `zh-CN` 和 `en-US`；其他语言可以先选择其中一个作为回退。
+
+---
+
 ## 命令参考
 
 | 命令 | 说明 |

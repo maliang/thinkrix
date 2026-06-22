@@ -5,6 +5,7 @@ namespace Thinkrix\Controllers;
 use think\Request;
 use Thinkrix\Services\AuthService;
 use Thinkrix\Models\Setting;
+use Thinkrix\Services\TranslationService;
 
 class AuthController extends Controller
 {
@@ -71,6 +72,7 @@ class AuthController extends Controller
             'status' => $user->status,
             'roles' => $user->getRoleNames(),
             'permissions' => $user->getActivePermissionNames(),
+            'locale' => $user->locale ?: config('thinkrix.locale', 'zh-CN'),
         ]);
     }
 
@@ -105,6 +107,10 @@ class AuthController extends Controller
             'apiPrefix' => '/' . ltrim(config('thinkrix.api_prefix', 'api/admin'), '/'),
             'appTitle' => $theme['appTitle'] ?? 'Thinkrix Admin',
             'logo' => $theme['logo'] ?? '',
+            'locale' => config('thinkrix.locale', 'zh-CN'),
+            'fallbackLocale' => config('thinkrix.fallback_locale', 'en-US'),
+            'languages' => app(TranslationService::class)->getLanguageOptions(),
+            'translationsUrl' => '/translations',
         ]);
     }
 }

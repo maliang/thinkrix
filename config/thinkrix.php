@@ -17,6 +17,12 @@ return [
     */
     'locale' => env('THINKRIX_LOCALE', 'zh-CN'),
     'fallback_locale' => 'en-US',
+    // 可用语言。新增语言只需在项目配置中追加一项，并创建 config/lang/{file}.php。
+    // naive_locale 用于 Naive UI 内置组件语言，目前可选 zh-CN / en-US。
+    'languages' => [
+        'zh-CN' => ['label' => '中文', 'file' => 'zh-cn', 'naive_locale' => 'zh-CN'],
+        'en-US' => ['label' => 'English', 'file' => 'en-us', 'naive_locale' => 'en-US'],
+    ],
     'copyright' => env('THINKRIX_COPYRIGHT', '© ' . date('Y') . ' Thinkrix Admin. All rights reserved.'),
 
     /*

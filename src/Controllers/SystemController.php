@@ -58,6 +58,8 @@ class SystemController extends Controller
             'logo' => $theme['logo'] ?? '',
             'locale' => config('thinkrix.locale', 'zh-CN'),
             'fallbackLocale' => config('thinkrix.fallback_locale', 'en-US'),
+            'languages' => app(TranslationService::class)->getLanguageOptions(),
+            'translationsUrl' => '/translations',
         ];
     }
 
@@ -202,7 +204,15 @@ class SystemController extends Controller
             $children[] = FullScreen::make();
         }
         if (config('thinkrix.header.lang_switch', true)) {
-            $children[] = LangSwitch::make();
+            $locale = $this->getUser()?->locale ?: config('thinkrix.locale', 'zh-CN');
+            $translationService = app(TranslationService::class);
+            $children[] = LangSwitch::make()->props([
+                'langOptions' => $translationService->getLanguageOptions(),
+                'defaultLang' => $locale,
+                'submitUrl' => '/locale',
+                'translationsUrl' => '/translations',
+                'reloadOnChange' => true,
+            ]);
         }
         if (config('thinkrix.header.theme_schema_switch', true)) {
             $children[] = ThemeSchemaSwitch::make();
@@ -248,8 +258,9 @@ class SystemController extends Controller
     public function translations(): array
     {
         $locale = $this->input('locale', config('thinkrix.locale', 'zh-CN'));
-        $locale = strtolower(str_replace('_', '-', $locale));
         $service = app(TranslationService::class);
+        $locale = $service->normalizeLocale($locale);
+        if ($locale === null) error(__t('system.message.locale_invalid'), null, 40022);
         return success($service->getTranslations($locale));
     }
 
@@ -260,11 +271,17 @@ class SystemController extends Controller
     public function setLocale(): array
     {
         $locale = $this->input('locale', 'zh-CN');
+        $service = app(TranslationService::class);
+        $locale = $service->normalizeLocale($locale);
+        if ($locale === null) {
+            error(__t('system.message.locale_invalid'), null, 40022);
+        }
         $user = $this->getUser();
         if ($user) {
             $user->locale = $locale;
             $user->save();
         }
-        return success(__t('system.locale_saved'));
+        app()->lang->setLangSet(strtolower(str_replace('_', '-', $locale)));
+        return success(__t('system.message.locale_saved'));
     }
 }

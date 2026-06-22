@@ -6,6 +6,7 @@ use Closure;
 use think\Request;
 use think\Response;
 use Thinkrix\Services\AuthService;
+use Thinkrix\Services\TranslationService;
 
 /**
  * Authenticate - 认证中间件
@@ -45,6 +46,12 @@ class Authenticate
 
         // 将用户对象绑定到请求
         $request->thinkrix_user = $user;
+
+        $translationService = app(TranslationService::class);
+        $locale = $translationService->normalizeLocale((string) ($user->locale ?: config('thinkrix.locale', 'zh-CN')));
+        if ($locale !== null) {
+            app()->lang->setLangSet(strtolower(str_replace('_', '-', $locale)));
+        }
 
         return $next($request);
     }
