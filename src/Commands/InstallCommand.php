@@ -40,18 +40,18 @@ class InstallCommand extends Command
         $this->publishConfig($output);
         $output->info('   配置发布完成。');
 
-        // 3. 执行数据库迁移
-        $output->info('3. 执行数据库迁移...');
+        // 3. 初始化基础数据表（为迁移提供前置依赖）
+        $output->info('3. 初始化基础数据表...');
+        $this->initBaseTables($output);
+        $output->info('   基础表初始化完成。');
+
+        // 4. 执行数据库迁移
+        $output->info('4. 执行数据库迁移...');
         if ($this->runMigrations($output)) {
             $output->info('   迁移完成。');
         } else {
-            $output->writeln('<comment>   迁移未执行，将使用完整建表兜底。</comment>');
+            $output->writeln('<comment>   迁移未执行，后续操作依赖基础表已就绪。</comment>');
         }
-
-        // 4. 创建基础表（如果不使用迁移）
-        $output->info('4. 初始化基础数据表...');
-        $this->initBaseTables($output);
-        $output->info('   基础表初始化完成。');
 
         // 5. 创建超级管理员角色
         $output->info('5. 创建超级管理员角色...');
