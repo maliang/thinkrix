@@ -269,7 +269,7 @@ return [
     */
     'theme' => [
         'appTitle' => env('THINKRIX_APP_TITLE', 'Thinkrix Admin'),
-        'logo' => env('THINKRIX_LOGO', '/favicon.svg'),
+        'logo' => env('THINKRIX_LOGO', '/admin/favicon.svg'),
         'themeScheme' => 'light',
         'grayscale' => false,
         'colourWeakness' => false,
