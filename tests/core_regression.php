@@ -22,6 +22,12 @@ function source(string $path): string
 $menu = source('src/Models/Menu.php');
 check(!str_contains($menu, 'relationLoaded('), 'Menu must not call Laravel relationLoaded().');
 check(!str_contains($menu, 'isNotEmpty('), 'Menu must not call Laravel Collection::isNotEmpty().');
+check(
+    str_contains($menu, 'translatedTitle()')
+        && str_contains($menu, "'menu.route.'")
+        && str_contains($menu, '__t($titleKey)'),
+    'Menu routes must translate built-in menu titles by route name before falling back to database titles.'
+);
 
 $userController = source('src/Controllers/UserController.php');
 check(

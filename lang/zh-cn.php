@@ -34,6 +34,9 @@ return [
     'system' => [
         'dashboard' => [
             'title' => '仪表盘',
+            'total_users' => '用户总数',
+            'active_users' => '活跃用户',
+            'total_roles' => '角色总数',
             'welcome' => '欢迎使用 Thinkrix 后台管理系统',
             'welcome_desc' => '基于 ThinkPHP 8 和 Trix 前端的后台管理解决方案',
         ],

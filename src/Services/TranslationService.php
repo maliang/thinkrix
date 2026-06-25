@@ -162,6 +162,9 @@ class TranslationService
             }
             $value = $value[$segment];
         }
+        if (is_array($value) && isset($value['_']) && is_string($value['_'])) {
+            return $value['_'];
+        }
         return $value;
     }
 

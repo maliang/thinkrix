@@ -29,6 +29,9 @@ return [
     'system' => [
         'dashboard' => [
             'title' => 'Dashboard',
+            'total_users' => 'Total Users',
+            'active_users' => 'Active Users',
+            'total_roles' => 'Total Roles',
             'welcome' => 'Welcome to Thinkrix Admin',
             'welcome_desc' => 'ThinkPHP 8 + Trix frontend admin solution',
         ],

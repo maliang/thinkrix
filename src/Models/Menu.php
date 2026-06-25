@@ -110,7 +110,7 @@ class Menu extends Model
         if ($this->redirect) { $route['redirect'] = $this->redirect; }
 
         $meta = [];
-        if ($this->title) $meta['title'] = $this->title;
+        if ($this->title) $meta['title'] = $this->translatedTitle();
         if ($this->icon) $meta['icon'] = $this->icon;
         if ($this->order) $meta['order'] = $this->order;
         if ($this->hide_in_menu) $meta['hideInMenu'] = true;
@@ -139,6 +139,14 @@ class Menu extends Model
         }
 
         return $route;
+    }
+
+    protected function translatedTitle(): string
+    {
+        $titleKey = 'menu.route.' . $this->getData('name');
+        $translated = __t($titleKey);
+
+        return $translated === $titleKey ? (string) $this->title : $translated;
     }
 
     /**

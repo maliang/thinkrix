@@ -20,6 +20,41 @@ if (!function_exists('config')) {
     }
 }
 
+if (!function_exists('app')) {
+    function app(?string $class = null): mixed
+    {
+        static $fakeApp = null;
+        $fakeApp ??= new class {
+            public object $lang;
+
+            public function __construct()
+            {
+                $this->lang = new class {
+                    public function getLangSet(): string
+                    {
+                        return 'zh-cn';
+                    }
+
+                    public function setLangSet(string $locale): void
+                    {
+                    }
+                };
+            }
+
+            public function getRootPath(): string
+            {
+                return dirname(__DIR__, 2) . '/thinkphp_web/';
+            }
+        };
+
+        if ($class === null) {
+            return $fakeApp;
+        }
+
+        return new $class();
+    }
+}
+
 spl_autoload_register(function (string $class) use ($root): void {
     $prefix = 'Thinkrix\\';
     if (!str_starts_with($class, $prefix)) {
@@ -81,6 +116,52 @@ foreach ([
 $dataTable = Thinkrix\Schema\Components\Business\DataTable::make()->rowKey('name')->toArray();
 if (($dataTable['props']['rowKey'] ?? null) !== '{{ row => row.name }}') {
     fwrite(STDERR, "DataTable::rowKey must generate a row resolver function for JsonDataTable.\n");
+    exit(1);
+}
+
+$translationService = new Thinkrix\Services\TranslationService();
+foreach (['zh-cn', 'en-us'] as $locale) {
+    foreach (['system.dashboard.total_users', 'system.dashboard.active_users', 'system.dashboard.total_roles'] as $key) {
+        if ($translationService->translate($key, [], $locale) === $key) {
+            fwrite(STDERR, "{$locale} must translate {$key}.\n");
+            exit(1);
+        }
+    }
+    foreach (['menu.route.home', 'menu.route.system', 'menu.route.system.user', 'menu.route.module', 'menu.route.module.installed'] as $key) {
+        if ($translationService->translate($key, [], $locale) === $key) {
+            fwrite(STDERR, "{$locale} must translate {$key}.\n");
+            exit(1);
+        }
+    }
+}
+
+$staticTranslationKeys = [];
+$sourceIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/src'));
+foreach ($sourceIterator as $sourceFile) {
+    if (!$sourceFile->isFile() || $sourceFile->getExtension() !== 'php') {
+        continue;
+    }
+
+    $contents = file_get_contents($sourceFile->getPathname());
+    preg_match_all('/__t\(\s*[\'"]([^\'"]+)[\'"]/', $contents, $matches);
+    foreach ($matches[1] as $key) {
+        if (!str_contains($key, '{{') && !str_contains($key, ' ')) {
+            $staticTranslationKeys[$key] = true;
+        }
+    }
+}
+ksort($staticTranslationKeys);
+
+$missingTranslationKeys = [];
+foreach (['zh-cn', 'en-us'] as $locale) {
+    foreach (array_keys($staticTranslationKeys) as $key) {
+        if ($translationService->translate($key, [], $locale) === $key) {
+            $missingTranslationKeys[] = "{$locale}:{$key}";
+        }
+    }
+}
+if ($missingTranslationKeys !== []) {
+    fwrite(STDERR, "Static __t() keys must resolve in zh-cn and en-us:\n" . implode(PHP_EOL, $missingTranslationKeys) . PHP_EOL);
     exit(1);
 }
 
