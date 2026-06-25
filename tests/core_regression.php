@@ -66,6 +66,16 @@ foreach (['RoleController.php', 'PermissionController.php', 'MenuController.php'
     check(str_contains($contents, 'getUpdateRules'), "{$controller} must define update validation.");
 }
 
+foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controllers')) as $controllerFile) {
+    if ($controllerFile->isFile() && $controllerFile->getExtension() === 'php') {
+        $contents = file_get_contents($controllerFile->getPathname());
+        check(
+            preg_match('/\{\{\s*slotData\.row[^}]*__t\(/', $contents) !== 1,
+            $controllerFile->getFilename() . ' table row slots must not call frontend __t().'
+        );
+    }
+}
+
 $dict = source('src/Controllers/DictController.php');
 check(!preg_match('/success\((?:DictGroup|DictItem)::create\(/', $dict), 'Dict create responses must not pass models as success() message.');
 check(!str_contains($dict, 'success(null,'), 'Dict responses must not pass null as success() message.');

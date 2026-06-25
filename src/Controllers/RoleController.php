@@ -134,6 +134,11 @@ class RoleController extends CrudController
 
     protected function listUi(): array
     {
+        $enabledLabel = $this->jsString(__t('ui.tag.enabled'));
+        $disabledLabel = $this->jsString(__t('ui.tag.disabled'));
+        $yesLabel = $this->jsString(__t('ui.button.yes'));
+        $noLabel = $this->jsString(__t('ui.button.no'));
+
         $permissionTree = Tree::make()->props([
             'data' => $this->getPermissionTree(), 'checkable' => true, 'selectable' => false,
             'cascade' => true, 'keyField' => 'name', 'labelField' => 'title', 'childrenField' => 'children',
@@ -159,8 +164,8 @@ class RoleController extends CrudController
                 ['key' => 'name', 'title' => __t('role.column.name')],
                 ['key' => 'title', 'title' => __t('role.column.title')],
                 ['key' => 'description', 'title' => __t('module.column.description')],
-                ['key' => 'status', 'title' => __t('module.column.status'), 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.status ? 'success' : 'error' }}", 'size' => 'small'])->children(["{{ slotData.row.status ? __t('ui.tag.enabled') : __t('ui.tag.disabled') }}"])]],
-                ['key' => 'is_system', 'title' => __t('role.column.is_system'), 'width' => 100, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.is_system ? 'warning' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.is_system ? __t('ui.button.yes') : __t('ui.button.no') }}"])]],
+                ['key' => 'status', 'title' => __t('module.column.status'), 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.status ? 'success' : 'error' }}", 'size' => 'small'])->children(["{{ slotData.row.status ? {$enabledLabel} : {$disabledLabel} }}"])]],
+                ['key' => 'is_system', 'title' => __t('role.column.is_system'), 'width' => 100, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.is_system ? 'warning' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.is_system ? {$yesLabel} : {$noLabel} }}"])]],
                 ['key' => 'actions', 'title' => __t('module.column.actions'), 'width' => 150, 'fixed' => 'right', 'slot' => [
                     Space::make()->children([
                         Button::make()->size('small')->props(['type' => 'primary', 'text' => true])->on('click', [SetAction::make('editingId', '{{ slotData.row.id }}'), SetAction::make('formData.name', '{{ slotData.row.name }}'), SetAction::make('formData.title', '{{ slotData.row.title || "" }}'), SetAction::make('formData.description', '{{ slotData.row.description || "" }}'), SetAction::make('formData.permissions', '{{ (slotData.row.permissions || []).map(p => p.name) }}'), SetAction::make('formData.status', '{{ slotData.row.status }}'), SetAction::make('formVisible', true)])->text(__t('permission.button.edit')),

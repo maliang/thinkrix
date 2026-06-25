@@ -63,4 +63,12 @@ abstract class Controller
     {
         return request()->param($name, $default);
     }
+
+    /**
+     * 转为前端表达式中可安全使用的 JavaScript 字符串字面量。
+     */
+    protected function jsString(string $value): string
+    {
+        return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
 }

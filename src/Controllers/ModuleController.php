@@ -141,6 +141,8 @@ class ModuleController extends Controller
     protected function installedUi(): array
     {
         $routePrefix = '/' . config('thinkrix.api_prefix', 'api/admin');
+        $installedLabel = $this->jsString(__t('module.tag.installed'));
+        $notInstalledLabel = $this->jsString(__t('module.tag.not_installed'));
         $schema = Card::make()->props([
                 'title' => __t('module.installed.title'),
                 'style' => ['height' => '100%', 'display' => 'flex', 'flexDirection' => 'column'],
@@ -202,7 +204,7 @@ class ModuleController extends Controller
                             ['key' => 'description', 'title' => __t('module.column.description'), 'ellipsis' => true],
                             ['key' => 'author', 'title' => __t('module.column.author'), 'width' => 100],
                             ['key' => 'website', 'title' => __t('module.column.website'), 'width' => 120, 'ellipsis' => true, 'slot' => [Button::make()->if('slotData.row.website')->size('small')->props(['text' => true, 'type' => 'primary', 'tag' => 'a', 'href' => '{{ slotData.row.website }}', 'target' => '_blank'])->children([__t('module.button.visit')])]],
-                            ['key' => 'enabled', 'title' => __t('module.column.status'), 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.enabled ? 'success' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.enabled ? __t('module.tag.installed') : __t('module.tag.not_installed') }}"])]],
+                            ['key' => 'enabled', 'title' => __t('module.column.status'), 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.enabled ? 'success' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.enabled ? {$installedLabel} : {$notInstalledLabel} }}"])]],
                             ['key' => 'actions', 'title' => __t('module.column.actions'), 'width' => 160, 'slot' => [
                                 Space::make()->children([
                                     // 未安装：显示安装按钮

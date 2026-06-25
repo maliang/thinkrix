@@ -168,6 +168,9 @@ class MenuController extends CrudController
 
     protected function listUi(): array
     {
+        $yesLabel = $this->jsString(__t('ui.button.yes'));
+        $noLabel = $this->jsString(__t('ui.button.no'));
+
         $menuForm = OptForm::make('formData')
             ->fields([
                 [__t('menu.form.parent_id'), 'parent_id', TreeSelect::make()->props(['placeholder' => __t('menu.placeholder.parent'), 'clearable' => true, 'options' => '{{ menuTreeOptions }}', 'keyField' => 'id', 'labelField' => 'title', 'childrenField' => 'children'])],
@@ -200,7 +203,7 @@ class MenuController extends CrudController
                 ['key' => 'path', 'title' => __t('menu.column.path')],
                 ['key' => 'icon', 'title' => __t('menu.column.icon')],
                 ['key' => 'order', 'title' => __t('permission.column.sort'), 'width' => 80],
-                ['key' => 'hide_in_menu', 'title' => __t('menu.column.hide_in_menu'), 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.hide_in_menu ? 'warning' : 'success' }}", 'size' => 'small'])->children(["{{ slotData.row.hide_in_menu ? __t('ui.button.yes') : __t('ui.button.no') }}"])]],
+                ['key' => 'hide_in_menu', 'title' => __t('menu.column.hide_in_menu'), 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.hide_in_menu ? 'warning' : 'success' }}", 'size' => 'small'])->children(["{{ slotData.row.hide_in_menu ? {$yesLabel} : {$noLabel} }}"])]],
                 ['key' => 'actions', 'title' => __t('module.column.actions'), 'width' => 200, 'fixed' => 'right', 'slot' => [
                     Space::make()->children([
                         Button::make()->size('small')->props(['type' => 'primary', 'text' => true])->on('click', [SetAction::make('editingId', '{{ slotData.row.id }}'), SetAction::make('formData.parent_id', '{{ slotData.row.parent_id }}'), SetAction::make('formData.name', '{{ slotData.row.name }}'), SetAction::make('formData.title', '{{ slotData.row.title || "" }}'), SetAction::make('formData.path', '{{ slotData.row.path }}'), SetAction::make('formData.icon', '{{ slotData.row.icon || "" }}'), SetAction::make('formData.redirect', '{{ slotData.row.redirect || "" }}'), SetAction::make('formData.order', '{{ slotData.row.order || 0 }}'), SetAction::make('formData.layout_type', '{{ slotData.row.layout_type }}'), SetAction::make('formData.open_type', '{{ slotData.row.open_type }}'), SetAction::make('formData.href', '{{ slotData.row.href || "" }}'), SetAction::make('formData.use_json_renderer', '{{ slotData.row.use_json_renderer || false }}'), SetAction::make('formData.schema_source', '{{ slotData.row.schema_source || "" }}'), SetAction::make('formData.hide_in_menu', '{{ slotData.row.hide_in_menu || false }}'), SetAction::make('formData.keep_alive', '{{ slotData.row.keep_alive || false }}'), SetAction::make('formData.requires_auth', '{{ slotData.row.requires_auth !== false }}'), SetAction::make('formData.is_default_after_login', '{{ slotData.row.is_default_after_login || false }}'), SetAction::make('formVisible', true), CallAction::make('loadMenuTree')])->text(__t('permission.button.edit')),

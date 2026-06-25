@@ -144,6 +144,11 @@ class DictController extends Controller
 
     protected function groupsListUi(): array
     {
+        $enabledLabel = $this->jsString(__t('ui.tag.enabled'));
+        $disabledLabel = $this->jsString(__t('ui.tag.disabled'));
+        $yesLabel = $this->jsString(__t('ui.button.yes'));
+        $noLabel = $this->jsString(__t('ui.button.no'));
+
         $groupForm = OptForm::make('formData')
             ->fields([
                 [__t('dict.column.code'), 'code', Input::make()->props(['placeholder' => __t('dict.placeholder.code'), 'disabled' => '{{ !!editingId && editingSystem }}'])],
@@ -173,7 +178,7 @@ class DictController extends Controller
                 ['key' => 'name', 'title' => __t('dict.column.name'), 'width' => 150],
                 ['key' => 'description', 'title' => __t('module.column.description')],
                 ['key' => 'items_count', 'title' => __t('dict.column.items_count'), 'width' => 100, 'slot' => [Tag::make()->props(['type' => 'info', 'size' => 'small'])->children(['{{ slotData.row.items_count }}'])]],
-                ['key' => 'is_system', 'title' => __t('dict.column.is_system'), 'width' => 100, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.is_system ? 'warning' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.is_system ? __t('ui.button.yes') : __t('ui.button.no') }}"])]],
+                ['key' => 'is_system', 'title' => __t('dict.column.is_system'), 'width' => 100, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.is_system ? 'warning' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.is_system ? {$yesLabel} : {$noLabel} }}"])]],
                 ['key' => 'created_at', 'title' => __t('system.column.created_at'), 'width' => 180],
                 ['key' => 'actions', 'title' => __t('module.column.actions'), 'width' => 200, 'fixed' => 'right', 'slot' => [
                     Space::make()->children([
@@ -221,7 +226,7 @@ class DictController extends Controller
                 ['key' => 'is_enabled', 'title' => __t('module.column.status'), 'width' => 80],
                 ['key' => 'actions', 'title' => __t('module.column.actions'), 'width' => 120, 'fixed' => 'right'],
             ], 'rowKey' => '{{ row => row.id }}', 'scrollX' => 700,
-        ])->slot('is_enabled', [Tag::make()->props(['type' => "{{ slotData.row.is_enabled ? 'success' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.is_enabled ? __t('ui.tag.enabled') : __t('ui.tag.disabled') }}"])], 'slotData')
+        ])->slot('is_enabled', [Tag::make()->props(['type' => "{{ slotData.row.is_enabled ? 'success' : 'default' }}", 'size' => 'small'])->children(["{{ slotData.row.is_enabled ? {$enabledLabel} : {$disabledLabel} }}"])], 'slotData')
             ->slot('actions', [Space::make()->children([
                 Button::make()->size('small')->props(['type' => 'info', 'text' => true])->on('click', [SetAction::make('editingItemId', '{{ slotData.row.id }}'), SetAction::make('itemFormData.code', '{{ slotData.row.code }}'), SetAction::make('itemFormData.label', '{{ slotData.row.label }}'), SetAction::make('itemFormData.value', '{{ slotData.row.value }}'), SetAction::make('itemFormData.sort', '{{ slotData.row.sort }}'), SetAction::make('itemFormData.is_enabled', '{{ slotData.row.is_enabled }}'), SetAction::make('itemFormVisible', true)])->text(__t('permission.button.edit')),
                 Popconfirm::make()->props(['positiveText' => __t('ui.button.confirm'), 'negativeText' => __t('ui.button.cancel')])
