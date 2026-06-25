@@ -99,6 +99,19 @@ check(
     'Thinkrix theme config must hide the global footer by default.'
 );
 
+$routes = source('src/routes.php');
+$rootTranslationsPosition = strpos($routes, "Route::get('translations', \"{\$systemController}@translations\")");
+$rootLocalePosition = strpos($routes, "Route::post('locale', \"{\$systemController}@setLocale\")");
+$systemGroupPosition = strpos($routes, "Route::group('system'");
+check(
+    $rootTranslationsPosition !== false
+        && $rootLocalePosition !== false
+        && $systemGroupPosition !== false
+        && $rootTranslationsPosition < $systemGroupPosition
+        && $rootLocalePosition < $systemGroupPosition,
+    'Thinkrix routes must expose root-level translations and locale endpoints under the configured API prefix.'
+);
+
 require_once $root . '/src/Exceptions/ApiException.php';
 $exception = new Thinkrix\Exceptions\ApiException('invalid', 40022);
 check($exception->getErrorCode() === 40022, 'ApiException second integer argument must be treated as error code.');

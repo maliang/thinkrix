@@ -71,6 +71,10 @@ Route::group($prefix, function () use (
             Route::delete('tokens/<id>', "{$authController}@revokeToken");
         });
 
+        // 统一前端多语言协议，兼容 Laravel 版的 /api/admin/translations 与 /api/admin/locale。
+        Route::get('translations', "{$systemController}@translations");
+        Route::post('locale', "{$systemController}@setLocale");
+
         // 系统配置
         Route::group('system', function () use ($systemController) {
             Route::post('theme-config', "{$systemController}@saveThemeConfig")
