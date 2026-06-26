@@ -55,6 +55,12 @@ class SettingController extends Controller
         $this->validate($data, ['settings' => 'require|array']);
 
         $cachePrefix = config('thinkrix.cache.settings.prefix', 'thinkrix.setting.');
+        $themeUpdates = [];
+        $themeMapping = [
+            'app_title' => 'appTitle',
+            'logo' => 'logo',
+            'copyright' => 'copyright',
+        ];
 
         foreach ($data['settings'] as $item) {
             if (empty($item['key'])) continue;
@@ -68,8 +74,29 @@ class SettingController extends Controller
                 $setting->save();
                 Cache::delete($cachePrefix . $item['key']);
             }
+
+            if (array_key_exists($item['key'], $themeMapping)) {
+                $themeUpdates[$themeMapping[$item['key']]] = $item['value'] ?? '';
+            }
         }
+
+        $this->syncThemeSettings($themeUpdates);
+
         return success(__t('crud.updated'));
+    }
+
+    protected function syncThemeSettings(array $themeUpdates): void
+    {
+        if ($themeUpdates === []) {
+            return;
+        }
+
+        $theme = Setting::fetchValue('theme', config('thinkrix.theme', []));
+        if (!is_array($theme)) {
+            $theme = config('thinkrix.theme', []);
+        }
+
+        Setting::setValue('theme', array_merge($theme, $themeUpdates));
     }
 
     protected function formUi(): array
@@ -95,7 +122,7 @@ class SettingController extends Controller
             ]),
         ])->toArray();
 
-        $theme = \Thinkrix\Models\Setting::fetchValue('theme', []);
+        $theme = \Thinkrix\Models\Setting::fetchThemeConfig(config('thinkrix.theme', []));
         $schema['data'] = [
             'formData' => [
                 'app_title' => $theme['appTitle'] ?? 'Thinkrix Admin',

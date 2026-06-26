@@ -74,7 +74,7 @@ class SystemController extends Controller
     protected function getThemeSettings(): array
     {
         $settingModel = $this->getSettingModel();
-        return $settingModel::fetchValue('theme', $this->getDefaultThemeConfig());
+        return $settingModel::fetchThemeConfig($this->getDefaultThemeConfig());
     }
 
     public function loginPage(): array

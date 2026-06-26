@@ -58,6 +58,32 @@ class Setting extends Model
     }
 
     /**
+     * 获取主题配置，并兼容系统设置页保存的独立站点配置。
+     */
+    public static function fetchThemeConfig(array $default = []): array
+    {
+        $theme = static::fetchValue('theme', $default);
+        if (!is_array($theme)) {
+            $theme = $default;
+        }
+
+        $mapping = [
+            'app_title' => 'appTitle',
+            'logo' => 'logo',
+            'copyright' => 'copyright',
+        ];
+
+        foreach ($mapping as $settingKey => $themeKey) {
+            $value = static::fetchValue($settingKey, null);
+            if ($value !== null) {
+                $theme[$themeKey] = $value;
+            }
+        }
+
+        return $theme;
+    }
+
+    /**
      * 设置值（不存在则创建）
      */
     public static function setValue(string $key, $value, ?string $group = null): bool

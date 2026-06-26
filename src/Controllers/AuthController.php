@@ -102,7 +102,7 @@ class AuthController extends Controller
      */
     public function config(): array
     {
-        $theme = Setting::fetchValue('theme', []);
+        $theme = Setting::fetchThemeConfig(config('thinkrix.theme', []));
         return success([
             'apiPrefix' => '/' . ltrim(config('thinkrix.api_prefix', 'api/admin'), '/'),
             'appTitle' => $theme['appTitle'] ?? 'Thinkrix Admin',

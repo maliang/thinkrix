@@ -115,6 +115,34 @@ check(
     'Thinkrix theme config must hide the global footer by default.'
 );
 
+$settingModel = source('src/Models/Setting.php');
+check(
+    str_contains($settingModel, 'public static function fetchThemeConfig')
+        && str_contains($settingModel, "'app_title' => 'appTitle'")
+        && str_contains($settingModel, "static::fetchValue(\$settingKey"),
+    'Setting must expose fetchThemeConfig() that merges standalone site settings into theme config.'
+);
+
+$settingController = source('src/Controllers/SettingController.php');
+check(
+    str_contains($settingController, 'syncThemeSettings')
+        && str_contains($settingController, "'app_title' => 'appTitle'")
+        && str_contains($settingController, "Setting::setValue('theme'"),
+    'SettingController must sync app title/logo/copyright writes into the theme setting.'
+);
+
+$systemController = source('src/Controllers/SystemController.php');
+check(
+    str_contains($systemController, 'fetchThemeConfig($this->getDefaultThemeConfig())'),
+    'SystemController must read merged theme config so site settings update entry, login and layout titles.'
+);
+
+$authController = source('src/Controllers/AuthController.php');
+check(
+    str_contains($authController, 'Setting::fetchThemeConfig'),
+    'AuthController config must read merged theme config.'
+);
+
 $routes = source('src/routes.php');
 $rootTranslationsPosition = strpos($routes, "Route::get('translations', \"{\$systemController}@translations\")");
 $rootLocalePosition = strpos($routes, "Route::post('locale', \"{\$systemController}@setLocale\")");
