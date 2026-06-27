@@ -170,10 +170,10 @@ Route::group($prefix, function () use (
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.setting.update');
         });
 
-        // 字典管理
+        // 字典管理 - 注意路由顺序：具体路由在前，通用路由在后
         Route::group('dicts', function () use ($dictController) {
-            Route::get('options/<code>', "{$dictController}@options");
             Route::post('options/batch', "{$dictController}@batchOptions");
+            Route::get('options/<code>', "{$dictController}@options");
             Route::get('groups', "{$dictController}@groups")
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.dict.list');
             Route::post('groups', "{$dictController}@createGroup")
@@ -209,18 +209,18 @@ Route::group($prefix, function () use (
             ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.setting.update');
 
         // 通知消息管理
-        Route::get('notifications', "{$notificationController}@index");
-        Route::post('notifications', "{$notificationController}@store")
-            ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.setting.update');
+        // 通知管理 - 注意路由顺序：具体路由在前，通用路由在后
+        Route::get('notifications/poll', "{$notificationController}@poll");
+        Route::post('notifications/mark-all-read', "{$notificationController}@markAllAsRead");
+        Route::post('notifications/<id>/mark-read', "{$notificationController}@markAsRead");
         Route::get('notifications/<id>', "{$notificationController}@show");
         Route::put('notifications/<id>', "{$notificationController}@update")
             ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.setting.update');
         Route::delete('notifications/<id>', "{$notificationController}@destroy")
             ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.setting.update');
-
-        Route::post('notifications/<id>/mark-read', "{$notificationController}@markAsRead");
-        Route::post('notifications/mark-all-read', "{$notificationController}@markAllAsRead");
-        Route::get('notifications/poll', "{$notificationController}@poll");
+        Route::get('notifications', "{$notificationController}@index");
+        Route::post('notifications', "{$notificationController}@store")
+            ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.setting.update');
 
         Route::group('admin', function () use ($adminNotificationController) {
             Route::post('notifications/send-to-backend', "{$adminNotificationController}@sendToBackend")
