@@ -63,6 +63,11 @@ class HeaderCustomItem extends Component
         return $this->props(['clickTarget' => $target]);
     }
 
+    public function target(string $target): static
+    {
+        return $this->props(['target' => $target]);
+    }
+
     /**
      * 设置 Schema API 地址
      * 接口返回任意 schema 节点，完全由 schema 控制渲染内容

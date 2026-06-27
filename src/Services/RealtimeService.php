@@ -46,16 +46,41 @@ class RealtimeService
     }
 
     /**
+     * 获取按消息类型聚合的未读数量
+     */
+    public function getUnreadCountByType(int $userId, string $guard): array
+    {
+        $rows = NotificationMessage::where('guard_name', $guard)
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id', $userId)->whereOr('user_id', null);
+            })
+            ->where('is_read', false)
+            ->field('type, COUNT(*) AS aggregate')
+            ->group('type')
+            ->select()
+            ->toArray();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(string) $row['type']] = (int) $row['aggregate'];
+        }
+
+        return $counts;
+    }
+
+    /**
      * 组装轮询响应
      */
     public function buildPollResponse(int $userId, string $guard, int $sinceId = 0, string $type = ''): array
     {
         $messages = $this->getNewMessages($userId, $guard, $sinceId, $type);
         $unreadCount = $this->getUnreadCount($userId, $guard);
+        $unreadCountByType = $this->getUnreadCountByType($userId, $guard);
 
         return [
             'messages' => $messages,
             'unread_count' => $unreadCount,
+            'unread_count_by_type' => $unreadCountByType,
             'has_new' => !empty($messages),
             'server_time' => date('Y-m-d H:i:s'),
         ];

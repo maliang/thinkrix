@@ -143,8 +143,9 @@ return [
         |       'icon'       => 'carbon:rocket',
         |       'tooltip'    => '消息中心',
         |       'badge'      => ['source' => 'notification', 'types' => ['audit.pending'], 'color' => '#f00'],
-        |       'click'      => 'link',                 // link | modal | drawer
-        |       'click_target'=> 'https://...',
+        |       'click'      => 'route',                // route | link | modal | drawer
+        |       'click_target'=> '/audit',
+        |       'target'     => '_blank',               // 仅 link 模式使用，默认 _blank
         |   }
         |
         | 高级自定义（通过 schema_api 返回任意 schema UI）：
