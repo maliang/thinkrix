@@ -167,7 +167,16 @@ class SystemController extends Controller
 
     public function headerRight(): array
     {
+        // 自定义导航项位置：left（默认，最左）/ right（最右）
+        $customItemsPosition = config('thinkrix.header.custom_items_position', 'left');
+        $customItems = $this->buildHeaderCustomItems();
+
         $children = [];
+
+        // 自定义项置于默认右侧组件整体的最左侧
+        if ($customItemsPosition === 'left') {
+            $children = array_merge($children, $customItems);
+        }
 
         if (config('thinkrix.header.global_search', true)) {
             $children[] = GlobalSearch::make();
@@ -177,29 +186,6 @@ class SystemController extends Controller
                 ->fetchApi('/notifications')
                 ->readApi('/notifications/{id}/mark-read')
                 ->readAllApi('/notifications/mark-all-read');
-        }
-
-        // 自定义导航项（从配置读取）
-        foreach (config('thinkrix.header.custom_items', []) as $item) {
-            $custom = HeaderCustomItem::make()
-                ->icon($item['icon'] ?? 'carbon:dot-mark')
-                ->tooltip($item['tooltip'] ?? '');
-            if (!empty($item['badge']) && is_array($item['badge'])) {
-                $custom->badge($item['badge']);
-            }
-            if (!empty($item['click'])) {
-                $custom->click($item['click']);
-            }
-            if (!empty($item['click_target'])) {
-                $custom->clickTarget($item['click_target']);
-            }
-            if (!empty($item['target'])) {
-                $custom->target($item['target']);
-            }
-            if (!empty($item['schema_api'])) {
-                $custom->schemaApi($item['schema_api']);
-            }
-            $children[] = $custom;
         }
 
         if (config('thinkrix.header.full_screen', true)) {
@@ -231,8 +217,43 @@ class SystemController extends Controller
             ['key' => 'logout', 'label' => __t('system.avatar.logout'), 'icon' => 'ph:sign-out', 'action' => 'logout'],
         ]);
 
+        // 自定义项置于默认右侧组件整体的最右侧
+        if ($customItemsPosition !== 'left') {
+            $children = array_merge($children, $customItems);
+        }
+
         $schema = Html::div()->props(['class' => 'h-full flex-y-center gap-4px'])->children($children);
         return success($schema->toArray());
+    }
+
+    /**
+     * 构建头部自定义导航项（从配置读取）
+     */
+    protected function buildHeaderCustomItems(): array
+    {
+        $items = [];
+        foreach (config('thinkrix.header.custom_items', []) as $item) {
+            $custom = HeaderCustomItem::make()
+                ->icon($item['icon'] ?? 'carbon:dot-mark')
+                ->tooltip($item['tooltip'] ?? '');
+            if (!empty($item['badge']) && is_array($item['badge'])) {
+                $custom->badge($item['badge']);
+            }
+            if (!empty($item['click'])) {
+                $custom->click($item['click']);
+            }
+            if (!empty($item['click_target'])) {
+                $custom->clickTarget($item['click_target']);
+            }
+            if (!empty($item['target'])) {
+                $custom->target($item['target']);
+            }
+            if (!empty($item['schema_api'])) {
+                $custom->schemaApi($item['schema_api']);
+            }
+            $items[] = $custom;
+        }
+        return $items;
     }
 
     public function getThemeConfig(): array
