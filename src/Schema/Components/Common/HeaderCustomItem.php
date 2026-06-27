@@ -48,6 +48,14 @@ class HeaderCustomItem extends Component
     }
 
     /**
+     * 设置徽标配置（如绑定通知类型未读数）
+     */
+    public function badge(array $config): static
+    {
+        return $this->props(['badge' => $config]);
+    }
+
+    /**
      * 设置徽标颜色
      */
     public function badgeColor(string $color): static

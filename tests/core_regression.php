@@ -28,6 +28,12 @@ check(
         && str_contains($menu, '__t($titleKey)'),
     'Menu routes must translate built-in menu titles by route name before falling back to database titles.'
 );
+check(
+    str_contains($menu, "'badge' => 'array'")
+        && str_contains($menu, "'module', 'badge'")
+        && str_contains($menu, "\$meta['badge'] = \$this->badge"),
+    'Menu model must cast, fill and expose badge config in route meta.'
+);
 
 $userController = source('src/Controllers/UserController.php');
 check(
@@ -65,6 +71,21 @@ foreach (['RoleController.php', 'PermissionController.php', 'MenuController.php'
     check(str_contains($contents, 'getStoreRules'), "{$controller} must define store validation.");
     check(str_contains($contents, 'getUpdateRules'), "{$controller} must define update validation.");
 }
+
+$menuController = source('src/Controllers/MenuController.php');
+check(
+    str_contains($menuController, "'badge' => 'array'")
+        && str_contains($menuController, 'normalizeBadgeInput')
+        && str_contains($menuController, "JSON.stringify(slotData.row.badge"),
+    'MenuController must accept and edit menu badge JSON config.'
+);
+
+$installCommand = source('src/Commands/InstallCommand.php');
+check(
+    str_contains($installCommand, '`badge` text COMMENT')
+        && str_contains($installCommand, "'badge' => \$data['badge'] ?? null"),
+    'InstallCommand must include admin_menus.badge in fallback table creation and default menu creation.'
+);
 
 foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controllers')) as $controllerFile) {
     if ($controllerFile->isFile() && $controllerFile->getExtension() === 'php') {
@@ -136,11 +157,41 @@ check(
     str_contains($systemController, 'fetchThemeConfig($this->getDefaultThemeConfig())'),
     'SystemController must read merged theme config so site settings update entry, login and layout titles.'
 );
+check(
+    str_contains($systemController, 'getRealtimeConfig()')
+        && str_contains($systemController, "'realtime' => \$this->getRealtimeConfig()")
+        && str_contains($systemController, "'behaviors' => config('thinkrix.realtime.behaviors', [])")
+        && !str_contains($systemController, '->enablePolling(')
+        && !str_contains($systemController, '->enableWs('),
+    'SystemController must expose realtime config globally instead of binding polling/ws to HeaderNotification.'
+);
 
 $authController = source('src/Controllers/AuthController.php');
 check(
     str_contains($authController, 'Setting::fetchThemeConfig'),
     'AuthController config must read merged theme config.'
+);
+check(
+    str_contains($authController, "'realtime' => \$this->getRealtimeConfig()")
+        && str_contains($authController, "'behaviors' => config('thinkrix.realtime.behaviors', [])"),
+    'AuthController config must expose global realtime notification config.'
+);
+
+$headerNotification = source('src/Schema/Components/Common/HeaderNotification.php');
+check(
+    !str_contains($headerNotification, 'enablePolling(')
+        && !str_contains($headerNotification, 'pollingInterval(')
+        && !str_contains($headerNotification, 'pollingApi(')
+        && !str_contains($headerNotification, 'enableWs(')
+        && !str_contains($headerNotification, 'wsUrl('),
+    'HeaderNotification schema component must not own realtime polling/ws props.'
+);
+
+$headerCustomItem = source('src/Schema/Components/Common/HeaderCustomItem.php');
+check(
+    str_contains($headerCustomItem, 'public function badge(array $config)')
+        && str_contains($systemController, '$custom->badge($item[\'badge\'])'),
+    'HeaderCustomItem must support local notification badge config for custom header navigation items.'
 );
 
 $routes = source('src/routes.php');

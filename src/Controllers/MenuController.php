@@ -57,6 +57,17 @@ class MenuController extends CrudController
     protected function prepareStoreData(array $validated): array
     {
         $validated['guard_name'] = config('thinkrix.guard', 'admin');
+        if (($validated['badge'] ?? null) === []) {
+            $validated['badge'] = null;
+        }
+        return $validated;
+    }
+
+    protected function prepareUpdateData(array $validated): array
+    {
+        if (($validated['badge'] ?? null) === []) {
+            $validated['badge'] = null;
+        }
         return $validated;
     }
 
@@ -73,6 +84,7 @@ class MenuController extends CrudController
             'icon' => 'max:255',
             'order' => 'integer',
             'permissions' => 'array',
+            'badge' => 'array',
             'schema_source' => 'max:255',
             'href' => 'max:255',
         ];
@@ -91,16 +103,46 @@ class MenuController extends CrudController
             'icon' => 'max:255',
             'order' => 'integer',
             'permissions' => 'array',
+            'badge' => 'array',
             'schema_source' => 'max:255',
             'href' => 'max:255',
         ];
     }
 
+    protected function validateStore(): array
+    {
+        $data = $this->normalizeBadgeInput(request()->post());
+        return $this->validate($data, $this->getStoreRules());
+    }
+
     protected function validateUpdate(int $id): array
     {
-        $validated = parent::validateUpdate($id);
+        $data = $this->normalizeBadgeInput(request()->put());
+        $validated = $this->validate($data, $this->getUpdateRules($id));
         $this->assertValidParent($id, $validated['parent_id'] ?? null);
         return $validated;
+    }
+
+    protected function normalizeBadgeInput(array $data): array
+    {
+        if (!array_key_exists('badge', $data)) {
+            return $data;
+        }
+
+        if ($data['badge'] === null || $data['badge'] === '') {
+            $data['badge'] = [];
+            return $data;
+        }
+
+        if (is_string($data['badge'])) {
+            $decoded = json_decode($data['badge'], true);
+            if (!is_array($decoded)) {
+                throw new \Thinkrix\Exceptions\ApiException(__t('menu.message.badge_invalid'), 40022);
+            }
+            $data['badge'] = $decoded;
+        }
+
+        return $data;
     }
 
     protected function assertValidParent(int $id, mixed $parentId): void
@@ -189,6 +231,7 @@ class MenuController extends CrudController
                 [__t('menu.form.keep_alive'), 'keep_alive', SwitchC::make(), false],
                 [__t('menu.form.requires_auth'), 'requires_auth', SwitchC::make(), true],
                 [__t('menu.form.is_default_after_login'), 'is_default_after_login', SwitchC::make(), false],
+                [__t('menu.form.badge'), 'badge', Input::make()->props(['type' => 'textarea', 'placeholder' => __t('menu.placeholder.badge'), 'autosize' => ['minRows' => 3, 'maxRows' => 6]]), ''],
             ])
             ->buttons([
                 Button::make()->on('click', SetAction::make('formVisible', false))->text(__t('ui.button.cancel')),
@@ -206,7 +249,7 @@ class MenuController extends CrudController
                 ['key' => 'hide_in_menu', 'title' => __t('menu.column.hide_in_menu'), 'width' => 80, 'slot' => [Tag::make()->props(['type' => "{{ slotData.row.hide_in_menu ? 'warning' : 'success' }}", 'size' => 'small'])->children(["{{ slotData.row.hide_in_menu ? {$yesLabel} : {$noLabel} }}"])]],
                 ['key' => 'actions', 'title' => __t('module.column.actions'), 'width' => 200, 'fixed' => 'right', 'slot' => [
                     Space::make()->children([
-                        Button::make()->size('small')->props(['type' => 'primary', 'text' => true])->on('click', [SetAction::make('editingId', '{{ slotData.row.id }}'), SetAction::make('formData.parent_id', '{{ slotData.row.parent_id }}'), SetAction::make('formData.name', '{{ slotData.row.name }}'), SetAction::make('formData.title', '{{ slotData.row.title || "" }}'), SetAction::make('formData.path', '{{ slotData.row.path }}'), SetAction::make('formData.icon', '{{ slotData.row.icon || "" }}'), SetAction::make('formData.redirect', '{{ slotData.row.redirect || "" }}'), SetAction::make('formData.order', '{{ slotData.row.order || 0 }}'), SetAction::make('formData.layout_type', '{{ slotData.row.layout_type }}'), SetAction::make('formData.open_type', '{{ slotData.row.open_type }}'), SetAction::make('formData.href', '{{ slotData.row.href || "" }}'), SetAction::make('formData.use_json_renderer', '{{ slotData.row.use_json_renderer || false }}'), SetAction::make('formData.schema_source', '{{ slotData.row.schema_source || "" }}'), SetAction::make('formData.hide_in_menu', '{{ slotData.row.hide_in_menu || false }}'), SetAction::make('formData.keep_alive', '{{ slotData.row.keep_alive || false }}'), SetAction::make('formData.requires_auth', '{{ slotData.row.requires_auth !== false }}'), SetAction::make('formData.is_default_after_login', '{{ slotData.row.is_default_after_login || false }}'), SetAction::make('formVisible', true), CallAction::make('loadMenuTree')])->text(__t('permission.button.edit')),
+                        Button::make()->size('small')->props(['type' => 'primary', 'text' => true])->on('click', [SetAction::make('editingId', '{{ slotData.row.id }}'), SetAction::make('formData.parent_id', '{{ slotData.row.parent_id }}'), SetAction::make('formData.name', '{{ slotData.row.name }}'), SetAction::make('formData.title', '{{ slotData.row.title || "" }}'), SetAction::make('formData.path', '{{ slotData.row.path }}'), SetAction::make('formData.icon', '{{ slotData.row.icon || "" }}'), SetAction::make('formData.redirect', '{{ slotData.row.redirect || "" }}'), SetAction::make('formData.order', '{{ slotData.row.order || 0 }}'), SetAction::make('formData.layout_type', '{{ slotData.row.layout_type }}'), SetAction::make('formData.open_type', '{{ slotData.row.open_type }}'), SetAction::make('formData.href', '{{ slotData.row.href || "" }}'), SetAction::make('formData.use_json_renderer', '{{ slotData.row.use_json_renderer || false }}'), SetAction::make('formData.schema_source', '{{ slotData.row.schema_source || "" }}'), SetAction::make('formData.hide_in_menu', '{{ slotData.row.hide_in_menu || false }}'), SetAction::make('formData.keep_alive', '{{ slotData.row.keep_alive || false }}'), SetAction::make('formData.requires_auth', '{{ slotData.row.requires_auth !== false }}'), SetAction::make('formData.is_default_after_login', '{{ slotData.row.is_default_after_login || false }}'), SetAction::make('formData.badge', '{{ slotData.row.badge ? JSON.stringify(slotData.row.badge, null, 2) : "" }}'), SetAction::make('formVisible', true), CallAction::make('loadMenuTree')])->text(__t('permission.button.edit')),
                         Button::make()->size('small')->props(['type' => 'success', 'text' => true])->on('click', ['call' => 'handleAddChild', 'args' => ['{{ slotData.row }}']])->text(__t('menu.button.add_child')),
                         Popconfirm::make()->props(['positiveText' => __t('ui.button.confirm'), 'negativeText' => __t('ui.button.cancel')])
                             ->on('positive-click', FetchAction::make('/menus/{{ slotData.row.id }}')->delete()->then([CallAction::make('$message.success', [__t('crud.message.deleted')]), CallAction::make('loadData')])->catch([CallAction::make('$message.error', ['{{ $error.message || "删除失败" }}'])]))

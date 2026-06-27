@@ -60,6 +60,23 @@ class SystemController extends Controller
             'fallbackLocale' => config('thinkrix.fallback_locale', 'en-US'),
             'languages' => app(TranslationService::class)->getLanguageOptions(),
             'translationsUrl' => '/translations',
+            'realtime' => $this->getRealtimeConfig(),
+        ];
+    }
+
+    protected function getRealtimeConfig(): array
+    {
+        return [
+            'enabled' => (bool) config('thinkrix.realtime.enabled', true),
+            'driver' => config('thinkrix.realtime.driver', 'polling'),
+            'polling' => [
+                'api' => config('thinkrix.realtime.polling.api', '/notifications/poll'),
+                'interval' => (int) config('thinkrix.realtime.polling.interval', 15000),
+            ],
+            'websocket' => [
+                'url' => config('thinkrix.realtime.websocket.url', ''),
+            ],
+            'behaviors' => config('thinkrix.realtime.behaviors', []),
         ];
     }
 
@@ -156,27 +173,10 @@ class SystemController extends Controller
             $children[] = GlobalSearch::make();
         }
         if (config('thinkrix.header.notification', true)) {
-            $notification = HeaderNotification::make()
+            $children[] = HeaderNotification::make()
                 ->fetchApi('/notifications')
                 ->readApi('/notifications/{id}/mark-read')
                 ->readAllApi('/notifications/mark-all-read');
-
-            // 实时消息配置
-            if (config('thinkrix.realtime.enabled', true)) {
-                $driver = config('thinkrix.realtime.driver', 'polling');
-                if ($driver === 'polling') {
-                    $notification->enablePolling(true)
-                        ->pollingInterval((int) config('thinkrix.realtime.polling.interval', 15000))
-                        ->pollingApi(config('thinkrix.realtime.polling.api', '/notifications/poll'));
-                } elseif ($driver === 'ws') {
-                    $wsUrl = config('thinkrix.realtime.websocket.url', '');
-                    if ($wsUrl) {
-                        $notification->enableWs(true)->wsUrl($wsUrl);
-                    }
-                }
-            }
-
-            $children[] = $notification;
         }
 
         // 自定义导航项（从配置读取）
@@ -187,6 +187,9 @@ class SystemController extends Controller
                 ->badgeColor($item['badge_color'] ?? '');
             if (!empty($item['badge_api'])) {
                 $custom->badgeApi($item['badge_api']);
+            }
+            if (!empty($item['badge']) && is_array($item['badge'])) {
+                $custom->badge($item['badge']);
             }
             if (!empty($item['click'])) {
                 $custom->click($item['click']);

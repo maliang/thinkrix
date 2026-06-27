@@ -111,6 +111,23 @@ class AuthController extends Controller
             'fallbackLocale' => config('thinkrix.fallback_locale', 'en-US'),
             'languages' => app(TranslationService::class)->getLanguageOptions(),
             'translationsUrl' => '/translations',
+            'realtime' => $this->getRealtimeConfig(),
         ]);
+    }
+
+    protected function getRealtimeConfig(): array
+    {
+        return [
+            'enabled' => (bool) config('thinkrix.realtime.enabled', true),
+            'driver' => config('thinkrix.realtime.driver', 'polling'),
+            'polling' => [
+                'api' => config('thinkrix.realtime.polling.api', '/notifications/poll'),
+                'interval' => (int) config('thinkrix.realtime.polling.interval', 15000),
+            ],
+            'websocket' => [
+                'url' => config('thinkrix.realtime.websocket.url', ''),
+            ],
+            'behaviors' => config('thinkrix.realtime.behaviors', []),
+        ];
     }
 }

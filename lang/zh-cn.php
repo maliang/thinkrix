@@ -342,6 +342,10 @@ return [
             'keep_alive' => '保持连接',
             'requires_auth' => '需要认证',
             'is_default_after_login' => '登录后默认页',
+            'badge' => 'Badge 配置',
+        ],
+        'placeholder' => [
+            'badge' => '{"source":"notification","types":["approval.contract","task.todo"],"max":99}',
         ],
         'tag' => [
             'hidden_yes' => '是',
@@ -356,6 +360,7 @@ return [
             'deleted' => '删除成功',
             'sorted' => '排序成功',
             'not_found' => '菜单不存在',
+            'badge_invalid' => 'Badge 配置必须是合法的 JSON 对象',
         ],
     ],
 

@@ -325,6 +325,10 @@ return [
             'keep_alive' => 'Keep Alive',
             'requires_auth' => 'Requires Auth',
             'is_default_after_login' => 'Default After Login',
+            'badge' => 'Badge Config',
+        ],
+        'placeholder' => [
+            'badge' => '{"source":"notification","types":["approval.contract","task.todo"],"max":99}',
         ],
         'tag' => [
             'hidden_yes' => 'Yes',
@@ -339,6 +343,7 @@ return [
             'deleted' => 'Deleted successfully',
             'sorted' => 'Reordered successfully',
             'not_found' => 'Menu not found',
+            'badge_invalid' => 'Badge config must be a valid JSON object',
         ],
     ],
     'dict' => [

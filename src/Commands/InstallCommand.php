@@ -302,6 +302,7 @@ class InstallCommand extends Command
                 `fixed_index_in_tab` int DEFAULT NULL COMMENT '固定标签索引',
                 `requires_auth` tinyint(1) DEFAULT '1' COMMENT '需要认证',
                 `active_menu` varchar(255) DEFAULT NULL COMMENT '激活的菜单',
+                `badge` text COMMENT '菜单徽标配置（JSON）',
                 `created_at` datetime DEFAULT NULL,
                 `updated_at` datetime DEFAULT NULL,
                 PRIMARY KEY (`id`),
@@ -570,6 +571,7 @@ class InstallCommand extends Command
             'schema_source' => $data['schema_source'] ?? null,
             'redirect' => $data['redirect'] ?? null,
             'module' => $data['module'] ?? null,
+            'badge' => $data['badge'] ?? null,
         ];
 
         $exists = Menu::where('name', $menuData['name'])->where('guard_name', $menuData['guard_name'])->find();

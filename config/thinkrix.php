@@ -259,6 +259,24 @@ return [
             'url' => env('THINKRIX_REALTIME_WS_URL', ''),
             'protocol' => env('THINKRIX_REALTIME_WS_PROTOCOL', 'ws'), // ws 或 wss
         ],
+        /*
+        |----------------------------------------------------------------------
+        | 消息行为配置
+        | 按通知 type 触发前端动作。actions 支持内置动作 sound / notification，
+        | 也支持前端通过 registerBehaviorAction 注册自定义动作。
+        |
+        | 示例：
+        | 'behaviors' => [
+        |     'audit.pending' => [
+        |         'actions' => [
+        |             ['type' => 'sound', 'src' => '/sounds/audit.mp3', 'times' => 3],
+        |             ['type' => 'notification', 'title' => '新的审核任务'],
+        |         ],
+        |     ],
+        | ],
+        |----------------------------------------------------------------------
+        */
+        'behaviors' => [],
     ],
 
     /*

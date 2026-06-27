@@ -32,6 +32,7 @@ use think\model\relation\BelongsTo;
  * @property int|null $fixed_index_in_tab
  * @property bool $requires_auth
  * @property string|null $active_menu
+ * @property array|null $badge
  * @property string $created_at
  * @property string $updated_at
  */
@@ -52,6 +53,7 @@ class Menu extends Model
         'fixed_index_in_tab' => 'integer',
         'requires_auth' => 'boolean',
         'permissions' => 'array',
+        'badge' => 'array',
         'order' => 'integer',
     ];
 
@@ -60,7 +62,7 @@ class Menu extends Model
         'title', 'icon', 'order', 'hide_in_menu', 'keep_alive', 'permissions',
         'use_json_renderer', 'schema_source', 'layout_type', 'open_type', 'href',
         'is_default_after_login', 'fixed_index_in_tab', 'requires_auth', 'active_menu',
-        'module',
+        'module', 'badge',
     ];
 
     /**
@@ -125,6 +127,7 @@ class Menu extends Model
         if ($this->fixed_index_in_tab !== null) $meta['fixedIndexInTab'] = $this->fixed_index_in_tab;
         if ($this->requires_auth) $meta['requiresAuth'] = true;
         if ($this->active_menu) $meta['activeMenu'] = $this->active_menu;
+        if (!empty($this->badge)) $meta['badge'] = $this->badge;
 
         if (!empty($meta)) { $route['meta'] = $meta; }
 
