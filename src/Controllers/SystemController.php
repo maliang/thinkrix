@@ -183,11 +183,7 @@ class SystemController extends Controller
         foreach (config('thinkrix.header.custom_items', []) as $item) {
             $custom = HeaderCustomItem::make()
                 ->icon($item['icon'] ?? 'carbon:dot-mark')
-                ->tooltip($item['tooltip'] ?? '')
-                ->badgeColor($item['badge_color'] ?? '');
-            if (!empty($item['badge_api'])) {
-                $custom->badgeApi($item['badge_api']);
-            }
+                ->tooltip($item['tooltip'] ?? '');
             if (!empty($item['badge']) && is_array($item['badge'])) {
                 $custom->badge($item['badge']);
             }

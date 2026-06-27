@@ -142,8 +142,7 @@ return [
         |   {
         |       'icon'       => 'carbon:rocket',
         |       'tooltip'    => '消息中心',
-        |       'badge_api'  => '/api/custom/unread',   // 返回 { count: N }
-        |       'badge_color'=> '#f00',
+        |       'badge'      => ['source' => 'notification', 'types' => ['audit.pending'], 'color' => '#f00'],
         |       'click'      => 'link',                 // link | modal | drawer
         |       'click_target'=> 'https://...',
         |   }
