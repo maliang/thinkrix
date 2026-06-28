@@ -119,6 +119,7 @@ class AuthController extends Controller
     {
         return [
             'enabled' => (bool) config('thinkrix.realtime.enabled', true),
+            'enableNotification' => (bool) config('thinkrix.realtime.enable_notification', true),
             'driver' => config('thinkrix.realtime.driver', 'polling'),
             'polling' => [
                 'api' => config('thinkrix.realtime.polling.api', '/notifications/poll'),
