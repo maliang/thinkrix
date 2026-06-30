@@ -159,15 +159,16 @@ check(
 );
 check(
     str_contains($settingController, 'Upload::make()')
+        && str_contains($settingController, "->fileList('formData.logoFileList')")
         && str_contains($settingController, "'set' => 'formData.logo'")
+        && str_contains($settingController, "'set' => 'formData.logoFileList'")
         && str_contains($settingController, "\$event.file.response?.data?.url")
         && !str_contains($settingController, "Input::make()->model('formData.logo')"),
-    'SettingController logo field must use authenticated image upload only and write the uploaded URL into formData.logo.'
+    'SettingController logo field must use authenticated image upload and render the uploaded image inside the upload file list.'
 );
 check(
     str_contains($settingController, "'call' => '\$methods.\$theme.updateSite'")
-        && str_contains($settingController, "'appTitle' => '{{ formData.appTitle }}'")
-        && str_contains($settingController, "'logo' => '{{ formData.logo }}'"),
+        && str_contains($settingController, "'args' => ['{{ formData.appTitle }}', '{{ formData.logo }}']"),
     'SettingController must update frontend theme title and logo after saving site settings.'
 );
 

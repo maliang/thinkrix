@@ -8,7 +8,6 @@ use Thinkrix\Models\Setting;
 use Thinkrix\Schema\Components\NaiveUI\Card;
 use Thinkrix\Schema\Components\NaiveUI\Form;
 use Thinkrix\Schema\Components\NaiveUI\FormItem;
-use Thinkrix\Schema\Components\NaiveUI\Image;
 use Thinkrix\Schema\Components\NaiveUI\Input;
 use Thinkrix\Schema\Components\NaiveUI\SwitchC;
 use Thinkrix\Schema\Components\NaiveUI\Upload;
@@ -115,10 +114,16 @@ class SettingController extends Controller
                             ->accept('.jpg,.jpeg,.png,.gif,.webp,.ico')
                             ->max(1)
                             ->listType('image-card')
+                            ->fileList('formData.logoFileList')
                             ->props(['name' => 'file'])
                             ->on('finish', [
                                 ['set' => 'formData.logo', 'value' => '{{ $event.file.response?.data?.url || $event.file.response?.url || "" }}'],
+                                ['set' => 'formData.logoFileList', 'value' => '{{ ($event.file.response?.data?.url || $event.file.response?.url) ? [{ id: $event.file.id || $event.file.name || "logo", name: $event.file.name || "logo", status: "finished", url: ($event.file.response?.data?.url || $event.file.response?.url) }] : [] }}'],
                                 ['call' => '$methods.$message.success', 'args' => [__t('upload.ok')]],
+                            ])
+                            ->on('remove', [
+                                ['set' => 'formData.logo', 'value' => ''],
+                                ['set' => 'formData.logoFileList', 'value' => []],
                             ])
                             ->on('error', [
                                 ['call' => '$methods.$message.error', 'args' => [__t('upload.failed')]],
@@ -126,12 +131,6 @@ class SettingController extends Controller
                             ->children([
                                 Button::make()->children([__t('upload.select_image')]),
                             ]),
-                        Image::make()
-                            ->src('{{ formData.logo }}')
-                            ->width(120)
-                            ->height(120)
-                            ->objectFit('contain')
-                            ->show('formData.logo'),
                     ]),
                 ]),
                 FormItem::make()->label(__t('system.setting.form.copyright'))->children([Input::make()->model('formData.copyright')->placeholder(__t('system.setting.placeholder.copyright'))]),
@@ -145,10 +144,7 @@ class SettingController extends Controller
                                 ['key' => 'copyright', 'value' => '{{ formData.copyright }}'],
                             ]],
                             'then' => [
-                                ['call' => '$methods.$theme.updateSite', 'args' => [[
-                                    'appTitle' => '{{ formData.appTitle }}',
-                                    'logo' => '{{ formData.logo }}',
-                                ]]],
+                                ['call' => '$methods.$theme.updateSite', 'args' => ['{{ formData.appTitle }}', '{{ formData.logo }}']],
                                 ['call' => '$methods.$message.success', 'args' => [__t('system.message.config_saved')]],
                             ],
                         ]),
@@ -158,10 +154,17 @@ class SettingController extends Controller
         ])->toArray();
 
         $theme = \Thinkrix\Models\Setting::fetchThemeConfig(config('thinkrix.theme', []));
+        $logo = $theme['logo'] ?? '';
         $schema['data'] = [
             'formData' => [
                 'appTitle' => $theme['appTitle'] ?? 'Thinkrix Admin',
-                'logo' => $theme['logo'] ?? '',
+                'logo' => $logo,
+                'logoFileList' => $logo !== '' ? [[
+                    'id' => $logo,
+                    'name' => basename(parse_url($logo, PHP_URL_PATH) ?: $logo),
+                    'status' => 'finished',
+                    'url' => $logo,
+                ]] : [],
                 'copyright' => config('thinkrix.copyright', '© ' . date('Y') . ' Thinkrix Admin. All rights reserved.'),
             ],
         ];
