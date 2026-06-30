@@ -11,6 +11,7 @@ use Thinkrix\Schema\Components\NaiveUI\FormItem;
 use Thinkrix\Schema\Components\NaiveUI\Input;
 use Thinkrix\Schema\Components\NaiveUI\SwitchC;
 use Thinkrix\Schema\Components\NaiveUI\Upload;
+use Thinkrix\Schema\Components\NaiveUI\Image;
 use Thinkrix\Schema\Components\NaiveUI\Button;
 use Thinkrix\Schema\Components\NaiveUI\Space;
 
@@ -112,26 +113,31 @@ class SettingController extends Controller
                         Upload::make()
                             ->action($uploadAction)
                             ->accept('.jpg,.jpeg,.png,.gif,.webp,.ico')
-                            ->max(1)
-                            ->listType('image-card')
-                            ->props([
-                                'name' => 'file',
-                                'default-file-list' => '{{ formData.logoFileList }}',
-                            ])
+                            // 不用 image-card + max，避免达到上限后触发器被隐藏（导致必须先删除才能再传）；
+                            // 关闭自带文件列表，改用下方 NImage 作为可点击的上传触发区，点击当前 logo 即可重新上传。
+                            ->showFileList(false)
+                            ->props(['name' => 'file'])
                             ->on('finish', [
-                                ['set' => 'formData.logo', 'value' => '{{ $event.file.response?.data?.url || $event.file.response?.url || "" }}'],
-                                ['set' => 'formData.logoFileList', 'value' => '{{ ($event.file.response?.data?.url || $event.file.response?.url) ? [{ id: $event.file.id || $event.file.name || "logo", name: $event.file.name || "logo", status: "finished", url: ($event.file.response?.data?.url || $event.file.response?.url) }] : [] }}'],
+                                // Naive UI 的 onFinish 回调中 file 对象没有 response 字段，
+                                // 上传返回数据只能从 XHR 事件读取：$event.event.target.response（原始 JSON 字符串），需 JSON.parse 解析。
+                                ['set' => 'formData.logo', 'value' => '{{ JSON.parse($event.event.target.response)?.data?.url || "" }}'],
                                 ['call' => '$methods.$message.success', 'args' => [__t('upload.ok')]],
-                            ])
-                            ->on('remove', [
-                                ['set' => 'formData.logo', 'value' => ''],
-                                ['set' => 'formData.logoFileList', 'value' => []],
                             ])
                             ->on('error', [
                                 ['call' => '$methods.$message.error', 'args' => [__t('upload.failed')]],
                             ])
                             ->children([
-                                Button::make()->children([__t('upload.select_image')]),
+                                // 已有 logo：直接点击图片即可重新选图上传（previewDisabled 确保点击冒泡到上传触发器，而非打开预览）
+                                Image::make()
+                                    ->if('formData.logo')
+                                    ->src('{{ formData.logo }}')
+                                    ->width(100)
+                                    ->height(100)
+                                    ->objectFit('contain')
+                                    ->previewDisabled()
+                                    ->props(['style' => 'cursor: pointer; display: block; border: 1px dashed #d9d9d9; border-radius: 6px; padding: 4px;']),
+                                // 无 logo：显示选择按钮
+                                Button::make()->if('!formData.logo')->children([__t('upload.select_image')]),
                             ]),
                     ]),
                 ]),
@@ -155,18 +161,12 @@ class SettingController extends Controller
             ]),
         ])->toArray();
 
-        $theme = \Thinkrix\Models\Setting::fetchThemeConfig(config('thinkrix.theme', []));
+        $theme = Setting::fetchValue('theme', config('thinkrix.theme', []));
         $logo = $theme['logo'] ?? '';
         $schema['data'] = [
             'formData' => [
                 'appTitle' => $theme['appTitle'] ?? 'Thinkrix Admin',
                 'logo' => $logo,
-                'logoFileList' => $logo !== '' ? [[
-                    'id' => $logo,
-                    'name' => basename(parse_url($logo, PHP_URL_PATH) ?: $logo),
-                    'status' => 'finished',
-                    'url' => $logo,
-                ]] : [],
                 'copyright' => config('thinkrix.copyright', '© ' . date('Y') . ' Thinkrix Admin. All rights reserved.'),
             ],
         ];

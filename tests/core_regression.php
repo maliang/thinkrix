@@ -159,12 +159,16 @@ check(
 );
 check(
     str_contains($settingController, 'Upload::make()')
-        && str_contains($settingController, "'default-file-list' => '{{ formData.logoFileList }}'")
         && str_contains($settingController, "'set' => 'formData.logo'")
-        && str_contains($settingController, "'set' => 'formData.logoFileList'")
-        && str_contains($settingController, "\$event.file.response?.data?.url")
+        && str_contains($settingController, 'JSON.parse($event.event.target.response)')
+        && str_contains($settingController, '->showFileList(false)')
+        && str_contains($settingController, "Image::make()")
+        && str_contains($settingController, "->previewDisabled()")
+        && !str_contains($settingController, "\$event.file.response?.data?.url")
+        && !str_contains($settingController, 'logoFileList')
+        && !str_contains($settingController, "->listType('image-card')")
         && !str_contains($settingController, "Input::make()->model('formData.logo')"),
-    'SettingController logo field must use authenticated image upload and render the uploaded image inside the upload file list.'
+    'SettingController logo field must read the uploaded URL from the XHR response and use a clickable image preview (no image-card/max so the logo can be replaced without removing it first).'
 );
 check(
     str_contains($settingController, "'call' => '\$methods.\$theme.updateSite'")
