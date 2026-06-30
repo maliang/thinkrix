@@ -114,8 +114,10 @@ class SettingController extends Controller
                             ->accept('.jpg,.jpeg,.png,.gif,.webp,.ico')
                             ->max(1)
                             ->listType('image-card')
-                            ->fileList('formData.logoFileList')
-                            ->props(['name' => 'file'])
+                            ->props([
+                                'name' => 'file',
+                                'default-file-list' => '{{ formData.logoFileList }}',
+                            ])
                             ->on('finish', [
                                 ['set' => 'formData.logo', 'value' => '{{ $event.file.response?.data?.url || $event.file.response?.url || "" }}'],
                                 ['set' => 'formData.logoFileList', 'value' => '{{ ($event.file.response?.data?.url || $event.file.response?.url) ? [{ id: $event.file.id || $event.file.name || "logo", name: $event.file.name || "logo", status: "finished", url: ($event.file.response?.data?.url || $event.file.response?.url) }] : [] }}'],

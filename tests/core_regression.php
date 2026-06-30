@@ -159,7 +159,7 @@ check(
 );
 check(
     str_contains($settingController, 'Upload::make()')
-        && str_contains($settingController, "->fileList('formData.logoFileList')")
+        && str_contains($settingController, "'default-file-list' => '{{ formData.logoFileList }}'")
         && str_contains($settingController, "'set' => 'formData.logo'")
         && str_contains($settingController, "'set' => 'formData.logoFileList'")
         && str_contains($settingController, "\$event.file.response?.data?.url")
