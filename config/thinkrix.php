@@ -54,6 +54,7 @@ return [
         'setting' => \Thinkrix\Controllers\SettingController::class,
         'system' => \Thinkrix\Controllers\SystemController::class,
         'home' => \Thinkrix\Controllers\HomeController::class,
+        'upload' => \Thinkrix\Controllers\UploadController::class,
     ],
 
     /*

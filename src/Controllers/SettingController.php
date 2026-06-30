@@ -8,8 +8,10 @@ use Thinkrix\Models\Setting;
 use Thinkrix\Schema\Components\NaiveUI\Card;
 use Thinkrix\Schema\Components\NaiveUI\Form;
 use Thinkrix\Schema\Components\NaiveUI\FormItem;
+use Thinkrix\Schema\Components\NaiveUI\Image;
 use Thinkrix\Schema\Components\NaiveUI\Input;
 use Thinkrix\Schema\Components\NaiveUI\SwitchC;
+use Thinkrix\Schema\Components\NaiveUI\Upload;
 use Thinkrix\Schema\Components\NaiveUI\Button;
 use Thinkrix\Schema\Components\NaiveUI\Space;
 
@@ -57,7 +59,7 @@ class SettingController extends Controller
         $cachePrefix = config('thinkrix.cache.settings.prefix', 'thinkrix.setting.');
         $themeUpdates = [];
         $themeMapping = [
-            'app_title' => 'appTitle',
+            'appTitle' => 'appTitle',
             'logo' => 'logo',
             'copyright' => 'copyright',
         ];
@@ -101,21 +103,54 @@ class SettingController extends Controller
 
     protected function formUi(): array
     {
+        $uploadAction = '/' . trim((string) config('thinkrix.api_prefix', 'api/admin'), '/') . '/upload/image';
+
         $schema = Card::make()->title(__t('system.setting.title'))->children([
             Form::make()->props(['model' => '{{ formData }}', 'labelPlacement' => 'left', 'labelWidth' => 120])->children([
-                FormItem::make()->label(__t('system.setting.form.app_title'))->children([Input::make()->model('formData.app_title')->placeholder(__t('system.setting.placeholder.app_title'))]),
-                FormItem::make()->label(__t('system.setting.form.logo_url'))->children([Input::make()->model('formData.logo')->placeholder(__t('system.setting.placeholder.logo_url'))]),
+                FormItem::make()->label(__t('system.setting.form.appTitle'))->children([Input::make()->model('formData.appTitle')->placeholder(__t('system.setting.placeholder.appTitle'))]),
+                FormItem::make()->label(__t('system.setting.form.logo_url'))->children([
+                    Space::make()->props(['vertical' => true, 'size' => 'small'])->children([
+                        Upload::make()
+                            ->action($uploadAction)
+                            ->accept('.jpg,.jpeg,.png,.gif,.webp,.ico')
+                            ->max(1)
+                            ->listType('image-card')
+                            ->props(['name' => 'file'])
+                            ->on('finish', [
+                                ['set' => 'formData.logo', 'value' => '{{ $event.file.response?.data?.url || $event.file.response?.url || "" }}'],
+                                ['call' => '$methods.$message.success', 'args' => [__t('upload.ok')]],
+                            ])
+                            ->on('error', [
+                                ['call' => '$methods.$message.error', 'args' => [__t('upload.failed')]],
+                            ])
+                            ->children([
+                                Button::make()->children([__t('upload.select_image')]),
+                            ]),
+                        Image::make()
+                            ->src('{{ formData.logo }}')
+                            ->width(120)
+                            ->height(120)
+                            ->objectFit('contain')
+                            ->show('formData.logo'),
+                    ]),
+                ]),
                 FormItem::make()->label(__t('system.setting.form.copyright'))->children([Input::make()->model('formData.copyright')->placeholder(__t('system.setting.placeholder.copyright'))]),
                 FormItem::make()->children([
                     Space::make()->children([
                         Button::make()->type('primary')->children([__t('system.button.save')])->on('click', [
                             'fetch' => '/settings', 'method' => 'PUT',
                             'body' => ['settings' => [
-                                ['key' => 'app_title', 'value' => '{{ formData.app_title }}'],
+                                ['key' => 'appTitle', 'value' => '{{ formData.appTitle }}'],
                                 ['key' => 'logo', 'value' => '{{ formData.logo }}'],
                                 ['key' => 'copyright', 'value' => '{{ formData.copyright }}'],
                             ]],
-                            'then' => [['call' => '$message.success', 'args' => [__t('system.message.config_saved')]]],
+                            'then' => [
+                                ['call' => '$methods.$theme.updateSite', 'args' => [[
+                                    'appTitle' => '{{ formData.appTitle }}',
+                                    'logo' => '{{ formData.logo }}',
+                                ]]],
+                                ['call' => '$methods.$message.success', 'args' => [__t('system.message.config_saved')]],
+                            ],
                         ]),
                     ]),
                 ]),
@@ -125,7 +160,7 @@ class SettingController extends Controller
         $theme = \Thinkrix\Models\Setting::fetchThemeConfig(config('thinkrix.theme', []));
         $schema['data'] = [
             'formData' => [
-                'app_title' => $theme['appTitle'] ?? 'Thinkrix Admin',
+                'appTitle' => $theme['appTitle'] ?? 'Thinkrix Admin',
                 'logo' => $theme['logo'] ?? '',
                 'copyright' => config('thinkrix.copyright', '© ' . date('Y') . ' Thinkrix Admin. All rights reserved.'),
             ],

@@ -67,16 +67,18 @@ class Setting extends Model
             $theme = $default;
         }
 
-        $mapping = [
-            'app_title' => 'appTitle',
-            'logo' => 'logo',
-            'copyright' => 'copyright',
-        ];
+        $appTitle = static::fetchValue('appTitle', null);
+        if ($appTitle === null) {
+            $appTitle = static::fetchValue('app_title', null);
+        }
+        if ($appTitle !== null) {
+            $theme['appTitle'] = $appTitle;
+        }
 
-        foreach ($mapping as $settingKey => $themeKey) {
+        foreach (['logo', 'copyright'] as $settingKey) {
             $value = static::fetchValue($settingKey, null);
             if ($value !== null) {
-                $theme[$themeKey] = $value;
+                $theme[$settingKey] = $value;
             }
         }
 

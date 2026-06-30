@@ -72,6 +72,10 @@ class ModuleLoader
             // 加载配置
             $this->loadConfig($moduleName, $modulePath);
 
+            // 合并模块声明的导航栏自定义项与实时消息行为到全局配置
+            $this->mergeModuleHeaderItems($moduleName);
+            $this->mergeModuleRealtimeBehaviors($moduleName);
+
             // 加载路由
             $this->loadRoutes($moduleName, $modulePath);
 
@@ -156,6 +160,73 @@ class ModuleLoader
         if (!empty($config)) {
             $this->app->config->set($config, "module_{$lowerName}");
         }
+    }
+
+    /**
+     * 将模块配置中的 header_custom_items 合并到全局 thinkrix.header.custom_items
+     *
+     * 模块在其 config/config.php 中声明：
+     *   'header_custom_items' => [
+     *       ['icon' => '...', 'tooltip' => '...', 'badge' => [...], 'click' => 'route', 'click_target' => '/...'],
+     *   ],
+     * 模块项追加在全局配置项之后，仅在模块启用时生效。
+     *
+     * @param string $moduleName 模块名称（StudlyCase）
+     */
+    public function mergeModuleHeaderItems(string $moduleName): void
+    {
+        $lowerName = strtolower($moduleName);
+        $items = $this->app->config->get("module_{$lowerName}.header_custom_items", []);
+
+        if (!is_array($items) || empty($items)) {
+            return;
+        }
+
+        $header = $this->app->config->get('thinkrix.header', []);
+        if (!is_array($header)) {
+            $header = [];
+        }
+
+        $existing = (isset($header['custom_items']) && is_array($header['custom_items'])) ? $header['custom_items'] : [];
+        $header['custom_items'] = array_merge($existing, array_values($items));
+
+        // set 以 thinkrix 为范围做顶层合并，整体替换 header 子树（保留其它 header 键）
+        $this->app->config->set(['header' => $header], 'thinkrix');
+    }
+
+    /**
+     * 将模块配置中的 realtime_behaviors 合并到全局 thinkrix.realtime.behaviors
+     *
+     * 模块在其 config/config.php 中声明：
+     *   'realtime_behaviors' => [
+     *       'mobile.recharge.pending' => [
+     *           'notify' => false,
+     *           'actions' => [['type' => 'sound', 'src' => '/voice/chongzhi.mp3', 'times' => 3]],
+     *       ],
+     *   ],
+     * 按消息 type 合并；同 type 时全局配置（config/thinkrix.php）优先于模块声明。
+     *
+     * @param string $moduleName 模块名称（StudlyCase）
+     */
+    public function mergeModuleRealtimeBehaviors(string $moduleName): void
+    {
+        $lowerName = strtolower($moduleName);
+        $behaviors = $this->app->config->get("module_{$lowerName}.realtime_behaviors", []);
+
+        if (!is_array($behaviors) || empty($behaviors)) {
+            return;
+        }
+
+        $realtime = $this->app->config->get('thinkrix.realtime', []);
+        if (!is_array($realtime)) {
+            $realtime = [];
+        }
+
+        $existing = (isset($realtime['behaviors']) && is_array($realtime['behaviors'])) ? $realtime['behaviors'] : [];
+        // 全局配置优先：先放模块声明，再用全局覆盖同名 type
+        $realtime['behaviors'] = array_merge($behaviors, $existing);
+
+        $this->app->config->set(['realtime' => $realtime], 'thinkrix');
     }
 
     /**

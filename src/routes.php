@@ -17,6 +17,7 @@ $settingController = config('thinkrix.controllers.setting', \Thinkrix\Controller
 $systemController = config('thinkrix.controllers.system', \Thinkrix\Controllers\SystemController::class);
 $homeController = config('thinkrix.controllers.home', \Thinkrix\Controllers\HomeController::class);
 $dictController = config('thinkrix.controllers.dict', \Thinkrix\Controllers\DictController::class);
+$uploadController = config('thinkrix.controllers.upload', \Thinkrix\Controllers\UploadController::class);
 $notificationCategoryController = \Thinkrix\Controllers\NotificationCategoryController::class;
 $notificationController = \Thinkrix\Controllers\NotificationController::class;
 $adminNotificationController = \Thinkrix\Controllers\AdminNotificationController::class;
@@ -35,6 +36,7 @@ Route::group($prefix, function () use (
     $systemController,
     $homeController,
     $dictController,
+    $uploadController,
     $notificationCategoryController,
     $notificationController,
     $adminNotificationController
@@ -58,6 +60,7 @@ Route::group($prefix, function () use (
         $systemController,
         $homeController,
         $dictController,
+        $uploadController,
         $notificationCategoryController,
         $notificationController,
         $adminNotificationController
@@ -92,6 +95,9 @@ Route::group($prefix, function () use (
         Route::get('dashboard', "{$homeController}@dashboard");
 
         // 用户管理
+        Route::post('upload/image', "{$uploadController}@image")
+            ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.setting.update');
+
         Route::get('users/<id>', "{$userController}@show")
             ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.user.list');
         Route::put('users/<id>', "{$userController}@update")

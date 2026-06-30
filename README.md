@@ -65,7 +65,7 @@ php think thinkrix:install
 | `path` | `THINKRIX_PATH` | `/admin` | 前端入口路径 |
 | `api_prefix` | `THINKRIX_API_PREFIX` | `api/admin` | API 路由前缀 |
 | `guard` | `THINKRIX_GUARD` | `admin` | 当前 guard 名称 |
-| `app_title` | `THINKRIX_APP_TITLE` | `Thinkrix Admin` | 系统标题 |
+| `theme.appTitle` | `THINKRIX_APP_TITLE` | `Thinkrix Admin` | 系统标题 |
 | `logo` | `THINKRIX_LOGO` | `/admin/favicon.svg` | 系统 Logo |
 | `super_admin_role` | `THINKRIX_SUPER_ADMIN_ROLE` | `super-admin` | 超级管理员角色 |
 | `realtime.driver` | `THINKRIX_REALTIME_DRIVER` | `polling` | 实时消息模式（polling/ws） |

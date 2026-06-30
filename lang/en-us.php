@@ -38,12 +38,12 @@ return [
         'setting' => [
             'title' => 'System Settings',
             'form' => [
-                'app_title' => 'System Title',
+                'appTitle' => 'System Title',
                 'logo_url' => 'Logo URL',
                 'copyright' => 'Copyright',
             ],
             'placeholder' => [
-                'app_title' => 'Enter system title',
+                'appTitle' => 'Enter system title',
                 'logo_url' => 'Enter logo URL',
                 'copyright' => 'Enter copyright info',
             ],
@@ -425,5 +425,13 @@ return [
             'marked_read' => 'Marked as read',
             'all_marked_read' => 'All marked as read',
         ],
+    ],
+    'upload' => [
+        'ok' => 'Uploaded successfully',
+        'failed' => 'Upload failed',
+        'file_required' => 'Please choose a file to upload',
+        'image_type_invalid' => 'Only image files are supported',
+        'image_too_large' => 'Image size must not exceed 2MB',
+        'select_image' => 'Upload Image',
     ],
 ];

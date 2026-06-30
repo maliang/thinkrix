@@ -139,7 +139,8 @@ check(
 $settingModel = source('src/Models/Setting.php');
 check(
     str_contains($settingModel, 'public static function fetchThemeConfig')
-        && str_contains($settingModel, "'app_title' => 'appTitle'")
+        && str_contains($settingModel, "static::fetchValue('appTitle', null)")
+        && str_contains($settingModel, "static::fetchValue('app_title', null)")
         && str_contains($settingModel, "static::fetchValue(\$settingKey"),
     'Setting must expose fetchThemeConfig() that merges standalone site settings into theme config.'
 );
@@ -147,9 +148,27 @@ check(
 $settingController = source('src/Controllers/SettingController.php');
 check(
     str_contains($settingController, 'syncThemeSettings')
-        && str_contains($settingController, "'app_title' => 'appTitle'")
+        && str_contains($settingController, "'appTitle' => 'appTitle'")
         && str_contains($settingController, "Setting::setValue('theme'"),
     'SettingController must sync app title/logo/copyright writes into the theme setting.'
+);
+check(
+    str_contains($settingController, "'call' => '\$methods.\$message.success'")
+        && !str_contains($settingController, "'call' => '\$message.success'"),
+    'SettingController schema actions must call message methods through the injected $methods namespace.'
+);
+check(
+    str_contains($settingController, 'Upload::make()')
+        && str_contains($settingController, "'set' => 'formData.logo'")
+        && str_contains($settingController, "\$event.file.response?.data?.url")
+        && !str_contains($settingController, "Input::make()->model('formData.logo')"),
+    'SettingController logo field must use authenticated image upload only and write the uploaded URL into formData.logo.'
+);
+check(
+    str_contains($settingController, "'call' => '\$methods.\$theme.updateSite'")
+        && str_contains($settingController, "'appTitle' => '{{ formData.appTitle }}'")
+        && str_contains($settingController, "'logo' => '{{ formData.logo }}'"),
+    'SettingController must update frontend theme title and logo after saving site settings.'
 );
 
 $systemController = source('src/Controllers/SystemController.php');
@@ -198,6 +217,11 @@ $routes = source('src/routes.php');
 $rootTranslationsPosition = strpos($routes, "Route::get('translations', \"{\$systemController}@translations\")");
 $rootLocalePosition = strpos($routes, "Route::post('locale', \"{\$systemController}@setLocale\")");
 $systemGroupPosition = strpos($routes, "Route::group('system'");
+check(
+    str_contains($routes, "Route::post('upload/image', \"{\$uploadController}@image\")")
+        && str_contains($routes, "'system.setting.update'"),
+    'Thinkrix routes must expose an authenticated image upload endpoint for settings logo uploads.'
+);
 check(
     $rootTranslationsPosition !== false
         && $rootLocalePosition !== false

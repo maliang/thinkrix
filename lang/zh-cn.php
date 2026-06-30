@@ -43,12 +43,12 @@ return [
         'setting' => [
             'title' => '系统设置',
             'form' => [
-                'app_title' => '系统名称',
+                'appTitle' => '系统名称',
                 'logo_url' => 'Logo 地址',
                 'copyright' => '版权信息',
             ],
             'placeholder' => [
-                'app_title' => '请输入系统名称',
+                'appTitle' => '请输入系统名称',
                 'logo_url' => '请输入 Logo 地址',
                 'copyright' => '请输入版权信息',
             ],
@@ -447,5 +447,13 @@ return [
             'marked_read' => '标记为已读',
             'all_marked_read' => '全部标记为已读',
         ],
+    ],
+    'upload' => [
+        'ok' => '上传成功',
+        'failed' => '上传失败',
+        'file_required' => '请选择上传文件',
+        'image_type_invalid' => '仅支持图片文件',
+        'image_too_large' => '图片大小不能超过 2MB',
+        'select_image' => '上传图片',
     ],
 ];
