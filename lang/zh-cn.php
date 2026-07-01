@@ -44,11 +44,13 @@ return [
             'title' => '系统设置',
             'form' => [
                 'appTitle' => '系统名称',
+                'appSubtitle' => '系统副标题',
                 'logo_url' => 'Logo',
                 'copyright' => '版权信息',
             ],
             'placeholder' => [
                 'appTitle' => '请输入系统名称',
+                'appSubtitle' => '请输入系统副标题',
                 'logo_url' => '请输入 Logo 地址',
                 'copyright' => '请输入版权信息',
             ],

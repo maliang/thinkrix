@@ -302,6 +302,7 @@ return [
     */
     'theme' => [
         'appTitle' => env('THINKRIX_APP_TITLE', 'Thinkrix Admin'),
+        'appSubtitle' => env('THINKRIX_APP_SUBTITLE', 'JSON 驱动的后台管理系统'),
         'logo' => env('THINKRIX_LOGO', '/admin/favicon.svg'),
         'themeScheme' => 'light',
         'grayscale' => false,

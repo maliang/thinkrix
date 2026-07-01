@@ -79,7 +79,7 @@ class Setting extends Model
             }
         }
 
-        foreach (['logo', 'copyright'] as $settingKey) {
+        foreach (['logo', 'copyright', 'appSubtitle'] as $settingKey) {
             if (!array_key_exists($settingKey, $theme) || $theme[$settingKey] === null) {
                 $value = static::fetchValue($settingKey, null);
                 if ($value !== null) {

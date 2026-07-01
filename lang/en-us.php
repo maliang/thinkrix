@@ -39,11 +39,13 @@ return [
             'title' => 'System Settings',
             'form' => [
                 'appTitle' => 'System Title',
+                'appSubtitle' => 'System Subtitle',
                 'logo_url' => 'Logo',
                 'copyright' => 'Copyright',
             ],
             'placeholder' => [
                 'appTitle' => 'Enter system title',
+                'appSubtitle' => 'Enter system subtitle',
                 'logo_url' => 'Enter logo URL',
                 'copyright' => 'Enter copyright info',
             ],

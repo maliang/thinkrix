@@ -59,6 +59,7 @@ class SettingController extends Controller
         $themeUpdates = [];
         $themeMapping = [
             'appTitle' => 'appTitle',
+            'appSubtitle' => 'appSubtitle',
             'logo' => 'logo',
             'copyright' => 'copyright',
         ];
@@ -107,6 +108,7 @@ class SettingController extends Controller
         $schema = Card::make()->title(__t('system.setting.title'))->children([
             Form::make()->props(['model' => '{{ formData }}', 'labelPlacement' => 'left', 'labelWidth' => 120])->children([
                 FormItem::make()->label(__t('system.setting.form.appTitle'))->children([Input::make()->model('formData.appTitle')->placeholder(__t('system.setting.placeholder.appTitle'))]),
+                FormItem::make()->label(__t('system.setting.form.appSubtitle'))->children([Input::make()->model('formData.appSubtitle')->placeholder(__t('system.setting.placeholder.appSubtitle'))]),
                 FormItem::make()->label(__t('system.setting.form.logo_url'))->children([
                     OneImgUp::make('formData.logo')
                         ->action($uploadAction)
@@ -120,6 +122,7 @@ class SettingController extends Controller
                             'fetch' => '/settings', 'method' => 'PUT',
                             'body' => ['settings' => [
                                 ['key' => 'appTitle', 'value' => '{{ formData.appTitle }}'],
+                                ['key' => 'appSubtitle', 'value' => '{{ formData.appSubtitle }}'],
                                 ['key' => 'logo', 'value' => '{{ formData.logo }}'],
                                 ['key' => 'copyright', 'value' => '{{ formData.copyright }}'],
                             ]],
@@ -138,6 +141,7 @@ class SettingController extends Controller
         $schema['data'] = [
             'formData' => [
                 'appTitle' => $theme['appTitle'] ?? 'Thinkrix Admin',
+                'appSubtitle' => $theme['appSubtitle'] ?? config('thinkrix.theme.appSubtitle', ''),
                 'logo' => $logo,
                 'copyright' => $theme['copyright'] ?? config('thinkrix.copyright', '© ' . date('Y') . ' Thinkrix Admin. All rights reserved.'),
             ],

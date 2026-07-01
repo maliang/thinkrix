@@ -99,7 +99,7 @@ class SystemController extends Controller
     {
         $theme = $this->getThemeSettings();
         $appTitle = $theme['appTitle'] ?? 'Thinkrix Admin';
-        $appSubtitle = __t('system.login.subtitle');
+        $appSubtitle = $theme['appSubtitle'] ?? config('thinkrix.theme.appSubtitle', __t('system.login.subtitle'));
         $copyright = $theme['copyright'] ?? config('thinkrix.copyright', 'Thinkrix Admin');
         $logo = $theme['logo'] ?? '';
 
