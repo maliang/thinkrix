@@ -4,7 +4,7 @@ namespace Thinkrix\Schema\Components\Business;
 
 use Thinkrix\Schema\Components\Component;
 use Thinkrix\Schema\Components\Custom\Html;
-use Thinkrix\Schema\Components\Custom\SvgIcon;
+use Thinkrix\Schema\Components\Custom\Icon;
 use Thinkrix\Schema\Components\NaiveUI\Upload;
 use Thinkrix\Schema\Components\NaiveUI\Image;
 use Thinkrix\Schema\Actions\ActionInterface;
@@ -169,7 +169,7 @@ class OneImgUp implements JsonNodeInterface
         } elseif ($this->placeholderText !== null) {
             $inner = Html::span()->children($this->placeholderText);
         } else {
-            $inner = SvgIcon::make($this->plusIcon)->size($this->plusIconSizeValue())->color('#bbb');
+            $inner = Icon::make($this->plusIcon)->size($this->plusIconSizeValue())->color('#bbb');
         }
 
         return Html::div()
@@ -195,10 +195,10 @@ class OneImgUp implements JsonNodeInterface
             }
         }
         if ($nums === []) {
-            return 44;
+            return 32;
         }
-        $size = (int) round(min($nums) * 0.42);
-        return max(28, min(72, $size));
+        $size = (int) round(min($nums) * 0.3);
+        return max(20, min(56, $size));
     }
 
     protected function buildDeleteButton(): JsonNodeInterface
@@ -210,7 +210,7 @@ class OneImgUp implements JsonNodeInterface
                 . 'align-items:center; justify-content:center; background:rgba(0,0,0,0.55); color:#fff; '
                 . 'border-radius:50%; cursor:pointer; pointer-events:auto;')
             ->on('click.stop', ['set' => $this->model, 'value' => ''])
-            ->children([SvgIcon::make($this->deleteIcon)->size(15)->color('#fff')]);
+            ->children([Icon::make($this->deleteIcon)->size(15)->color('#fff')]);
     }
 
     public function toArray(): array
