@@ -44,7 +44,7 @@ return [
             'title' => '系统设置',
             'form' => [
                 'appTitle' => '系统名称',
-                'logo_url' => 'Logo 地址',
+                'logo_url' => 'Logo',
                 'copyright' => '版权信息',
             ],
             'placeholder' => [

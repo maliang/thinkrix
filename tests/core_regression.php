@@ -157,18 +157,26 @@ check(
         && !str_contains($settingController, "'call' => '\$message.success'"),
     'SettingController schema actions must call message methods through the injected $methods namespace.'
 );
+$oneImgUp = source('src/Schema/Components/Business/OneImgUp.php');
 check(
-    str_contains($settingController, 'Upload::make()')
-        && str_contains($settingController, "'set' => 'formData.logo'")
-        && str_contains($settingController, 'JSON.parse($event.event.target.response)')
-        && str_contains($settingController, '->showFileList(false)')
-        && str_contains($settingController, "Image::make()")
-        && str_contains($settingController, "->previewDisabled()")
+    str_contains($settingController, "OneImgUp::make('formData.logo')")
+        && str_contains($settingController, '->action($uploadAction)')
         && !str_contains($settingController, "\$event.file.response?.data?.url")
         && !str_contains($settingController, 'logoFileList')
         && !str_contains($settingController, "->listType('image-card')")
         && !str_contains($settingController, "Input::make()->model('formData.logo')"),
-    'SettingController logo field must read the uploaded URL from the XHR response and use a clickable image preview (no image-card/max so the logo can be replaced without removing it first).'
+    'SettingController logo field must use the OneImgUp single-image upload component bound to formData.logo.'
+);
+check(
+    str_contains($oneImgUp, 'JSON.parse($event.event.target.response)')
+        && str_contains($oneImgUp, '->showFileList(false)')
+        && str_contains($oneImgUp, 'previewDisabled')
+        && str_contains($oneImgUp, "'mouseenter'")
+        && str_contains($oneImgUp, "'click.stop'")
+        && str_contains($oneImgUp, "->listType('image-card')")
+        && str_contains($oneImgUp, "->on('remove'")
+        && !str_contains($oneImgUp, "\$event.file.response"),
+    'OneImgUp: replace mode uses click-to-replace + hover delete; preview mode uses native image-card overlay (eye/trash) with delete-to-reupload; URL read from XHR response.'
 );
 check(
     str_contains($settingController, "'call' => '\$methods.\$theme.updateSite'")

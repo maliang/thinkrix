@@ -39,7 +39,7 @@ return [
             'title' => 'System Settings',
             'form' => [
                 'appTitle' => 'System Title',
-                'logo_url' => 'Logo URL',
+                'logo_url' => 'Logo',
                 'copyright' => 'Copyright',
             ],
             'placeholder' => [
