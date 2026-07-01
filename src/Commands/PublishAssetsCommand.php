@@ -26,13 +26,37 @@ class PublishAssetsCommand extends Command
         }
 
         if (is_dir($targetDir)) {
-            $output->writeln('<comment>目标目录已存在，将覆盖文件...</comment>');
+            $output->writeln('<comment>目标目录已存在，正在删除旧资源...</comment>');
+            $this->removeDir($targetDir);
         }
 
         $this->copyDir($sourceDir, $targetDir);
         $output->info('前端资源发布完成。');
 
         return 0;
+    }
+
+    /**
+     * 递归删除目录及其内容
+     */
+    protected function removeDir(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $items = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($items as $item) {
+            if ($item->isDir()) {
+                @rmdir($item->getPathname());
+            } else {
+                @unlink($item->getPathname());
+            }
+        }
+        @rmdir($dir);
     }
 
     protected function copyDir(string $source, string $dest): void
