@@ -67,18 +67,24 @@ class Setting extends Model
             $theme = $default;
         }
 
-        $appTitle = static::fetchValue('appTitle', null);
-        if ($appTitle === null) {
-            $appTitle = static::fetchValue('app_title', null);
-        }
-        if ($appTitle !== null) {
-            $theme['appTitle'] = $appTitle;
+        // theme.* 为权威来源（系统设置页 form_ui 的保存目标）；
+        // 仅当 theme 中缺失对应键时，才回退到独立设置项，兼容旧数据/自定义保存路径。
+        if (!array_key_exists('appTitle', $theme) || $theme['appTitle'] === null) {
+            $appTitle = static::fetchValue('appTitle', null);
+            if ($appTitle === null) {
+                $appTitle = static::fetchValue('app_title', null);
+            }
+            if ($appTitle !== null) {
+                $theme['appTitle'] = $appTitle;
+            }
         }
 
         foreach (['logo', 'copyright'] as $settingKey) {
-            $value = static::fetchValue($settingKey, null);
-            if ($value !== null) {
-                $theme[$settingKey] = $value;
+            if (!array_key_exists($settingKey, $theme) || $theme[$settingKey] === null) {
+                $value = static::fetchValue($settingKey, null);
+                if ($value !== null) {
+                    $theme[$settingKey] = $value;
+                }
             }
         }
 

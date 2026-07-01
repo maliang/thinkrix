@@ -133,13 +133,13 @@ class SettingController extends Controller
             ]),
         ])->toArray();
 
-        $theme = Setting::fetchValue('theme', config('thinkrix.theme', []));
+        $theme = Setting::fetchThemeConfig(config('thinkrix.theme', []));
         $logo = $theme['logo'] ?? '';
         $schema['data'] = [
             'formData' => [
                 'appTitle' => $theme['appTitle'] ?? 'Thinkrix Admin',
                 'logo' => $logo,
-                'copyright' => config('thinkrix.copyright', '© ' . date('Y') . ' Thinkrix Admin. All rights reserved.'),
+                'copyright' => $theme['copyright'] ?? config('thinkrix.copyright', '© ' . date('Y') . ' Thinkrix Admin. All rights reserved.'),
             ],
         ];
 
