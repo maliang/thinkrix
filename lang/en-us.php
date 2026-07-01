@@ -50,6 +50,9 @@ return [
         ],
         'login' => [
             'title' => 'Login',
+            'subtitle' => 'JSON-driven admin system',
+            'remember_me' => 'Remember me',
+            'forgot_password' => 'Forgot password?',
             'reset_password' => 'Reset Password',
             'get_code' => 'Get Code',
             'form' => [
@@ -78,6 +81,7 @@ return [
                 'code_len' => 'Code must be 6 digits',
                 'fill_all' => 'Please fill in all fields',
                 'pwd_mismatch' => 'Passwords do not match',
+                'code_sent' => 'Verification code sent',
             ],
         ],
         'error' => [

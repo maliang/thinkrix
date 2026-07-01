@@ -55,6 +55,9 @@ return [
         ],
         'login' => [
             'title' => '登 录',
+            'subtitle' => 'JSON 驱动的后台管理系统',
+            'remember_me' => '记住我',
+            'forgot_password' => '忘记密码？',
             'reset_password' => '重置密码',
             'get_code' => '获取验证码',
             'form' => [
@@ -83,6 +86,7 @@ return [
                 'code_len' => '验证码为6位数字',
                 'fill_all' => '请填写完整信息',
                 'pwd_mismatch' => '两次输入的密码不一致',
+                'code_sent' => '验证码已发送',
             ],
         ],
         'error' => [
