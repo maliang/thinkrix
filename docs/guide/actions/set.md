@@ -29,5 +29,4 @@ SetAction::batch([
 
 ## 注意
 
-表达式字符串如 `{{ slotData.row.id }}` 在前端运行。后端不要尝试在 PHP 中求值这类表达式。
-
+表达式字符串如 <code v-pre>{{ slotData.row.id }}</code> 在前端运行。后端不要尝试在 PHP 中求值这类表达式。

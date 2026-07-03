@@ -27,5 +27,4 @@ SetAction::batch([
 
 Batch mode expands to multiple `set` actions.
 
-Expressions such as `{{ slotData.row.id }}` run in the browser, not in PHP.
-
+Expressions such as <code v-pre>{{ slotData.row.id }}</code> run in the browser, not in PHP.
