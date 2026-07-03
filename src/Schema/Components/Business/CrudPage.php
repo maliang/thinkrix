@@ -504,7 +504,7 @@ class CrudPage
                 'showSizePicker' => $this->showSizePicker,
                 'showQuickJumper' => $this->showQuickJumper,
                 'showItemCount' => $this->showItemCount,
-            ])->on('update:page', ['call' => 'handlePageChange'])->on('update:pageSize', ['call' => 'handlePageSizeChange']),
+            ])->on('update:page', ['call' => 'handlePageChange', 'args' => ['{{ $event }}']])->on('update:pageSize', ['call' => 'handlePageSizeChange', 'args' => ['{{ $event }}']]),
         ]);
     }
 

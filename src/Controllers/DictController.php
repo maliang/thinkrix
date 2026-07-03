@@ -216,6 +216,9 @@ class DictController extends Controller
 
     protected function buildItemsDrawerContent(OptForm $itemForm): array
     {
+        $enabledLabel = $this->jsString(__t('ui.tag.enabled'));
+        $disabledLabel = $this->jsString(__t('ui.tag.disabled'));
+
         $itemsTable = DataTable::make()->props([
             'loading' => '{{ itemsLoading }}', 'data' => '{{ itemsData }}',
             'columns' => [
