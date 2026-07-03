@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.vitepress/cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.github
+.omc
+.claude
+docs/.omc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+.kiro

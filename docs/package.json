@@ -1,0 +1,16 @@
+{
+  "name": "thinkrix-docs",
+  "version": "1.0.0",
+  "description": "Thinkrix Documentation",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "keywords": ["thinkrix", "thinkphp", "admin", "documentation"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vitepress": "^1.6.0"
+  }
+}
