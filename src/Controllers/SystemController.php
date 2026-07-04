@@ -81,6 +81,17 @@ class SystemController extends Controller
         ];
     }
 
+    protected function getNotificationTabs(): array
+    {
+        return [
+            ['key' => 'all', 'label' => __t('role.filter_all'), 'icon' => 'ph:bell', 'types' => []],
+            ['key' => 'system', 'label' => __t('notification.type_system'), 'icon' => 'ph:gear', 'types' => ['system']],
+            ['key' => 'notice', 'label' => __t('notification.type_notice'), 'icon' => 'ph:bell', 'types' => ['notice']],
+            ['key' => 'message', 'label' => __t('notification.type_message'), 'icon' => 'ph:chat-circle', 'types' => ['message']],
+            ['key' => 'todo', 'label' => __t('notification.type_todo'), 'icon' => 'ph:check-square', 'types' => ['todo']],
+        ];
+    }
+
     protected function getSettingModel(): string
     {
         return config('thinkrix.models.setting', \Thinkrix\Models\Setting::class);
@@ -332,10 +343,19 @@ class SystemController extends Controller
             $children[] = GlobalSearch::make();
         }
         if (config('thinkrix.header.notification', true)) {
-            $children[] = HeaderNotification::make()
+            $notification = HeaderNotification::make()
                 ->fetchApi('/notifications')
                 ->readApi('/notifications/{id}/mark-read')
-                ->readAllApi('/notifications/mark-all-read');
+                ->readAllApi('/notifications/mark-all-read')
+                ->badgeMode('count')
+                ->pageSize(10)
+                ->enableNotification(true)
+                ->notificationDuration(4500)
+                ->enableDetail(true)
+                ->tabs($this->getNotificationTabs())
+                ->titlePrefixField('categoryLabel');
+
+            $children[] = $notification;
         }
 
         if (config('thinkrix.header.full_screen', true)) {

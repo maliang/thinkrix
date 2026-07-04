@@ -170,7 +170,7 @@ abstract class CrudController extends Controller
     {
         $query = $this->buildListQuery();
 
-        $perPage = (int) $this->input('page_size', $this->getDefaultPageSize());
+        $perPage = (int) $this->input('page_size', $this->input('pageSize', $this->getDefaultPageSize()));
         $paginator = $query->paginate($perPage);
 
         return success([
@@ -178,6 +178,7 @@ abstract class CrudController extends Controller
             'total' => $paginator->total(),
             'page' => $paginator->currentPage(),
             'page_size' => $paginator->listRows(),
+            'pageSize' => $paginator->listRows(),
         ]);
     }
 

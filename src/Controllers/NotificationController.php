@@ -15,9 +15,23 @@ class NotificationController extends CrudController
 
     protected function getDefaultOrder(): array { return ['created_at', 'desc']; }
 
+    protected function getListWith(): array
+    {
+        return ['category'];
+    }
+
     protected function applyFilters($query): void
     {
         $this->applyOwnershipScope($query);
+
+        if ($this->input('category_key') !== null && $this->input('category_key') !== '') {
+            $query->where('category_key', $this->input('category_key'));
+        }
+
+        $types = $this->normalizeTypes($this->input('types'));
+        if (!empty($types)) {
+            $query->whereIn('type', $types);
+        }
 
         if ($this->input('type') !== null) {
             $query->where('type', $this->input('type'));
@@ -32,6 +46,7 @@ class NotificationController extends CrudController
     {
         $model = $this->findOrFail($id);
         if ($model->user_id === null) {
+            // 共享广播不支持单用户修改已读状态。
             throw new \Thinkrix\Exceptions\ApiException(__t('notification.message.broadcast_readonly'), 40022);
         }
         $model->is_read = true;
@@ -46,6 +61,12 @@ class NotificationController extends CrudController
         $query = $modelClass::where('is_read', false)
             ->where('guard_name', config('thinkrix.guard', 'admin'))
             ->where('user_id', $this->getUser()->id);
+
+        $types = $this->normalizeTypes($this->input('types'));
+        if (!empty($types)) {
+            $query->whereIn('type', $types);
+        }
+
         $query
             ->update(['is_read' => true, 'read_at' => date('Y-m-d H:i:s')]);
         return success(__t('notification.all_marked_read'));
@@ -100,6 +121,7 @@ class NotificationController extends CrudController
     protected function beforeDelete($model): void
     {
         if ($model->user_id === null) {
+            // 共享广播不能由单个接收用户删除。
             throw new \Thinkrix\Exceptions\ApiException(__t('notification.message.broadcast_delete'), 40022);
         }
     }
@@ -144,6 +166,22 @@ class NotificationController extends CrudController
         $query->where(function ($q) use ($user) {
             $q->where('user_id', $user->id)->whereOr('user_id', null);
         });
+    }
+
+    protected function normalizeTypes(mixed $types): array
+    {
+        if (is_string($types)) {
+            $types = explode(',', $types);
+        }
+
+        if (!is_array($types)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map(
+            static fn ($type) => trim((string) $type),
+            $types
+        )));
     }
 
     /**

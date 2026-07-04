@@ -239,6 +239,7 @@ return [
     // ==================== 角色管理 ====================
     'role' => [
         'title' => '角色管理',
+        'filter_all' => '全部',
         'column' => [
             'name' => '角色标识',
             'title' => '角色名称',
@@ -443,6 +444,10 @@ return [
 
     // ==================== 通知 ====================
     'notification' => [
+        'type_system' => '系统',
+        'type_notice' => '通知',
+        'type_message' => '消息',
+        'type_todo' => '待办',
         'button' => [
             'mark_read' => '标记为已读',
             'mark_all_read' => '全部标记为已读',

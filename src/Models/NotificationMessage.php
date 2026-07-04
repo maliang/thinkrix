@@ -44,6 +44,42 @@ class NotificationMessage extends Model
         'user_id', 'from_user_id', 'from_guard', 'target_guards', 'is_read', 'read_at', 'extra',
     ];
 
+    public function toArray(): array
+    {
+        $array = parent::toArray();
+
+        $array['createdAt'] = $array['created_at'] ?? null;
+        $array['updatedAt'] = $array['updated_at'] ?? null;
+        $array['readAt'] = $array['read_at'] ?? null;
+        $array['fromUserId'] = $array['from_user_id'] ?? null;
+        $array['targetGuards'] = $array['target_guards'] ?? null;
+        $array['categoryKey'] = $array['category_key'] ?? null;
+        $array['isRead'] = (bool) ($array['is_read'] ?? false);
+        $array['userId'] = $array['user_id'] ?? null;
+        $array['guardName'] = $array['guard_name'] ?? null;
+
+        $category = $array['category'] ?? null;
+        if (!$category) {
+            $relation = $this->getRelation('category');
+            if ($relation instanceof Model) {
+                $category = $relation->toArray();
+            } elseif (is_array($relation) && !empty($relation)) {
+                $category = $relation;
+            }
+        }
+
+        if (is_array($category) && !empty($category)) {
+            $array['category'] = [
+                'name' => $category['name'] ?? null,
+                'color' => $category['color'] ?? null,
+                'icon' => $category['icon'] ?? null,
+            ];
+            $array['categoryLabel'] = '[' . ($category['name'] ?? ($array['categoryKey'] ?? '')) . ']';
+        }
+
+        return $array;
+    }
+
     /**
      * 关联接收用户
      */

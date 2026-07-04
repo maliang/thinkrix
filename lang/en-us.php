@@ -226,6 +226,7 @@ return [
     ],
     'role' => [
         'title' => 'Role Management',
+        'filter_all' => 'All',
         'column' => [
             'name' => 'Role Name',
             'title' => 'Display Name',
@@ -421,6 +422,10 @@ return [
         ],
     ],
     'notification' => [
+        'type_system' => 'System',
+        'type_notice' => 'Notice',
+        'type_message' => 'Message',
+        'type_todo' => 'Todo',
         'button' => [
             'mark_read' => 'Mark Read',
             'mark_all_read' => 'Mark All Read',
