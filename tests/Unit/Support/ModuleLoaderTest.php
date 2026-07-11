@@ -9,37 +9,37 @@ use think\App;
 use Thinkrix\Support\ModuleLoader;
 
 /**
- * ModuleLoader 单元测试
+ * ModuleLoader 鍗曞厓娴嬭瘯
  *
- * 测试配置加载优先级、路由条件加载、命令类扫描与异常跳过逻辑。
- * 通过创建真实的 App 实例（指定临时 rootPath），并绑定模拟服务对象来隔离测试。
+ * 娴嬭瘯閰嶇疆鍔犺浇浼樺厛绾с€佽矾鐢辨潯浠跺姞杞姐€佸懡浠ょ被鎵弿涓庡紓甯歌烦杩囬€昏緫銆?
+ * 閫氳繃鍒涘缓鐪熷疄鐨?App 瀹炰緥锛堟寚瀹氫复鏃?rootPath锛夛紝骞剁粦瀹氭ā鎷熸湇鍔″璞℃潵闅旂娴嬭瘯銆?
  */
 class ModuleLoaderTest extends TestCase
 {
     private string $tempDir;
     private App $app;
 
-    /** @var object 模拟的 Config 对象 */
+    /** @var object 妯℃嫙鐨?Config 瀵硅薄 */
     private object $mockConfig;
 
-    /** @var object 模拟的 Log 对象 */
+    /** @var object 妯℃嫙鐨?Log 瀵硅薄 */
     private object $mockLog;
 
-    /** @var object 模拟的 Middleware 对象 */
+    /** @var object 妯℃嫙鐨?Middleware 瀵硅薄 */
     private object $mockMiddleware;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // 创建临时目录模拟项目结构
+        // 鍒涘缓涓存椂鐩綍妯℃嫙椤圭洰缁撴瀯
         $this->tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'module_loader_test_' . uniqid();
         mkdir($this->tempDir, 0755, true);
 
-        // 创建真实的 App 实例，使用临时目录作为 rootPath
+        // 鍒涘缓鐪熷疄鐨?App 瀹炰緥锛屼娇鐢ㄤ复鏃剁洰褰曚綔涓?rootPath
         $this->app = new App($this->tempDir);
 
-        // 创建模拟的 Config 服务
+        // 鍒涘缓妯℃嫙鐨?Config 鏈嶅姟
         $this->mockConfig = new class {
             /** @var array<string, array> */
             public array $data = [];
@@ -70,7 +70,7 @@ class ModuleLoaderTest extends TestCase
             }
         };
 
-        // 创建模拟的 Log 服务
+        // 鍒涘缓妯℃嫙鐨?Log 鏈嶅姟
         $this->mockLog = new class {
             /** @var array */
             public array $warnings = [];
@@ -82,11 +82,11 @@ class ModuleLoaderTest extends TestCase
 
             public function __call($name, $args)
             {
-                // 忽略其他日志方法调用
+                // 蹇界暐鍏朵粬鏃ュ織鏂规硶璋冪敤
             }
         };
 
-        // 创建模拟的 Middleware 服务
+        // 鍒涘缓妯℃嫙鐨?Middleware 鏈嶅姟
         $this->mockMiddleware = new class {
             /** @var array */
             public array $added = [];
@@ -105,11 +105,11 @@ class ModuleLoaderTest extends TestCase
 
             public function __call($name, $args)
             {
-                // 忽略其他中间件方法调用
+                // 蹇界暐鍏朵粬涓棿浠舵柟娉曡皟鐢?
             }
         };
 
-        // 将模拟对象绑定到容器
+        // 灏嗘ā鎷熷璞＄粦瀹氬埌瀹瑰櫒
         $this->app->bind('config', function () {
             return $this->mockConfig;
         });
@@ -127,17 +127,17 @@ class ModuleLoaderTest extends TestCase
         parent::tearDown();
     }
 
-    // ==================== 配置加载优先级测试 (Requirements: 7.2, 7.4) ====================
+    // ==================== 閰嶇疆鍔犺浇浼樺厛绾ф祴璇?(Requirements: 7.2, 7.4) ====================
 
     /**
-     * 测试项目配置优先于模块配置
+     * 娴嬭瘯椤圭洰閰嶇疆浼樺厛浜庢ā鍧楅厤缃?
      */
     public function testLoadConfigProjectConfigTakesPriority(): void
     {
         $moduleName = 'Blog';
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . $moduleName;
 
-        // 创建模块配置（低优先级）
+        // 鍒涘缓妯″潡閰嶇疆锛堜綆浼樺厛绾э級
         $moduleConfigDir = $modulePath . DIRECTORY_SEPARATOR . 'config';
         mkdir($moduleConfigDir, 0755, true);
         file_put_contents(
@@ -145,7 +145,7 @@ class ModuleLoaderTest extends TestCase
             '<?php return ["source" => "module", "module_only" => true];'
         );
 
-        // 创建项目配置（高优先级）
+        // 鍒涘缓椤圭洰閰嶇疆锛堥珮浼樺厛绾э級
         $projectConfigDir = $this->tempDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'modules';
         mkdir($projectConfigDir, 0755, true);
         file_put_contents(
@@ -156,24 +156,24 @@ class ModuleLoaderTest extends TestCase
         $loader = new ModuleLoader($this->app);
         $loader->loadConfig($moduleName, $modulePath);
 
-        // 应使用项目配置（最高优先级）
+        // 搴斾娇鐢ㄩ」鐩厤缃紙鏈€楂樹紭鍏堢骇锛?
         $configData = $this->mockConfig->data;
         $this->assertArrayHasKey('module_blog', $configData);
         $this->assertEquals('project', $configData['module_blog']['source']);
         $this->assertTrue($configData['module_blog']['project_only']);
-        // 模块配置中的字段不应出现
+        // 妯″潡閰嶇疆涓殑瀛楁涓嶅簲鍑虹幇
         $this->assertArrayNotHasKey('module_only', $configData['module_blog']);
     }
 
     /**
-     * 测试模块配置在项目配置不存在时被使用
+     * 娴嬭瘯妯″潡閰嶇疆鍦ㄩ」鐩厤缃笉瀛樺湪鏃惰浣跨敤
      */
     public function testLoadConfigFallsBackToModuleConfig(): void
     {
         $moduleName = 'UserCenter';
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . $moduleName;
 
-        // 仅创建模块配置
+        // 浠呭垱寤烘ā鍧楅厤缃?
         $moduleConfigDir = $modulePath . DIRECTORY_SEPARATOR . 'config';
         mkdir($moduleConfigDir, 0755, true);
         file_put_contents(
@@ -181,7 +181,7 @@ class ModuleLoaderTest extends TestCase
             '<?php return ["key" => "module_value", "debug" => false];'
         );
 
-        // 不创建项目配置
+        // 涓嶅垱寤洪」鐩厤缃?
 
         $loader = new ModuleLoader($this->app);
         $loader->loadConfig($moduleName, $modulePath);
@@ -193,7 +193,7 @@ class ModuleLoaderTest extends TestCase
     }
 
     /**
-     * 测试两种配置文件都不存在时不注册配置
+     * 娴嬭瘯涓ょ閰嶇疆鏂囦欢閮戒笉瀛樺湪鏃朵笉娉ㄥ唽閰嶇疆
      */
     public function testLoadConfigDoesNothingWhenNoConfigExists(): void
     {
@@ -204,12 +204,12 @@ class ModuleLoaderTest extends TestCase
         $loader = new ModuleLoader($this->app);
         $loader->loadConfig($moduleName, $modulePath);
 
-        // 不应注册任何配置
+        // 涓嶅簲娉ㄥ唽浠讳綍閰嶇疆
         $this->assertEmpty($this->mockConfig->data);
     }
 
     /**
-     * 测试配置注册键名格式为 module_{lower_name}
+     * 娴嬭瘯閰嶇疆娉ㄥ唽閿悕鏍煎紡涓?module_{lower_name}
      */
     public function testLoadConfigUsesCorrectKeyName(): void
     {
@@ -226,13 +226,13 @@ class ModuleLoaderTest extends TestCase
         $loader = new ModuleLoader($this->app);
         $loader->loadConfig($moduleName, $modulePath);
 
-        // 键名应为 module_usercenter（模块名全小写）
+        // 閿悕搴斾负 module_usercenter锛堟ā鍧楀悕鍏ㄥ皬鍐欙級
         $this->assertArrayHasKey('module_usercenter', $this->mockConfig->data);
         $this->assertArrayNotHasKey('module_UserCenter', $this->mockConfig->data);
     }
 
     /**
-     * 测试配置文件返回非数组时使用空配置
+     * 娴嬭瘯閰嶇疆鏂囦欢杩斿洖闈炴暟缁勬椂浣跨敤绌洪厤缃?
      */
     public function testLoadConfigHandlesNonArrayReturn(): void
     {
@@ -241,7 +241,7 @@ class ModuleLoaderTest extends TestCase
 
         $moduleConfigDir = $modulePath . DIRECTORY_SEPARATOR . 'config';
         mkdir($moduleConfigDir, 0755, true);
-        // 配置文件返回字符串而非数组
+        // 閰嶇疆鏂囦欢杩斿洖瀛楃涓茶€岄潪鏁扮粍
         file_put_contents(
             $moduleConfigDir . DIRECTORY_SEPARATOR . 'config.php',
             '<?php return "invalid";'
@@ -250,14 +250,14 @@ class ModuleLoaderTest extends TestCase
         $loader = new ModuleLoader($this->app);
         $loader->loadConfig($moduleName, $modulePath);
 
-        // 非数组返回值会被转为空数组，空配置不会注册
+        // 闈炴暟缁勮繑鍥炲€间細琚浆涓虹┖鏁扮粍锛岀┖閰嶇疆涓嶄細娉ㄥ唽
         $this->assertEmpty($this->mockConfig->data);
     }
 
-    // ==================== 路由条件加载测试 (Requirements: 5.1, 5.2) ====================
+    // ==================== 璺敱鏉′欢鍔犺浇娴嬭瘯 (Requirements: 5.1, 5.2) ====================
 
     /**
-     * 测试路由文件存在时被加载
+     * 娴嬭瘯璺敱鏂囦欢瀛樺湪鏃惰鍔犺浇
      */
     public function testLoadRoutesIncludesRouteFileWhenExists(): void
     {
@@ -267,7 +267,7 @@ class ModuleLoaderTest extends TestCase
         $routeDir = $modulePath . DIRECTORY_SEPARATOR . 'route';
         mkdir($routeDir, 0755, true);
 
-        // 创建路由文件，写入标记以验证加载
+        // 鍒涘缓璺敱鏂囦欢锛屽啓鍏ユ爣璁颁互楠岃瘉鍔犺浇
         $markerFile = $this->tempDir . DIRECTORY_SEPARATOR . 'route_loaded_marker.txt';
         $escapedPath = str_replace('\\', '/', $markerFile);
         file_put_contents(
@@ -278,13 +278,13 @@ class ModuleLoaderTest extends TestCase
         $loader = new ModuleLoader($this->app);
         $loader->loadRoutes($moduleName, $modulePath);
 
-        // 验证路由文件被加载执行
+        // 楠岃瘉璺敱鏂囦欢琚姞杞芥墽琛?
         $this->assertFileExists($markerFile);
         $this->assertEquals('blog_route_loaded', file_get_contents($markerFile));
     }
 
     /**
-     * 测试路由文件不存在时不报错
+     * 娴嬭瘯璺敱鏂囦欢涓嶅瓨鍦ㄦ椂涓嶆姤閿?
      */
     public function testLoadRoutesDoesNothingWhenRouteFileMissing(): void
     {
@@ -294,15 +294,15 @@ class ModuleLoaderTest extends TestCase
 
         $loader = new ModuleLoader($this->app);
 
-        // 不应抛出异常
+        // 涓嶅簲鎶涘嚭寮傚父
         $loader->loadRoutes($moduleName, $modulePath);
 
-        // 测试通过即表示不报错
+        // 娴嬭瘯閫氳繃鍗宠〃绀轰笉鎶ラ敊
         $this->assertTrue(true);
     }
 
     /**
-     * 测试路由目录存在但 app.php 不存在时不报错
+     * 娴嬭瘯璺敱鐩綍瀛樺湪浣?app.php 涓嶅瓨鍦ㄦ椂涓嶆姤閿?
      */
     public function testLoadRoutesDoesNothingWhenRouteDirectoryExistsButNoFile(): void
     {
@@ -311,7 +311,7 @@ class ModuleLoaderTest extends TestCase
 
         $routeDir = $modulePath . DIRECTORY_SEPARATOR . 'route';
         mkdir($routeDir, 0755, true);
-        // 不创建 app.php
+        // 涓嶅垱寤?app.php
 
         $loader = new ModuleLoader($this->app);
         $loader->loadRoutes($moduleName, $modulePath);
@@ -319,10 +319,10 @@ class ModuleLoaderTest extends TestCase
         $this->assertTrue(true);
     }
 
-    // ==================== 命令类扫描与异常跳过测试 (Requirements: 10.2, 10.3, 10.7) ====================
+    // ==================== 鍛戒护绫绘壂鎻忎笌寮傚父璺宠繃娴嬭瘯 (Requirements: 10.2, 10.3, 10.7) ====================
 
     /**
-     * 测试 command 目录不存在时返回空命令列表
+     * 娴嬭瘯 command 鐩綍涓嶅瓨鍦ㄦ椂杩斿洖绌哄懡浠ゅ垪琛?
      */
     public function testRegisterCommandsReturnsEmptyWhenNoCommandDir(): void
     {
@@ -337,7 +337,7 @@ class ModuleLoaderTest extends TestCase
     }
 
     /**
-     * 测试 command 目录为空时返回空命令列表
+     * 娴嬭瘯 command 鐩綍涓虹┖鏃惰繑鍥炵┖鍛戒护鍒楄〃
      */
     public function testRegisterCommandsReturnsEmptyWhenCommandDirEmpty(): void
     {
@@ -354,7 +354,7 @@ class ModuleLoaderTest extends TestCase
     }
 
     /**
-     * 测试扫描 command 目录下的 PHP 文件不抛出异常
+     * 娴嬭瘯鎵弿 command 鐩綍涓嬬殑 PHP 鏂囦欢涓嶆姏鍑哄紓甯?
      */
     public function testRegisterCommandsDetectsPhpFilesWithoutError(): void
     {
@@ -364,19 +364,19 @@ class ModuleLoaderTest extends TestCase
         $commandDir = $modulePath . DIRECTORY_SEPARATOR . 'command';
         mkdir($commandDir, 0755, true);
 
-        // 创建 PHP 文件（这些类不在自动加载中，class_exists 返回 false）
+        // 鍒涘缓 PHP 鏂囦欢锛堣繖浜涚被涓嶅湪鑷姩鍔犺浇涓紝class_exists 杩斿洖 false锛?
         file_put_contents($commandDir . DIRECTORY_SEPARATOR . 'SyncData.php', '<?php // dummy');
         file_put_contents($commandDir . DIRECTORY_SEPARATOR . 'ImportUser.php', '<?php // dummy');
 
         $loader = new ModuleLoader($this->app);
         $loader->registerCommands($moduleName, $modulePath);
 
-        // 由于这些类不存在于自动加载中，不会注册，但不应抛出异常
+        // 鐢变簬杩欎簺绫讳笉瀛樺湪浜庤嚜鍔ㄥ姞杞戒腑锛屼笉浼氭敞鍐岋紝浣嗕笉搴旀姏鍑哄紓甯?
         $this->assertIsArray($loader->getRegisteredCommands());
     }
 
     /**
-     * 测试非 PHP 文件被跳过（glob 只匹配 *.php）
+     * 娴嬭瘯闈?PHP 鏂囦欢琚烦杩囷紙glob 鍙尮閰?*.php锛?
      */
     public function testRegisterCommandsSkipsNonPhpFiles(): void
     {
@@ -386,7 +386,7 @@ class ModuleLoaderTest extends TestCase
         $commandDir = $modulePath . DIRECTORY_SEPARATOR . 'command';
         mkdir($commandDir, 0755, true);
 
-        // 创建非 PHP 文件
+        // 鍒涘缓闈?PHP 鏂囦欢
         file_put_contents($commandDir . DIRECTORY_SEPARATOR . 'readme.md', '# Commands');
         file_put_contents($commandDir . DIRECTORY_SEPARATOR . '.gitkeep', '');
         file_put_contents($commandDir . DIRECTORY_SEPARATOR . 'config.json', '{}');
@@ -394,12 +394,12 @@ class ModuleLoaderTest extends TestCase
         $loader = new ModuleLoader($this->app);
         $loader->registerCommands($moduleName, $modulePath);
 
-        // glob('*.php') 只匹配 PHP 文件，所以非 PHP 文件被忽略
+        // glob('*.php') 鍙尮閰?PHP 鏂囦欢锛屾墍浠ラ潪 PHP 鏂囦欢琚拷鐣?
         $this->assertEmpty($loader->getRegisteredCommands());
     }
 
     /**
-     * 测试命令类加载失败时被捕获并记录日志（异常跳过）
+     * 娴嬭瘯鍛戒护绫诲姞杞藉け璐ユ椂琚崟鑾峰苟璁板綍鏃ュ織锛堝紓甯歌烦杩囷級
      */
     public function testRegisterCommandsCatchesExceptionsAndLogs(): void
     {
@@ -409,20 +409,20 @@ class ModuleLoaderTest extends TestCase
         $commandDir = $modulePath . DIRECTORY_SEPARATOR . 'command';
         mkdir($commandDir, 0755, true);
 
-        // 创建一个 PHP 文件
+        // 鍒涘缓涓€涓?PHP 鏂囦欢
         file_put_contents($commandDir . DIRECTORY_SEPARATOR . 'BrokenCommand.php', '<?php // broken');
 
         $loader = new ModuleLoader($this->app);
 
-        // registerCommands 应该捕获异常并记录日志，不应向外抛出
+        // registerCommands 搴旇鎹曡幏寮傚父骞惰褰曟棩蹇楋紝涓嶅簲鍚戝鎶涘嚭
         $loader->registerCommands($moduleName, $modulePath);
 
-        // 注册命令列表应为空（因为类不存在或加载失败）
+        // 娉ㄥ唽鍛戒护鍒楄〃搴斾负绌猴紙鍥犱负绫讳笉瀛樺湪鎴栧姞杞藉け璐ワ級
         $this->assertEmpty($loader->getRegisteredCommands());
     }
 
     /**
-     * 测试多个命令文件时处理不会中断（遍历不被打断）
+     * 娴嬭瘯澶氫釜鍛戒护鏂囦欢鏃跺鐞嗕笉浼氫腑鏂紙閬嶅巻涓嶈鎵撴柇锛?
      */
     public function testRegisterCommandsContinuesAfterError(): void
     {
@@ -432,24 +432,24 @@ class ModuleLoaderTest extends TestCase
         $commandDir = $modulePath . DIRECTORY_SEPARATOR . 'command';
         mkdir($commandDir, 0755, true);
 
-        // 创建多个 PHP 文件
+        // 鍒涘缓澶氫釜 PHP 鏂囦欢
         file_put_contents($commandDir . DIRECTORY_SEPARATOR . 'Alpha.php', '<?php // alpha');
         file_put_contents($commandDir . DIRECTORY_SEPARATOR . 'Beta.php', '<?php // beta');
         file_put_contents($commandDir . DIRECTORY_SEPARATOR . 'Gamma.php', '<?php // gamma');
 
         $loader = new ModuleLoader($this->app);
 
-        // 不应抛出异常，即使某个文件加载失败
+        // 涓嶅簲鎶涘嚭寮傚父锛屽嵆浣挎煇涓枃浠跺姞杞藉け璐?
         $loader->registerCommands($moduleName, $modulePath);
 
-        // 方法正常执行完成
+        // 鏂规硶姝ｅ父鎵ц瀹屾垚
         $this->assertIsArray($loader->getRegisteredCommands());
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== 杈呭姪鏂规硶 ====================
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

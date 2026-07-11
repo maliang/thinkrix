@@ -10,14 +10,14 @@ use PHPUnit\Framework\TestCase;
 use Thinkrix\Support\StubResolver;
 
 /**
- * StubResolver 文件解析优先级属性测试
+ * StubResolver 鏂囦欢瑙ｆ瀽浼樺厛绾у睘鎬ф祴璇?
  *
- * // Feature: laravel-modules, Property 3: 文件解析优先级——自定义文件存在时优先返回
+ * // Feature: laravel-modules, Property 3: 鏂囦欢瑙ｆ瀽浼樺厛绾р€斺€旇嚜瀹氫箟鏂囦欢瀛樺湪鏃朵紭鍏堣繑鍥?
  *
  * **Validates: Requirements 6.2, 6.3**
  *
- * 对任意文件名标识符，当自定义目录中存在同名文件时，
- * 解析器应返回自定义路径；当自定义文件不存在但默认文件存在时，应返回默认路径。
+ * 瀵逛换鎰忔枃浠跺悕鏍囪瘑绗︼紝褰撹嚜瀹氫箟鐩綍涓瓨鍦ㄥ悓鍚嶆枃浠舵椂锛?
+ * 瑙ｆ瀽鍣ㄥ簲杩斿洖鑷畾涔夎矾寰勶紱褰撹嚜瀹氫箟鏂囦欢涓嶅瓨鍦ㄤ絾榛樿鏂囦欢瀛樺湪鏃讹紝搴旇繑鍥為粯璁よ矾寰勩€?
  */
 class FileResolutionPriorityPropertyTest extends TestCase
 {
@@ -46,9 +46,9 @@ class FileResolutionPriorityPropertyTest extends TestCase
     }
 
     /**
-     * Property 3a: 当自定义目录中存在同名文件时，getStubPath 返回自定义路径
+     * Property 3a: 褰撹嚜瀹氫箟鐩綍涓瓨鍦ㄥ悓鍚嶆枃浠舵椂锛実etStubPath 杩斿洖鑷畾涔夎矾寰?
      *
-     * // Feature: laravel-modules, Property 3: 文件解析优先级——自定义文件存在时优先返回
+     * // Feature: laravel-modules, Property 3: 鏂囦欢瑙ｆ瀽浼樺厛绾р€斺€旇嚜瀹氫箟鏂囦欢瀛樺湪鏃朵紭鍏堣繑鍥?
      */
     public function testCustomFileAlwaysTakesPriority(): void
     {
@@ -62,30 +62,30 @@ class FileResolutionPriorityPropertyTest extends TestCase
         )->then(function (string $fileName): void {
             $stubName = $fileName . '.stub';
 
-            // 在两个目录中都创建文件
+            // 鍦ㄤ袱涓洰褰曚腑閮藉垱寤烘枃浠?
             file_put_contents($this->packageStubDir . DIRECTORY_SEPARATOR . $stubName, 'default content');
             file_put_contents($this->customStubDir . DIRECTORY_SEPARATOR . $stubName, 'custom content');
 
             $resolver = $this->createResolver();
             $resolvedPath = $resolver->getStubPath($stubName);
 
-            // 当自定义文件存在时，应优先返回自定义路径
+            // 褰撹嚜瀹氫箟鏂囦欢瀛樺湪鏃讹紝搴斾紭鍏堣繑鍥炶嚜瀹氫箟璺緞
             $this->assertEquals(
                 $this->customStubDir . DIRECTORY_SEPARATOR . $stubName,
                 $resolvedPath,
-                "当自定义目录存在文件 [{$stubName}] 时，应优先返回自定义路径"
+                "褰撹嚜瀹氫箟鐩綍瀛樺湪鏂囦欢 [{$stubName}] 鏃讹紝搴斾紭鍏堣繑鍥炶嚜瀹氫箟璺緞"
             );
 
-            // 清理此次迭代创建的文件
+            // 娓呯悊姝ゆ杩唬鍒涘缓鐨勬枃浠?
             @unlink($this->packageStubDir . DIRECTORY_SEPARATOR . $stubName);
             @unlink($this->customStubDir . DIRECTORY_SEPARATOR . $stubName);
         });
     }
 
     /**
-     * Property 3b: 当自定义文件不存在但默认文件存在时，getStubPath 返回默认路径
+     * Property 3b: 褰撹嚜瀹氫箟鏂囦欢涓嶅瓨鍦ㄤ絾榛樿鏂囦欢瀛樺湪鏃讹紝getStubPath 杩斿洖榛樿璺緞
      *
-     * // Feature: laravel-modules, Property 3: 文件解析优先级——自定义文件存在时优先返回
+     * // Feature: laravel-modules, Property 3: 鏂囦欢瑙ｆ瀽浼樺厛绾р€斺€旇嚜瀹氫箟鏂囦欢瀛樺湪鏃朵紭鍏堣繑鍥?
      */
     public function testFallsBackToDefaultWhenCustomNotExists(): void
     {
@@ -99,10 +99,10 @@ class FileResolutionPriorityPropertyTest extends TestCase
         )->then(function (string $fileName): void {
             $stubName = $fileName . '.stub';
 
-            // 仅在默认目录中创建文件，不在自定义目录中创建
+            // 浠呭湪榛樿鐩綍涓垱寤烘枃浠讹紝涓嶅湪鑷畾涔夌洰褰曚腑鍒涘缓
             file_put_contents($this->packageStubDir . DIRECTORY_SEPARATOR . $stubName, 'default content');
 
-            // 确保自定义目录中不存在该文件
+            // 纭繚鑷畾涔夌洰褰曚腑涓嶅瓨鍦ㄨ鏂囦欢
             $customFile = $this->customStubDir . DIRECTORY_SEPARATOR . $stubName;
             if (file_exists($customFile)) {
                 unlink($customFile);
@@ -111,20 +111,20 @@ class FileResolutionPriorityPropertyTest extends TestCase
             $resolver = $this->createResolver();
             $resolvedPath = $resolver->getStubPath($stubName);
 
-            // 自定义不存在时应回退到默认路径
+            // 鑷畾涔変笉瀛樺湪鏃跺簲鍥為€€鍒伴粯璁よ矾寰?
             $this->assertEquals(
                 $this->packageStubDir . DIRECTORY_SEPARATOR . $stubName,
                 $resolvedPath,
-                "当自定义目录不存在文件 [{$stubName}] 时，应回退返回默认路径"
+                "褰撹嚜瀹氫箟鐩綍涓嶅瓨鍦ㄦ枃浠?[{$stubName}] 鏃讹紝搴斿洖閫€杩斿洖榛樿璺緞"
             );
 
-            // 清理
+            // 娓呯悊
             @unlink($this->packageStubDir . DIRECTORY_SEPARATOR . $stubName);
         });
     }
 
     /**
-     * 创建可测试的 StubResolver 实例（注入测试目录路径）
+     * 鍒涘缓鍙祴璇曠殑 StubResolver 瀹炰緥锛堟敞鍏ユ祴璇曠洰褰曡矾寰勶級
      */
     private function createResolver(): StubResolver
     {
@@ -141,7 +141,7 @@ class FileResolutionPriorityPropertyTest extends TestCase
     }
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

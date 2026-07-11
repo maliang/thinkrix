@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Thinkrix\Support\StubResolver;
 
 /**
- * StubResolver 单元测试
+ * StubResolver 鍗曞厓娴嬭瘯
  */
 class StubResolverTest extends TestCase
 {
@@ -20,28 +20,28 @@ class StubResolverTest extends TestCase
     {
         parent::setUp();
 
-        // 创建临时目录模拟项目结构
+        // 鍒涘缓涓存椂鐩綍妯℃嫙椤圭洰缁撴瀯
         $this->tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'stub_resolver_test_' . uniqid();
         $this->packageStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'package' . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'modules';
         $this->customStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'project' . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'thinkrix-modules';
 
         mkdir($this->packageStubDir, 0755, true);
-        // 自定义目录不一定存在
+        // 鑷畾涔夌洰褰曚笉涓€瀹氬瓨鍦?
     }
 
     protected function tearDown(): void
     {
-        // 递归删除临时目录
+        // 閫掑綊鍒犻櫎涓存椂鐩綍
         $this->removeDirectory($this->tempDir);
         parent::tearDown();
     }
 
     /**
-     * 测试 resolve 方法替换所有占位符
+     * 娴嬭瘯 resolve 鏂规硶鏇挎崲鎵€鏈夊崰浣嶇
      */
     public function testResolveReplacesAllPlaceholders(): void
     {
-        // 创建测试 Stub 文件
+        // 鍒涘缓娴嬭瘯 Stub 鏂囦欢
         $stubContent = "<?php\nnamespace {{NAMESPACE}};\nclass {{CLASS_NAME}} {\n    // Module: {{MODULE_NAME}}\n}";
         file_put_contents($this->packageStubDir . DIRECTORY_SEPARATOR . 'test.stub', $stubContent);
 
@@ -62,7 +62,7 @@ class StubResolverTest extends TestCase
     }
 
     /**
-     * 测试 resolve 方法支持所有标准占位符
+     * 娴嬭瘯 resolve 鏂规硶鏀寔鎵€鏈夋爣鍑嗗崰浣嶇
      */
     public function testResolveSupportsAllStandardPlaceholders(): void
     {
@@ -84,11 +84,11 @@ class StubResolverTest extends TestCase
     }
 
     /**
-     * 测试 getStubPath 优先返回自定义路径
+     * 娴嬭瘯 getStubPath 浼樺厛杩斿洖鑷畾涔夎矾寰?
      */
     public function testGetStubPathPrefersCustomPath(): void
     {
-        // 创建两个同名文件
+        // 鍒涘缓涓や釜鍚屽悕鏂囦欢
         file_put_contents($this->packageStubDir . DIRECTORY_SEPARATOR . 'controller.stub', 'default');
         mkdir($this->customStubDir, 0755, true);
         file_put_contents($this->customStubDir . DIRECTORY_SEPARATOR . 'controller.stub', 'custom');
@@ -101,7 +101,7 @@ class StubResolverTest extends TestCase
     }
 
     /**
-     * 测试 getStubPath 自定义不存在时回退默认
+     * 娴嬭瘯 getStubPath 鑷畾涔変笉瀛樺湪鏃跺洖閫€榛樿
      */
     public function testGetStubPathFallsBackToDefault(): void
     {
@@ -115,13 +115,13 @@ class StubResolverTest extends TestCase
     }
 
     /**
-     * 测试 resolve 当文件不存在时返回空字符串并触发警告
+     * 娴嬭瘯 resolve 褰撴枃浠朵笉瀛樺湪鏃惰繑鍥炵┖瀛楃涓插苟瑙﹀彂璀﹀憡
      */
     public function testResolveReturnsEmptyStringWhenStubMissing(): void
     {
         $resolver = $this->createResolver();
 
-        // 期望触发 E_USER_WARNING
+        // 鏈熸湜瑙﹀彂 E_USER_WARNING
         $warningTriggered = false;
         set_error_handler(function ($errno) use (&$warningTriggered) {
             if ($errno === E_USER_WARNING) {
@@ -135,15 +135,15 @@ class StubResolverTest extends TestCase
         restore_error_handler();
 
         $this->assertEmpty($result);
-        $this->assertTrue($warningTriggered, '应当触发 E_USER_WARNING');
+        $this->assertTrue($warningTriggered, '搴斿綋瑙﹀彂 E_USER_WARNING');
     }
 
     /**
-     * 测试 publishStubs 方法将文件复制到目标目录
+     * 娴嬭瘯 publishStubs 鏂规硶灏嗘枃浠跺鍒跺埌鐩爣鐩綍
      */
     public function testPublishStubsCopiesFiles(): void
     {
-        // 创建几个默认 Stub 文件
+        // 鍒涘缓鍑犱釜榛樿 Stub 鏂囦欢
         file_put_contents($this->packageStubDir . DIRECTORY_SEPARATOR . 'controller.stub', 'controller content');
         file_put_contents($this->packageStubDir . DIRECTORY_SEPARATOR . 'model.stub', 'model content');
 
@@ -154,14 +154,14 @@ class StubResolverTest extends TestCase
         $this->assertArrayHasKey('controller.stub', $published);
         $this->assertArrayHasKey('model.stub', $published);
 
-        // 验证文件确实被复制
+        // 楠岃瘉鏂囦欢纭疄琚鍒?
         $this->assertFileExists($this->customStubDir . DIRECTORY_SEPARATOR . 'controller.stub');
         $this->assertFileExists($this->customStubDir . DIRECTORY_SEPARATOR . 'model.stub');
         $this->assertEquals('controller content', file_get_contents($this->customStubDir . DIRECTORY_SEPARATOR . 'controller.stub'));
     }
 
     /**
-     * 测试 publishStubs 不覆盖已存在的文件
+     * 娴嬭瘯 publishStubs 涓嶈鐩栧凡瀛樺湪鐨勬枃浠?
      */
     public function testPublishStubsDoesNotOverwriteExisting(): void
     {
@@ -172,12 +172,12 @@ class StubResolverTest extends TestCase
         $resolver = $this->createResolver();
         $resolver->publishStubs();
 
-        // 已存在的文件不应被覆盖
+        // 宸插瓨鍦ㄧ殑鏂囦欢涓嶅簲琚鐩?
         $this->assertEquals('customized', file_get_contents($this->customStubDir . DIRECTORY_SEPARATOR . 'controller.stub'));
     }
 
     /**
-     * 测试 getPlaceholders 返回所有支持的占位符
+     * 娴嬭瘯 getPlaceholders 杩斿洖鎵€鏈夋敮鎸佺殑鍗犱綅绗?
      */
     public function testGetPlaceholdersReturnsExpectedKeys(): void
     {
@@ -193,7 +193,7 @@ class StubResolverTest extends TestCase
     }
 
     /**
-     * 创建可测试的 StubResolver 实例（注入测试目录路径）
+     * 鍒涘缓鍙祴璇曠殑 StubResolver 瀹炰緥锛堟敞鍏ユ祴璇曠洰褰曡矾寰勶級
      */
     private function createResolver(): StubResolver
     {
@@ -209,7 +209,7 @@ class StubResolverTest extends TestCase
     }
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

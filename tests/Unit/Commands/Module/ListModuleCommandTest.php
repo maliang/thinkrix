@@ -8,16 +8,16 @@ use PHPUnit\Framework\TestCase;
 use Thinkrix\Commands\Module\ListModuleCommand;
 
 /**
- * ListModuleCommand 单元测试
+ * ListModuleCommand 鍗曞厓娴嬭瘯
  *
- * 验证命令配置正确性和表格输出逻辑。
+ * 楠岃瘉鍛戒护閰嶇疆姝ｇ‘鎬у拰琛ㄦ牸杈撳嚭閫昏緫銆?
  *
  * Requirements: 3.4
  */
 class ListModuleCommandTest extends TestCase
 {
     /**
-     * 测试命令名称配置正确
+     * 娴嬭瘯鍛戒护鍚嶇О閰嶇疆姝ｇ‘
      */
     public function testCommandNameIsCorrect(): void
     {
@@ -26,7 +26,7 @@ class ListModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试命令描述已配置
+     * 娴嬭瘯鍛戒护鎻忚堪宸查厤缃?
      */
     public function testCommandHasDescription(): void
     {
@@ -35,7 +35,7 @@ class ListModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试命令不需要任何参数
+     * 娴嬭瘯鍛戒护涓嶉渶瑕佷换浣曞弬鏁?
      */
     public function testCommandHasNoArguments(): void
     {
@@ -46,14 +46,14 @@ class ListModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试命令不需要任何自定义选项（除内置选项外）
+     * 娴嬭瘯鍛戒护涓嶉渶瑕佷换浣曡嚜瀹氫箟閫夐」锛堥櫎鍐呯疆閫夐」澶栵級
      */
     public function testCommandHasNoCustomOptions(): void
     {
         $command = new ListModuleCommand();
         $definition = $command->getDefinition();
 
-        // ThinkPHP/Symfony 内置选项列表
+        // ThinkPHP/Symfony 鍐呯疆閫夐」鍒楄〃
         $builtinOptions = ['help', 'quiet', 'verbose', 'version', 'ansi', 'no-ansi', 'no-interaction'];
 
         $options = $definition->getOptions();
@@ -61,6 +61,6 @@ class ListModuleCommandTest extends TestCase
             return !in_array($option->getName(), $builtinOptions);
         });
 
-        $this->assertEmpty($customOptions, '命令不应有自定义选项');
+        $this->assertEmpty($customOptions, '鍛戒护涓嶅簲鏈夎嚜瀹氫箟閫夐」');
     }
 }

@@ -129,6 +129,31 @@ check(
         && !str_contains($moduleController, "->itemCount('{{"),
     'ModuleController pagination helpers must receive raw expressions to avoid nested template braces.'
 );
+check(
+    str_contains($moduleController, "->props(['src' => '{{ slotData.row.logo }}', 'size' => 32, 'objectFit' => 'contain'])")
+        && !str_contains($moduleController, 'routePrefix + "/modules/" + slotData.row.name + "/logo"'),
+    'ModuleController installed module list must use the stored static logo URL directly instead of routing through /api/admin/modules/{name}/logo.'
+);
+check(
+    str_contains($moduleController, "'marketModuleType' => 'all'")
+        && str_contains($moduleController, "'marketProjectType' => 'all'")
+        && str_contains($moduleController, "['label' => '全部', 'value' => 'all']")
+        && str_contains($moduleController, "'language' => 'php', 'framework' => 'thinkphp'")
+        && str_contains($moduleController, 'normalizeMarketType'),
+    'ModuleController market modal must default category selects to selected "all" and send php/thinkphp adapter params.'
+);
+
+check(
+    str_contains($moduleController, "'marketModulePageSize' => 16")
+        && str_contains($moduleController, "'marketProjectPageSize' => 16")
+        && str_contains($moduleController, "page_size' => 16")
+        && str_contains($moduleController, 'marketCardGrid')
+        && str_contains($moduleController, 'marketDetailModal')
+        && str_contains($moduleController, "'content-style' => ['height' => '682px'")
+        && str_contains($moduleController, "'flex' => '0 0 48px'")
+        && str_contains($moduleController, 'type_label'),
+    'ModuleController market modal must use card grid, fixed 16-item pagination, internal footer pagination, translated type labels and a detail modal.'
+);
 
 $themeConfig = source('config/thinkrix.php');
 check(

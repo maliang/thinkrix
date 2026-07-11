@@ -11,6 +11,7 @@ use Thinkrix\Services\PermissionService;
 use Thinkrix\Services\RealtimeService;
 use Thinkrix\Services\TranslationService;
 
+/** 注册并启动 Thinkrix 服务、路由、资源及模块能力。 */
 class ThinkrixService extends Service
 {
     /**
@@ -57,6 +58,7 @@ class ThinkrixService extends Service
         'thinkrix:uninstall' => \Thinkrix\Commands\UninstallCommand::class,
         'thinkrix:make-backend' => \Thinkrix\Commands\MakeBackendCommand::class,
         'thinkrix:remove-backend' => \Thinkrix\Commands\RemoveBackendCommand::class,
+        'thinkrix:project-install' => \Thinkrix\Commands\ProjectInstallCommand::class,
         // 模块管理命令
         'thinkrix:module-list' => \Thinkrix\Commands\Module\ListModuleCommand::class,
         'thinkrix:module-make' => \Thinkrix\Commands\Module\MakeModuleCommand::class,
@@ -79,6 +81,7 @@ class ThinkrixService extends Service
         'thinkrix:module-publish-config' => \Thinkrix\Commands\Module\PublishConfigCommand::class,
         'thinkrix:module-route-list' => \Thinkrix\Commands\Module\RouteListCommand::class,
         'thinkrix:module-install' => \Thinkrix\Commands\Module\InstallModuleCommand::class,
+        'thinkrix:module-update' => \Thinkrix\Commands\Module\UpdateModuleCommand::class,
         'thinkrix:module-uninstall' => \Thinkrix\Commands\Module\UninstallModuleCommand::class,
     ];
 

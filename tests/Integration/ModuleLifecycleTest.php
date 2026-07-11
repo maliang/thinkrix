@@ -11,10 +11,10 @@ use Thinkrix\Support\ModuleLoader;
 use Thinkrix\Support\StubResolver;
 
 /**
- * 模块生命周期集成测试
+ * 妯″潡鐢熷懡鍛ㄦ湡闆嗘垚娴嬭瘯
  *
- * 测试模块从创建到启用、路由加载、中间件注册、事件监听、
- * 以及禁用后资源卸载的完整流程。
+ * 娴嬭瘯妯″潡浠庡垱寤哄埌鍚敤銆佽矾鐢卞姞杞姐€佷腑闂翠欢娉ㄥ唽銆佷簨浠剁洃鍚€?
+ * 浠ュ強绂佺敤鍚庤祫婧愬嵏杞界殑瀹屾暣娴佺▼銆?
  *
  * Requirements: 1.5, 3.1, 3.2, 5.1, 5.2, 9.1-9.4, 10.2, 10.3
  */
@@ -41,7 +41,7 @@ class ModuleLifecycleTest extends TestCase
 
         $this->createStubFiles();
 
-        // 创建可测试的 StubResolver（注入自定义路径）
+        // 鍒涘缓鍙祴璇曠殑 StubResolver锛堟敞鍏ヨ嚜瀹氫箟璺緞锛?
         $stubResolver = new class($this->packageStubDir, $customStubDir) extends StubResolver {
             public function __construct(string $d, string $c)
             {
@@ -50,7 +50,7 @@ class ModuleLifecycleTest extends TestCase
             }
         };
 
-        // 创建可测试的 ModuleGenerator（覆盖 getModulePath 以使用临时目录）
+        // 鍒涘缓鍙祴璇曠殑 ModuleGenerator锛堣鐩?getModulePath 浠ヤ娇鐢ㄤ复鏃剁洰褰曪級
         $tempDir = $this->tempDir;
         $this->generator = new class($stubResolver, $tempDir) extends ModuleGenerator {
             private string $rootPath;
@@ -67,10 +67,10 @@ class ModuleLifecycleTest extends TestCase
             }
         };
 
-        // 创建真实 App 实例（使用临时目录作为 rootPath）
+        // 鍒涘缓鐪熷疄 App 瀹炰緥锛堜娇鐢ㄤ复鏃剁洰褰曚綔涓?rootPath锛?
         $this->app = new App($this->tempDir);
 
-        // 模拟 Config 服务
+        // 妯℃嫙 Config 鏈嶅姟
         $this->mockConfig = new class {
             public array $data = [];
 
@@ -97,7 +97,7 @@ class ModuleLifecycleTest extends TestCase
             }
         };
 
-        // 模拟 Middleware 服务
+        // 妯℃嫙 Middleware 鏈嶅姟
         $this->mockMiddleware = new class {
             public array $added = [];
             public array $routed = [];
@@ -117,7 +117,7 @@ class ModuleLifecycleTest extends TestCase
             }
         };
 
-        // 模拟 Log 服务
+        // 妯℃嫙 Log 鏈嶅姟
         $this->mockLog = new class {
             public array $warnings = [];
 
@@ -131,7 +131,7 @@ class ModuleLifecycleTest extends TestCase
             }
         };
 
-        // 将模拟对象绑定到 App 容器
+        // 灏嗘ā鎷熷璞＄粦瀹氬埌 App 瀹瑰櫒
         $this->app->bind('config', function () {
             return $this->mockConfig;
         });
@@ -149,21 +149,21 @@ class ModuleLifecycleTest extends TestCase
         parent::tearDown();
     }
 
-    // ==================== 模块创建→路由加载流程测试 ====================
+    // ==================== 妯″潡鍒涘缓鈫掕矾鐢卞姞杞芥祦绋嬫祴璇?====================
 
     /**
-     * 测试完整流程：创建模块 → 验证结构 → 加载路由
+     * 娴嬭瘯瀹屾暣娴佺▼锛氬垱寤烘ā鍧?鈫?楠岃瘉缁撴瀯 鈫?鍔犺浇璺敱
      */
     public function testModuleCreationAndRouteLoading(): void
     {
-        // Step 1: 创建模块
+        // Step 1: 鍒涘缓妯″潡
         $result = $this->generator->createModule('blog', ['plain' => false, 'title' => 'Blog']);
         $this->assertTrue($result);
 
-        // Step 2: 验证模块存在
+        // Step 2: 楠岃瘉妯″潡瀛樺湪
         $this->assertTrue($this->generator->moduleExists('Blog'));
 
-        // Step 3: 验证目录结构
+        // Step 3: 楠岃瘉鐩綍缁撴瀯
         $modulePath = $this->generator->getModulePath('Blog');
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'controller');
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'model');
@@ -171,13 +171,13 @@ class ModuleLifecycleTest extends TestCase
         $this->assertFileExists($modulePath . DIRECTORY_SEPARATOR . 'module.json');
         $this->assertFileExists($modulePath . DIRECTORY_SEPARATOR . 'route' . DIRECTORY_SEPARATOR . 'app.php');
 
-        // Step 4: 使用 ModuleLoader 加载路由
+        // Step 4: 浣跨敤 ModuleLoader 鍔犺浇璺敱
         $loader = new ModuleLoader($this->app);
 
-        // 创建标记文件验证路由被加载执行
+        // 鍒涘缓鏍囪鏂囦欢楠岃瘉璺敱琚姞杞芥墽琛?
         $markerFile = $this->tempDir . DIRECTORY_SEPARATOR . 'route_marker.txt';
         $escapedPath = str_replace('\\', '/', $markerFile);
-        // 覆盖路由文件内容为标记逻辑
+        // 瑕嗙洊璺敱鏂囦欢鍐呭涓烘爣璁伴€昏緫
         file_put_contents(
             $modulePath . DIRECTORY_SEPARATOR . 'route' . DIRECTORY_SEPARATOR . 'app.php',
             "<?php file_put_contents('{$escapedPath}', 'loaded');"
@@ -188,15 +188,15 @@ class ModuleLifecycleTest extends TestCase
     }
 
     /**
-     * 测试模块禁用后路由不加载
+     * 娴嬭瘯妯″潡绂佺敤鍚庤矾鐢变笉鍔犺浇
      */
     public function testDisabledModuleRoutesNotLoaded(): void
     {
-        // 创建模块
+        // 鍒涘缓妯″潡
         $this->generator->createModule('shop', ['plain' => false]);
         $modulePath = $this->generator->getModulePath('Shop');
 
-        // 设置路由标记
+        // 璁剧疆璺敱鏍囪
         $markerFile = $this->tempDir . DIRECTORY_SEPARATOR . 'shop_route_marker.txt';
         $escapedPath = str_replace('\\', '/', $markerFile);
         file_put_contents(
@@ -204,23 +204,23 @@ class ModuleLifecycleTest extends TestCase
             "<?php file_put_contents('{$escapedPath}', 'loaded');"
         );
 
-        // 模拟禁用状态：不调用 loadRoutes
-        // 验证路由文件未被加载
+        // 妯℃嫙绂佺敤鐘舵€侊細涓嶈皟鐢?loadRoutes
+        // 楠岃瘉璺敱鏂囦欢鏈鍔犺浇
         $this->assertFileDoesNotExist($markerFile);
     }
 
-    // ==================== module.json 中间件/事件声明→自动注册 ====================
+    // ==================== module.json 涓棿浠?浜嬩欢澹版槑鈫掕嚜鍔ㄦ敞鍐?====================
 
     /**
-     * 测试 module.json 中间件声明自动注册
+     * 娴嬭瘯 module.json 涓棿浠跺０鏄庤嚜鍔ㄦ敞鍐?
      */
     public function testModuleJsonMiddlewareAutoRegistration(): void
     {
-        // 创建模块
+        // 鍒涘缓妯″潡
         $this->generator->createModule('auth-module', ['plain' => false]);
         $modulePath = $this->generator->getModulePath('AuthModule');
 
-        // 写入包含中间件声明的 module.json
+        // 鍐欏叆鍖呭惈涓棿浠跺０鏄庣殑 module.json
         $moduleJson = [
             'name' => 'AuthModule',
             'alias' => 'authmodule',
@@ -235,27 +235,27 @@ class ModuleLifecycleTest extends TestCase
             json_encode($moduleJson, JSON_PRETTY_PRINT)
         );
 
-        // 使用 ModuleLoader 注册中间件
+        // 浣跨敤 ModuleLoader 娉ㄥ唽涓棿浠?
         $loader = new ModuleLoader($this->app);
         $loader->registerMiddleware('AuthModule', $modulePath, $moduleJson);
 
-        // 验证全局中间件已注册
+        // 楠岃瘉鍏ㄥ眬涓棿浠跺凡娉ㄥ唽
         $this->assertContains('app\\AuthModule\\middleware\\CheckToken', $this->mockMiddleware->added);
 
-        // 验证路由中间件已注册
+        // 楠岃瘉璺敱涓棿浠跺凡娉ㄥ唽
         $this->assertContains('app\\AuthModule\\middleware\\CheckPermission', $this->mockMiddleware->routed);
     }
 
     /**
-     * 测试 module.json 事件监听器声明自动注册
+     * 娴嬭瘯 module.json 浜嬩欢鐩戝惉鍣ㄥ０鏄庤嚜鍔ㄦ敞鍐?
      */
     public function testModuleJsonListenersAutoRegistration(): void
     {
-        // 创建模块
+        // 鍒涘缓妯″潡
         $this->generator->createModule('user-center', ['plain' => false]);
         $modulePath = $this->generator->getModulePath('UserCenter');
 
-        // 写入包含事件声明的 module.json
+        // 鍐欏叆鍖呭惈浜嬩欢澹版槑鐨?module.json
         $moduleJson = [
             'name' => 'UserCenter',
             'alias' => 'usercenter',
@@ -270,29 +270,29 @@ class ModuleLifecycleTest extends TestCase
             json_encode($moduleJson, JSON_PRETTY_PRINT)
         );
 
-        // 使用 ModuleLoader 注册事件
-        // Event::listen 是静态方法，在没有完整应用的情况下无法直接验证注册
-        // 但可以验证方法不抛出异常
+        // 浣跨敤 ModuleLoader 娉ㄥ唽浜嬩欢
+        // Event::listen 鏄潤鎬佹柟娉曪紝鍦ㄦ病鏈夊畬鏁村簲鐢ㄧ殑鎯呭喌涓嬫棤娉曠洿鎺ラ獙璇佹敞鍐?
+        // 浣嗗彲浠ラ獙璇佹柟娉曚笉鎶涘嚭寮傚父
         $loader = new ModuleLoader($this->app);
 
-        // 如果 Event facade 未初始化，registerListeners 可能会抛出错误
-        // 这里验证方法可以安全执行（在完整应用环境下会正常注册）
+        // 濡傛灉 Event facade 鏈垵濮嬪寲锛宺egisterListeners 鍙兘浼氭姏鍑洪敊璇?
+        // 杩欓噷楠岃瘉鏂规硶鍙互瀹夊叏鎵ц锛堝湪瀹屾暣搴旂敤鐜涓嬩細姝ｅ父娉ㄥ唽锛?
         try {
             $loader->registerListeners('UserCenter', $modulePath, $moduleJson);
-            // 如果能到达这里说明方法执行无异常
+            // 濡傛灉鑳藉埌杈捐繖閲岃鏄庢柟娉曟墽琛屾棤寮傚父
             $this->assertTrue(true);
         } catch (\Throwable $e) {
-            // Event facade 不可用时预期会失败，但这不影响集成逻辑正确性
+            // Event facade 涓嶅彲鐢ㄦ椂棰勬湡浼氬け璐ワ紝浣嗚繖涓嶅奖鍝嶉泦鎴愰€昏緫姝ｇ‘鎬?
             $this->assertStringContainsString('Event', $e->getMessage());
         }
     }
 
     /**
-     * 测试禁用后中间件不注册
+     * 娴嬭瘯绂佺敤鍚庝腑闂翠欢涓嶆敞鍐?
      */
     public function testDisabledModuleMiddlewareNotRegistered(): void
     {
-        // 创建模块
+        // 鍒涘缓妯″潡
         $this->generator->createModule('payment', ['plain' => false]);
 
         $moduleJson = [
@@ -302,54 +302,54 @@ class ModuleLifecycleTest extends TestCase
             ],
         ];
 
-        // 模拟禁用状态：不调用 registerMiddleware
-        // 验证中间件未被注册
+        // 妯℃嫙绂佺敤鐘舵€侊細涓嶈皟鐢?registerMiddleware
+        // 楠岃瘉涓棿浠舵湭琚敞鍐?
         $this->assertEmpty($this->mockMiddleware->added);
     }
 
-    // ==================== 模块配置加载流程 ====================
+    // ==================== 妯″潡閰嶇疆鍔犺浇娴佺▼ ====================
 
     /**
-     * 测试模块创建后配置文件可被加载
+     * 娴嬭瘯妯″潡鍒涘缓鍚庨厤缃枃浠跺彲琚姞杞?
      */
     public function testModuleConfigLoadedAfterCreation(): void
     {
-        // 创建模块（非 plain，包含 config/config.php）
+        // 鍒涘缓妯″潡锛堥潪 plain锛屽寘鍚?config/config.php锛?
         $this->generator->createModule('blog', ['plain' => false]);
         $modulePath = $this->generator->getModulePath('Blog');
 
-        // 确认配置文件存在
+        // 纭閰嶇疆鏂囦欢瀛樺湪
         $configFile = $modulePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
         $this->assertFileExists($configFile);
 
-        // 替换为可验证的配置内容
+        // 鏇挎崲涓哄彲楠岃瘉鐨勯厤缃唴瀹?
         file_put_contents($configFile, "<?php\nreturn ['blog_key' => 'blog_value'];");
 
-        // 使用 ModuleLoader 加载配置
+        // 浣跨敤 ModuleLoader 鍔犺浇閰嶇疆
         $loader = new ModuleLoader($this->app);
         $loader->loadConfig('Blog', $modulePath);
 
-        // 验证配置已注册
+        // 楠岃瘉閰嶇疆宸叉敞鍐?
         $this->assertArrayHasKey('module_blog', $this->mockConfig->data);
         $this->assertEquals('blog_value', $this->mockConfig->data['module_blog']['blog_key']);
     }
 
     /**
-     * 测试项目配置覆盖模块配置
+     * 娴嬭瘯椤圭洰閰嶇疆瑕嗙洊妯″潡閰嶇疆
      */
     public function testProjectConfigOverridesModuleConfig(): void
     {
-        // 创建模块
+        // 鍒涘缓妯″潡
         $this->generator->createModule('blog', ['plain' => false]);
         $modulePath = $this->generator->getModulePath('Blog');
 
-        // 模块配置
+        // 妯″潡閰嶇疆
         file_put_contents(
             $modulePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php',
             "<?php\nreturn ['source' => 'module'];"
         );
 
-        // 项目配置（高优先级）
+        // 椤圭洰閰嶇疆锛堥珮浼樺厛绾э級
         $projectConfigDir = $this->tempDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'modules';
         mkdir($projectConfigDir, 0755, true);
         file_put_contents(
@@ -357,79 +357,79 @@ class ModuleLifecycleTest extends TestCase
             "<?php\nreturn ['source' => 'project'];"
         );
 
-        // 加载配置
+        // 鍔犺浇閰嶇疆
         $loader = new ModuleLoader($this->app);
         $loader->loadConfig('Blog', $modulePath);
 
-        // 验证项目配置优先
+        // 楠岃瘉椤圭洰閰嶇疆浼樺厛
         $this->assertEquals('project', $this->mockConfig->data['module_blog']['source']);
     }
 
-    // ==================== 自定义命令注册流程 ====================
+    // ==================== 鑷畾涔夊懡浠ゆ敞鍐屾祦绋?====================
 
     /**
-     * 测试命令目录扫描
+     * 娴嬭瘯鍛戒护鐩綍鎵弿
      */
     public function testCommandDirectoryScanningAfterModuleCreation(): void
     {
-        // 创建模块
+        // 鍒涘缓妯″潡
         $this->generator->createModule('blog', ['plain' => false]);
         $modulePath = $this->generator->getModulePath('Blog');
 
-        // 验证 command 目录存在
+        // 楠岃瘉 command 鐩綍瀛樺湪
         $commandDir = $modulePath . DIRECTORY_SEPARATOR . 'command';
         $this->assertDirectoryExists($commandDir);
 
-        // 生成一个命令文件
+        // 鐢熸垚涓€涓懡浠ゆ枃浠?
         $this->generator->generateResource('Blog', 'command', 'sync-data');
 
-        // 验证命令文件存在
+        // 楠岃瘉鍛戒护鏂囦欢瀛樺湪
         $files = glob($commandDir . DIRECTORY_SEPARATOR . '*.php');
         $this->assertNotEmpty($files);
     }
 
     /**
-     * 测试禁用后命令不注册
+     * 娴嬭瘯绂佺敤鍚庡懡浠や笉娉ㄥ唽
      */
     public function testDisabledModuleCommandsNotRegistered(): void
     {
-        // 创建模块并生成命令
+        // 鍒涘缓妯″潡骞剁敓鎴愬懡浠?
         $this->generator->createModule('blog', ['plain' => false]);
         $modulePath = $this->generator->getModulePath('Blog');
         $this->generator->generateResource('Blog', 'command', 'sync-data');
 
-        // 模拟禁用：不调用 registerCommands
+        // 妯℃嫙绂佺敤锛氫笉璋冪敤 registerCommands
         $loader = new ModuleLoader($this->app);
-        // 不调用 registerCommands
+        // 涓嶈皟鐢?registerCommands
 
         $this->assertEmpty($loader->getRegisteredCommands());
     }
 
-    // ==================== 资源生成完整流程 ====================
+    // ==================== 璧勬簮鐢熸垚瀹屾暣娴佺▼ ====================
 
     /**
-     * 测试在已创建模块中生成多种资源
+     * 娴嬭瘯鍦ㄥ凡鍒涘缓妯″潡涓敓鎴愬绉嶈祫婧?
      */
     public function testGenerateMultipleResourcesInModule(): void
     {
-        // 创建模块
+        // 鍒涘缓妯″潡
         $this->generator->createModule('blog', ['plain' => false]);
 
-        // 生成各种资源
+        // 鐢熸垚鍚勭璧勬簮
         $controller = $this->generator->generateResource('Blog', 'controller', 'PostController');
         $model = $this->generator->generateResource('Blog', 'model', 'Post');
         $service = $this->generator->generateResource('Blog', 'service', 'PostService');
         $event = $this->generator->generateResource('Blog', 'event', 'PostCreated');
         $listener = $this->generator->generateResource('Blog', 'listener', 'NotifyAuthor');
 
-        // 验证所有文件都已生成
+        // 楠岃瘉鎵€鏈夋枃浠堕兘宸茬敓鎴?
         $this->assertFileExists($controller);
         $this->assertFileExists($model);
         $this->assertFileExists($service);
         $this->assertFileExists($event);
         $this->assertFileExists($listener);
 
-        // 验证命名空间
+        // 楠岃瘉鍛藉悕绌洪棿
         $this->assertStringContainsString('app\\Blog\\controller', file_get_contents($controller));
         $this->assertStringContainsString('app\\Blog\\model', file_get_contents($model));
         $this->assertStringContainsString('app\\Blog\\service', file_get_contents($service));
@@ -437,10 +437,10 @@ class ModuleLifecycleTest extends TestCase
         $this->assertStringContainsString('app\\Blog\\listener', file_get_contents($listener));
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== 杈呭姪鏂规硶 ====================
 
     /**
-     * 创建所有需要的 Stub 模板文件
+     * 鍒涘缓鎵€鏈夐渶瑕佺殑 Stub 妯℃澘鏂囦欢
      */
     private function createStubFiles(): void
     {
@@ -467,7 +467,7 @@ class ModuleLifecycleTest extends TestCase
     }
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

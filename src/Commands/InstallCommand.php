@@ -68,13 +68,18 @@ class InstallCommand extends Command
         $this->createDefaultMenus($output);
         $output->info('   默认菜单创建完成。');
 
-        // 8. 初始化通知分类
-        $output->info('8. 初始化通知分类...');
+        // 8. 初始化系统设置
+        $output->info('8. 初始化系统设置...');
+        $this->initializeSettings();
+        $output->info('   系统设置初始化完成。');
+
+        // 9. 初始化通知分类
+        $output->info('9. 初始化通知分类...');
         $this->initNotificationCategories($output);
         $output->info('   通知分类初始化完成。');
 
-        // 9. 创建管理员账户
-        $output->info('9. 创建超级管理员账户...');
+        // 10. 创建管理员账户
+        $output->info('10. 创建超级管理员账户...');
         [$username, $password] = $this->resolveAdminCredentials($input, $output);
         $admin = $this->createSuperAdmin($role, $username, $password, $output);
 
@@ -86,8 +91,8 @@ class InstallCommand extends Command
         $output->writeln('');
         $output->writeln("管理员用户名: {$admin->username}");
 
-        // 10. 配置 composer merge-plugin
-        $output->info('10. 配置 Composer 模块依赖合并...');
+        // 11. 配置 composer merge-plugin
+        $output->info('11. 配置 Composer 模块依赖合并...');
         $this->setupComposerMerge($output);
 
         return 0;
@@ -549,6 +554,16 @@ class InstallCommand extends Command
         foreach ($menus as $menu) {
             $this->createMenu($menu);
         }
+    }
+
+    /** 将配置文件中的默认主题写入系统设置。 */
+    protected function initializeSettings(): void
+    {
+        if (Setting::where('key', 'theme')->find()) {
+            return;
+        }
+
+        Setting::setValue('theme', config('thinkrix.theme', []), 'theme');
     }
 
     protected function createMenu(array $data, ?int $parentId = null): void

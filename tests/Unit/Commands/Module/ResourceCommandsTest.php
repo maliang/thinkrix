@@ -19,10 +19,10 @@ use Thinkrix\Support\ModuleGenerator;
 use Thinkrix\Support\StubResolver;
 
 /**
- * 资源生成命令单元测试
+ * 璧勬簮鐢熸垚鍛戒护鍗曞厓娴嬭瘯
  *
- * 测试所有模块内资源生成命令的配置正确性、文件生成与命名空间设置。
- * 使用临时目录模拟项目结构，避免依赖 ThinkPHP app() 容器。
+ * 娴嬭瘯鎵€鏈夋ā鍧楀唴璧勬簮鐢熸垚鍛戒护鐨勯厤缃纭€с€佹枃浠剁敓鎴愪笌鍛藉悕绌洪棿璁剧疆銆?
+ * 浣跨敤涓存椂鐩綍妯℃嫙椤圭洰缁撴瀯锛岄伩鍏嶄緷璧?ThinkPHP app() 瀹瑰櫒銆?
  *
  * Requirements: 2.1-2.11
  */
@@ -37,7 +37,7 @@ class ResourceCommandsTest extends TestCase
     {
         parent::setUp();
 
-        // 创建临时目录模拟项目结构
+        // 鍒涘缓涓存椂鐩綍妯℃嫙椤圭洰缁撴瀯
         $this->tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'resource_cmd_test_' . uniqid();
         $this->packageStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'modules';
         $this->customStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'project' . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'thinkrix-modules';
@@ -45,10 +45,10 @@ class ResourceCommandsTest extends TestCase
         mkdir($this->packageStubDir, 0755, true);
         mkdir($this->tempDir . DIRECTORY_SEPARATOR . 'app', 0755, true);
 
-        // 创建基础 stub 模板
+        // 鍒涘缓鍩虹 stub 妯℃澘
         $this->createStubFiles();
 
-        // 使用可测试的 StubResolver 和 ModuleGenerator
+        // 浣跨敤鍙祴璇曠殑 StubResolver 鍜?ModuleGenerator
         $stubResolver = $this->createStubResolver();
         $this->generator = $this->createGenerator($stubResolver);
     }
@@ -59,10 +59,10 @@ class ResourceCommandsTest extends TestCase
         parent::tearDown();
     }
 
-    // ==================== 命令配置测试 ====================
+    // ==================== 鍛戒护閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试 MakeControllerCommand 命令配置
+     * 娴嬭瘯 MakeControllerCommand 鍛戒护閰嶇疆
      *
      * Requirements: 2.1
      */
@@ -80,7 +80,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MakeModelCommand 命令配置
+     * 娴嬭瘯 MakeModelCommand 鍛戒护閰嶇疆
      *
      * Requirements: 2.2
      */
@@ -98,7 +98,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MakeServiceCommand 命令配置
+     * 娴嬭瘯 MakeServiceCommand 鍛戒护閰嶇疆
      *
      * Requirements: 2.3
      */
@@ -114,7 +114,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MakeMigrationCommand 命令配置
+     * 娴嬭瘯 MakeMigrationCommand 鍛戒护閰嶇疆
      *
      * Requirements: 2.4
      */
@@ -130,7 +130,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MakeSeederCommand 命令配置
+     * 娴嬭瘯 MakeSeederCommand 鍛戒护閰嶇疆
      *
      * Requirements: 2.5
      */
@@ -146,7 +146,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MakeValidateCommand 命令配置
+     * 娴嬭瘯 MakeValidateCommand 鍛戒护閰嶇疆
      *
      * Requirements: 2.6
      */
@@ -162,7 +162,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MakeMiddlewareCommand 命令配置
+     * 娴嬭瘯 MakeMiddlewareCommand 鍛戒护閰嶇疆
      *
      * Requirements: 2.7
      */
@@ -178,7 +178,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MakeEventCommand 命令配置
+     * 娴嬭瘯 MakeEventCommand 鍛戒护閰嶇疆
      *
      * Requirements: 2.8
      */
@@ -194,7 +194,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MakeListenerCommand 命令配置
+     * 娴嬭瘯 MakeListenerCommand 鍛戒护閰嶇疆
      *
      * Requirements: 2.9
      */
@@ -210,7 +210,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MakeCommandCommand 命令配置
+     * 娴嬭瘯 MakeCommandCommand 鍛戒护閰嶇疆
      *
      * Requirements: 2.10
      */
@@ -225,16 +225,16 @@ class ResourceCommandsTest extends TestCase
         $this->assertTrue($definition->hasArgument('module'));
     }
 
-    // ==================== 控制器生成测试 ====================
+    // ==================== 鎺у埗鍣ㄧ敓鎴愭祴璇?====================
 
     /**
-     * 测试控制器文件生成到正确目录
+     * 娴嬭瘯鎺у埗鍣ㄦ枃浠剁敓鎴愬埌姝ｇ‘鐩綍
      *
      * Requirements: 2.1, 2.11
      */
     public function testGenerateControllerCreatesFileInCorrectDirectory(): void
     {
-        // 预创建模块目录
+        // 棰勫垱寤烘ā鍧楃洰褰?
         $this->createModuleDirectory('Blog');
 
         $filePath = $this->generator->generateResource('Blog', 'controller', 'UserController');
@@ -245,7 +245,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试控制器命名空间正确
+     * 娴嬭瘯鎺у埗鍣ㄥ懡鍚嶇┖闂存纭?
      *
      * Requirements: 2.1, 2.11
      */
@@ -253,7 +253,7 @@ class ResourceCommandsTest extends TestCase
     {
         $this->createModuleDirectory('Blog');
 
-        // 使用连字符分隔的名称，studlyCase 会正确转换为 UserController
+        // 浣跨敤杩炲瓧绗﹀垎闅旂殑鍚嶇О锛宻tudlyCase 浼氭纭浆鎹负 UserController
         $filePath = $this->generator->generateResource('Blog', 'controller', 'user-controller');
         $content = file_get_contents($filePath);
 
@@ -261,10 +261,10 @@ class ResourceCommandsTest extends TestCase
         $this->assertStringContainsString('UserController', $content);
     }
 
-    // ==================== 模型生成测试 ====================
+    // ==================== 妯″瀷鐢熸垚娴嬭瘯 ====================
 
     /**
-     * 测试模型文件生成到正确目录
+     * 娴嬭瘯妯″瀷鏂囦欢鐢熸垚鍒版纭洰褰?
      *
      * Requirements: 2.2, 2.11
      */
@@ -280,7 +280,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试模型命名空间正确
+     * 娴嬭瘯妯″瀷鍛藉悕绌洪棿姝ｇ‘
      *
      * Requirements: 2.2, 2.11
      */
@@ -295,10 +295,10 @@ class ResourceCommandsTest extends TestCase
         $this->assertStringContainsString('User', $content);
     }
 
-    // ==================== 服务生成测试 ====================
+    // ==================== 鏈嶅姟鐢熸垚娴嬭瘯 ====================
 
     /**
-     * 测试服务文件生成到正确目录
+     * 娴嬭瘯鏈嶅姟鏂囦欢鐢熸垚鍒版纭洰褰?
      *
      * Requirements: 2.3, 2.11
      */
@@ -314,7 +314,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试服务命名空间正确
+     * 娴嬭瘯鏈嶅姟鍛藉悕绌洪棿姝ｇ‘
      *
      * Requirements: 2.3, 2.11
      */
@@ -322,7 +322,7 @@ class ResourceCommandsTest extends TestCase
     {
         $this->createModuleDirectory('Blog');
 
-        // 使用连字符分隔的名称，studlyCase 会正确转换为 UserService
+        // 浣跨敤杩炲瓧绗﹀垎闅旂殑鍚嶇О锛宻tudlyCase 浼氭纭浆鎹负 UserService
         $filePath = $this->generator->generateResource('Blog', 'service', 'user-service');
         $content = file_get_contents($filePath);
 
@@ -330,10 +330,10 @@ class ResourceCommandsTest extends TestCase
         $this->assertStringContainsString('UserService', $content);
     }
 
-    // ==================== 迁移生成测试 ====================
+    // ==================== 杩佺Щ鐢熸垚娴嬭瘯 ====================
 
     /**
-     * 测试迁移文件生成到正确目录
+     * 娴嬭瘯杩佺Щ鏂囦欢鐢熸垚鍒版纭洰褰?
      *
      * Requirements: 2.4, 2.11
      */
@@ -349,7 +349,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试迁移文件名包含时间戳前缀
+     * 娴嬭瘯杩佺Щ鏂囦欢鍚嶅寘鍚椂闂存埑鍓嶇紑
      *
      * Requirements: 2.4
      */
@@ -360,13 +360,13 @@ class ResourceCommandsTest extends TestCase
         $filePath = $this->generator->generateResource('Blog', 'migration', 'create_posts');
         $filename = basename($filePath);
 
-        // 文件名格式：{YmdHis}_create_{table_name}_table.php
+        // 鏂囦欢鍚嶆牸寮忥細{YmdHis}_create_{table_name}_table.php
         $this->assertMatchesRegularExpression('/^\d{14}_create_/', $filename);
         $this->assertStringEndsWith('.php', $filename);
     }
 
     /**
-     * 测试迁移命名空间为 database 层级
+     * 娴嬭瘯杩佺Щ鍛藉悕绌洪棿涓?database 灞傜骇
      *
      * Requirements: 2.4, 2.11
      */
@@ -377,14 +377,14 @@ class ResourceCommandsTest extends TestCase
         $filePath = $this->generator->generateResource('Blog', 'migration', 'create_posts');
         $content = file_get_contents($filePath);
 
-        // migration 的命名空间应为 app\{Module}\database
+        // migration 鐨勫懡鍚嶇┖闂村簲涓?app\{Module}\database
         $this->assertStringContainsString('app\\Blog\\database', $content);
     }
 
-    // ==================== Seeder 生成测试 ====================
+    // ==================== Seeder 鐢熸垚娴嬭瘯 ====================
 
     /**
-     * 测试 Seeder 文件生成到正确目录
+     * 娴嬭瘯 Seeder 鏂囦欢鐢熸垚鍒版纭洰褰?
      *
      * Requirements: 2.5, 2.11
      */
@@ -400,7 +400,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试 Seeder 命名空间为 database 层级
+     * 娴嬭瘯 Seeder 鍛藉悕绌洪棿涓?database 灞傜骇
      *
      * Requirements: 2.5, 2.11
      */
@@ -411,14 +411,14 @@ class ResourceCommandsTest extends TestCase
         $filePath = $this->generator->generateResource('Blog', 'seeder', 'UserSeeder');
         $content = file_get_contents($filePath);
 
-        // seeder 的命名空间应为 app\{Module}\database
+        // seeder 鐨勫懡鍚嶇┖闂村簲涓?app\{Module}\database
         $this->assertStringContainsString('app\\Blog\\database', $content);
     }
 
-    // ==================== 验证器生成测试 ====================
+    // ==================== 楠岃瘉鍣ㄧ敓鎴愭祴璇?====================
 
     /**
-     * 测试验证器文件生成到正确目录
+     * 娴嬭瘯楠岃瘉鍣ㄦ枃浠剁敓鎴愬埌姝ｇ‘鐩綍
      *
      * Requirements: 2.6, 2.11
      */
@@ -434,7 +434,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试验证器命名空间正确
+     * 娴嬭瘯楠岃瘉鍣ㄥ懡鍚嶇┖闂存纭?
      *
      * Requirements: 2.6, 2.11
      */
@@ -442,7 +442,7 @@ class ResourceCommandsTest extends TestCase
     {
         $this->createModuleDirectory('Blog');
 
-        // 使用连字符分隔的名称，studlyCase 会正确转换为 UserValidate
+        // 浣跨敤杩炲瓧绗﹀垎闅旂殑鍚嶇О锛宻tudlyCase 浼氭纭浆鎹负 UserValidate
         $filePath = $this->generator->generateResource('Blog', 'validate', 'user-validate');
         $content = file_get_contents($filePath);
 
@@ -450,10 +450,10 @@ class ResourceCommandsTest extends TestCase
         $this->assertStringContainsString('UserValidate', $content);
     }
 
-    // ==================== 中间件生成测试 ====================
+    // ==================== 涓棿浠剁敓鎴愭祴璇?====================
 
     /**
-     * 测试中间件文件生成到正确目录
+     * 娴嬭瘯涓棿浠舵枃浠剁敓鎴愬埌姝ｇ‘鐩綍
      *
      * Requirements: 2.7, 2.11
      */
@@ -469,7 +469,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试中间件命名空间正确
+     * 娴嬭瘯涓棿浠跺懡鍚嶇┖闂存纭?
      *
      * Requirements: 2.7, 2.11
      */
@@ -477,7 +477,7 @@ class ResourceCommandsTest extends TestCase
     {
         $this->createModuleDirectory('Blog');
 
-        // 使用连字符分隔的名称，studlyCase 会正确转换为 CheckAuth
+        // 浣跨敤杩炲瓧绗﹀垎闅旂殑鍚嶇О锛宻tudlyCase 浼氭纭浆鎹负 CheckAuth
         $filePath = $this->generator->generateResource('Blog', 'middleware', 'check-auth');
         $content = file_get_contents($filePath);
 
@@ -485,10 +485,10 @@ class ResourceCommandsTest extends TestCase
         $this->assertStringContainsString('CheckAuth', $content);
     }
 
-    // ==================== 事件生成测试 ====================
+    // ==================== 浜嬩欢鐢熸垚娴嬭瘯 ====================
 
     /**
-     * 测试事件文件生成到正确目录
+     * 娴嬭瘯浜嬩欢鏂囦欢鐢熸垚鍒版纭洰褰?
      *
      * Requirements: 2.8, 2.11
      */
@@ -504,7 +504,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试事件命名空间正确
+     * 娴嬭瘯浜嬩欢鍛藉悕绌洪棿姝ｇ‘
      *
      * Requirements: 2.8, 2.11
      */
@@ -512,7 +512,7 @@ class ResourceCommandsTest extends TestCase
     {
         $this->createModuleDirectory('Blog');
 
-        // 使用连字符分隔的名称，studlyCase 会正确转换为 UserCreated
+        // 浣跨敤杩炲瓧绗﹀垎闅旂殑鍚嶇О锛宻tudlyCase 浼氭纭浆鎹负 UserCreated
         $filePath = $this->generator->generateResource('Blog', 'event', 'user-created');
         $content = file_get_contents($filePath);
 
@@ -520,10 +520,10 @@ class ResourceCommandsTest extends TestCase
         $this->assertStringContainsString('UserCreated', $content);
     }
 
-    // ==================== 监听器生成测试 ====================
+    // ==================== 鐩戝惉鍣ㄧ敓鎴愭祴璇?====================
 
     /**
-     * 测试监听器文件生成到正确目录
+     * 娴嬭瘯鐩戝惉鍣ㄦ枃浠剁敓鎴愬埌姝ｇ‘鐩綍
      *
      * Requirements: 2.9, 2.11
      */
@@ -539,7 +539,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试监听器命名空间正确
+     * 娴嬭瘯鐩戝惉鍣ㄥ懡鍚嶇┖闂存纭?
      *
      * Requirements: 2.9, 2.11
      */
@@ -547,7 +547,7 @@ class ResourceCommandsTest extends TestCase
     {
         $this->createModuleDirectory('Blog');
 
-        // 使用连字符分隔的名称，studlyCase 会正确转换为 SendNotification
+        // 浣跨敤杩炲瓧绗﹀垎闅旂殑鍚嶇О锛宻tudlyCase 浼氭纭浆鎹负 SendNotification
         $filePath = $this->generator->generateResource('Blog', 'listener', 'send-notification');
         $content = file_get_contents($filePath);
 
@@ -555,10 +555,10 @@ class ResourceCommandsTest extends TestCase
         $this->assertStringContainsString('SendNotification', $content);
     }
 
-    // ==================== 命令文件生成测试 ====================
+    // ==================== 鍛戒护鏂囦欢鐢熸垚娴嬭瘯 ====================
 
     /**
-     * 测试命令文件生成到正确目录
+     * 娴嬭瘯鍛戒护鏂囦欢鐢熸垚鍒版纭洰褰?
      *
      * Requirements: 2.10, 2.11
      */
@@ -574,7 +574,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试命令文件命名空间正确
+     * 娴嬭瘯鍛戒护鏂囦欢鍛藉悕绌洪棿姝ｇ‘
      *
      * Requirements: 2.10, 2.11
      */
@@ -586,14 +586,14 @@ class ResourceCommandsTest extends TestCase
         $content = file_get_contents($filePath);
 
         $this->assertStringContainsString('app\\Blog\\command', $content);
-        // sync-data 经 studlyCase 转换为 SyncData
+        // sync-data 缁?studlyCase 杞崲涓?SyncData
         $this->assertStringContainsString('SyncData', $content);
     }
 
-    // ==================== 模块不存在时的错误处理测试 ====================
+    // ==================== 妯″潡涓嶅瓨鍦ㄦ椂鐨勯敊璇鐞嗘祴璇?====================
 
     /**
-     * 测试目标模块不存在时 generateResource 返回空字符串（controller）
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂 generateResource 杩斿洖绌哄瓧绗︿覆锛坈ontroller锛?
      *
      * Requirements: 2.10
      */
@@ -604,7 +604,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试目标模块不存在时 generateResource 返回空字符串（model）
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂 generateResource 杩斿洖绌哄瓧绗︿覆锛坢odel锛?
      *
      * Requirements: 2.10
      */
@@ -615,7 +615,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试目标模块不存在时 generateResource 返回空字符串（service）
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂 generateResource 杩斿洖绌哄瓧绗︿覆锛坰ervice锛?
      *
      * Requirements: 2.10
      */
@@ -626,7 +626,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试目标模块不存在时 generateResource 返回空字符串（migration）
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂 generateResource 杩斿洖绌哄瓧绗︿覆锛坢igration锛?
      *
      * Requirements: 2.10
      */
@@ -637,7 +637,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试目标模块不存在时 generateResource 返回空字符串（seeder）
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂 generateResource 杩斿洖绌哄瓧绗︿覆锛坰eeder锛?
      *
      * Requirements: 2.10
      */
@@ -648,7 +648,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试目标模块不存在时 generateResource 返回空字符串（validate）
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂 generateResource 杩斿洖绌哄瓧绗︿覆锛坴alidate锛?
      *
      * Requirements: 2.10
      */
@@ -659,7 +659,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试目标模块不存在时 generateResource 返回空字符串（middleware）
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂 generateResource 杩斿洖绌哄瓧绗︿覆锛坢iddleware锛?
      *
      * Requirements: 2.10
      */
@@ -670,7 +670,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试目标模块不存在时 generateResource 返回空字符串（event）
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂 generateResource 杩斿洖绌哄瓧绗︿覆锛坋vent锛?
      *
      * Requirements: 2.10
      */
@@ -681,7 +681,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试目标模块不存在时 generateResource 返回空字符串（listener）
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂 generateResource 杩斿洖绌哄瓧绗︿覆锛坙istener锛?
      *
      * Requirements: 2.10
      */
@@ -692,7 +692,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 测试目标模块不存在时 generateResource 返回空字符串（command）
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂 generateResource 杩斿洖绌哄瓧绗︿覆锛坈ommand锛?
      *
      * Requirements: 2.10
      */
@@ -702,10 +702,10 @@ class ResourceCommandsTest extends TestCase
         $this->assertEmpty($result);
     }
 
-    // ==================== 名称转换测试 ====================
+    // ==================== 鍚嶇О杞崲娴嬭瘯 ====================
 
     /**
-     * 测试资源名称经 StudlyCase 转换后作为类名
+     * 娴嬭瘯璧勬簮鍚嶇О缁?StudlyCase 杞崲鍚庝綔涓虹被鍚?
      *
      * Requirements: 2.11
      */
@@ -716,23 +716,23 @@ class ResourceCommandsTest extends TestCase
         $filePath = $this->generator->generateResource('Blog', 'controller', 'user-profile');
         $content = file_get_contents($filePath);
 
-        // user-profile 经 studlyCase 转为 UserProfile
+        // user-profile 缁?studlyCase 杞负 UserProfile
         $this->assertStringContainsString('UserProfile', $content);
     }
 
     /**
-     * 测试多段模块名（带连字符）的命名空间正确性
+     * 娴嬭瘯澶氭妯″潡鍚嶏紙甯﹁繛瀛楃锛夌殑鍛藉悕绌洪棿姝ｇ‘鎬?
      *
      * Requirements: 2.11
      */
     public function testResourceInMultiWordModuleHasCorrectNamespace(): void
     {
-        // 注意：generateResource 内部对 module 参数也会调用 studlyCase
-        // 所以传入 'user-center' 会被转换为 'UserCenter'
-        // 但 getModulePath 使用转换后的名称检查目录是否存在
+        // 娉ㄦ剰锛歡enerateResource 鍐呴儴瀵?module 鍙傛暟涔熶細璋冪敤 studlyCase
+        // 鎵€浠ヤ紶鍏?'user-center' 浼氳杞崲涓?'UserCenter'
+        // 浣?getModulePath 浣跨敤杞崲鍚庣殑鍚嶇О妫€鏌ョ洰褰曟槸鍚﹀瓨鍦?
         $this->createModuleDirectory('UserCenter');
 
-        // 使用连字符格式的模块名，generateResource 内部会 studlyCase 转换
+        // 浣跨敤杩炲瓧绗︽牸寮忕殑妯″潡鍚嶏紝generateResource 鍐呴儴浼?studlyCase 杞崲
         $filePath = $this->generator->generateResource('user-center', 'service', 'order-service');
         $content = file_get_contents($filePath);
 
@@ -740,10 +740,10 @@ class ResourceCommandsTest extends TestCase
         $this->assertStringContainsString('OrderService', $content);
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== 杈呭姪鏂规硶 ====================
 
     /**
-     * 在临时目录中创建模块目录结构
+     * 鍦ㄤ复鏃剁洰褰曚腑鍒涘缓妯″潡鐩綍缁撴瀯
      */
     private function createModuleDirectory(string $moduleName): void
     {
@@ -761,7 +761,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 创建基础 Stub 文件
+     * 鍒涘缓鍩虹 Stub 鏂囦欢
      */
     private function createStubFiles(): void
     {
@@ -833,7 +833,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 创建可测试的 StubResolver 实例
+     * 鍒涘缓鍙祴璇曠殑 StubResolver 瀹炰緥
      */
     private function createStubResolver(): StubResolver
     {
@@ -847,7 +847,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 创建可测试的 ModuleGenerator 实例（覆盖 getModulePath 使用临时目录）
+     * 鍒涘缓鍙祴璇曠殑 ModuleGenerator 瀹炰緥锛堣鐩?getModulePath 浣跨敤涓存椂鐩綍锛?
      */
     private function createGenerator(StubResolver $stubResolver): ModuleGenerator
     {
@@ -869,7 +869,7 @@ class ResourceCommandsTest extends TestCase
     }
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

@@ -14,10 +14,10 @@ use Thinkrix\Support\ModuleGenerator;
 use Thinkrix\Support\StubResolver;
 
 /**
- * 模块生命周期管理命令单元测试
+ * 妯″潡鐢熷懡鍛ㄦ湡绠＄悊鍛戒护鍗曞厓娴嬭瘯
  *
- * 测试启用/禁用/删除/列表命令的配置正确性、类继承结构，
- * 以及 DeleteModuleCommand 的目录删除逻辑。
+ * 娴嬭瘯鍚敤/绂佺敤/鍒犻櫎/鍒楄〃鍛戒护鐨勯厤缃纭€с€佺被缁ф壙缁撴瀯锛?
+ * 浠ュ強 DeleteModuleCommand 鐨勭洰褰曞垹闄ら€昏緫銆?
  *
  * Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6
  */
@@ -32,7 +32,7 @@ class LifecycleCommandsTest extends TestCase
     {
         parent::setUp();
 
-        // 创建临时目录模拟项目结构
+        // 鍒涘缓涓存椂鐩綍妯℃嫙椤圭洰缁撴瀯
         $this->tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'lifecycle_cmd_test_' . uniqid();
         $this->packageStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'modules';
         $this->customStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'project' . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'thinkrix-modules';
@@ -40,10 +40,10 @@ class LifecycleCommandsTest extends TestCase
         mkdir($this->packageStubDir, 0755, true);
         mkdir($this->tempDir . DIRECTORY_SEPARATOR . 'app', 0755, true);
 
-        // 创建基础 stub 模板
+        // 鍒涘缓鍩虹 stub 妯℃澘
         $this->createStubFiles();
 
-        // 使用可测试的 StubResolver 和 ModuleGenerator
+        // 浣跨敤鍙祴璇曠殑 StubResolver 鍜?ModuleGenerator
         $stubResolver = $this->createStubResolver();
         $this->generator = $this->createGenerator($stubResolver);
     }
@@ -54,10 +54,10 @@ class LifecycleCommandsTest extends TestCase
         parent::tearDown();
     }
 
-    // ==================== EnableModuleCommand 配置测试 ====================
+    // ==================== EnableModuleCommand 閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试 EnableModuleCommand 命令名称配置正确
+     * 娴嬭瘯 EnableModuleCommand 鍛戒护鍚嶇О閰嶇疆姝ｇ‘
      *
      * Requirements: 3.1
      */
@@ -68,7 +68,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 EnableModuleCommand 定义了必须的 name 参数
+     * 娴嬭瘯 EnableModuleCommand 瀹氫箟浜嗗繀椤荤殑 name 鍙傛暟
      *
      * Requirements: 3.1, 3.5
      */
@@ -83,7 +83,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 EnableModuleCommand 有描述信息
+     * 娴嬭瘯 EnableModuleCommand 鏈夋弿杩颁俊鎭?
      *
      * Requirements: 3.1
      */
@@ -94,7 +94,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 EnableModuleCommand 继承自 BaseModuleCommand
+     * 娴嬭瘯 EnableModuleCommand 缁ф壙鑷?BaseModuleCommand
      *
      * Requirements: 3.1
      */
@@ -104,10 +104,10 @@ class LifecycleCommandsTest extends TestCase
         $this->assertInstanceOf(BaseModuleCommand::class, $command);
     }
 
-    // ==================== DisableModuleCommand 配置测试 ====================
+    // ==================== DisableModuleCommand 閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试 DisableModuleCommand 命令名称配置正确
+     * 娴嬭瘯 DisableModuleCommand 鍛戒护鍚嶇О閰嶇疆姝ｇ‘
      *
      * Requirements: 3.2
      */
@@ -118,7 +118,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 DisableModuleCommand 定义了必须的 name 参数
+     * 娴嬭瘯 DisableModuleCommand 瀹氫箟浜嗗繀椤荤殑 name 鍙傛暟
      *
      * Requirements: 3.2, 3.5
      */
@@ -133,7 +133,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 DisableModuleCommand 有描述信息
+     * 娴嬭瘯 DisableModuleCommand 鏈夋弿杩颁俊鎭?
      *
      * Requirements: 3.2
      */
@@ -144,7 +144,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 DisableModuleCommand 继承自 BaseModuleCommand
+     * 娴嬭瘯 DisableModuleCommand 缁ф壙鑷?BaseModuleCommand
      *
      * Requirements: 3.2
      */
@@ -154,10 +154,10 @@ class LifecycleCommandsTest extends TestCase
         $this->assertInstanceOf(BaseModuleCommand::class, $command);
     }
 
-    // ==================== DeleteModuleCommand 配置测试 ====================
+    // ==================== DeleteModuleCommand 閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试 DeleteModuleCommand 命令名称配置正确
+     * 娴嬭瘯 DeleteModuleCommand 鍛戒护鍚嶇О閰嶇疆姝ｇ‘
      *
      * Requirements: 3.3
      */
@@ -168,7 +168,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 DeleteModuleCommand 定义了必须的 name 参数
+     * 娴嬭瘯 DeleteModuleCommand 瀹氫箟浜嗗繀椤荤殑 name 鍙傛暟
      *
      * Requirements: 3.3, 3.5
      */
@@ -183,7 +183,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 DeleteModuleCommand 有描述信息
+     * 娴嬭瘯 DeleteModuleCommand 鏈夋弿杩颁俊鎭?
      *
      * Requirements: 3.3, 3.6
      */
@@ -194,7 +194,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 DeleteModuleCommand 继承自 BaseModuleCommand
+     * 娴嬭瘯 DeleteModuleCommand 缁ф壙鑷?BaseModuleCommand
      *
      * Requirements: 3.3
      */
@@ -204,10 +204,10 @@ class LifecycleCommandsTest extends TestCase
         $this->assertInstanceOf(BaseModuleCommand::class, $command);
     }
 
-    // ==================== ListModuleCommand 配置测试 ====================
+    // ==================== ListModuleCommand 閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试 ListModuleCommand 命令名称配置正确
+     * 娴嬭瘯 ListModuleCommand 鍛戒护鍚嶇О閰嶇疆姝ｇ‘
      *
      * Requirements: 3.4
      */
@@ -218,7 +218,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 ListModuleCommand 有描述信息
+     * 娴嬭瘯 ListModuleCommand 鏈夋弿杩颁俊鎭?
      *
      * Requirements: 3.4
      */
@@ -229,7 +229,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 测试 ListModuleCommand 没有必须的参数
+     * 娴嬭瘯 ListModuleCommand 娌℃湁蹇呴』鐨勫弬鏁?
      *
      * Requirements: 3.4
      */
@@ -239,13 +239,13 @@ class LifecycleCommandsTest extends TestCase
         $definition = $command->getDefinition();
         $arguments = $definition->getArguments();
 
-        // ListModuleCommand 不应定义任何参数
+        // ListModuleCommand 涓嶅簲瀹氫箟浠讳綍鍙傛暟
         $requiredArgs = array_filter($arguments, fn($arg) => $arg->isRequired());
         $this->assertEmpty($requiredArgs, 'ListModuleCommand should not have any required arguments');
     }
 
     /**
-     * 测试 ListModuleCommand 继承自 BaseModuleCommand
+     * 娴嬭瘯 ListModuleCommand 缁ф壙鑷?BaseModuleCommand
      *
      * Requirements: 3.4
      */
@@ -255,29 +255,29 @@ class LifecycleCommandsTest extends TestCase
         $this->assertInstanceOf(BaseModuleCommand::class, $command);
     }
 
-    // ==================== DeleteModuleCommand 目录删除逻辑测试 ====================
+    // ==================== DeleteModuleCommand 鐩綍鍒犻櫎閫昏緫娴嬭瘯 ====================
 
     /**
-     * 测试通过 ModuleGenerator 验证模块存在性（删除前检查）
+     * 娴嬭瘯閫氳繃 ModuleGenerator 楠岃瘉妯″潡瀛樺湪鎬э紙鍒犻櫎鍓嶆鏌ワ級
      *
-     * 模拟 DeleteModuleCommand 中 validateModuleExists 的逻辑：
-     * 模块目录存在时 moduleExists 返回 true
+     * 妯℃嫙 DeleteModuleCommand 涓?validateModuleExists 鐨勯€昏緫锛?
+     * 妯″潡鐩綍瀛樺湪鏃?moduleExists 杩斿洖 true
      *
      * Requirements: 3.3, 3.5
      */
     public function testModuleExistsBeforeDeletion(): void
     {
-        // 创建模块目录模拟已存在的模块
+        // 鍒涘缓妯″潡鐩綍妯℃嫙宸插瓨鍦ㄧ殑妯″潡
         $moduleName = 'TestModule';
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . $moduleName;
         mkdir($modulePath, 0755, true);
 
-        // moduleExists 应返回 true
+        // moduleExists 搴旇繑鍥?true
         $this->assertTrue($this->generator->moduleExists($moduleName));
     }
 
     /**
-     * 测试模块不存在时 moduleExists 返回 false（模拟错误提示场景）
+     * 娴嬭瘯妯″潡涓嶅瓨鍦ㄦ椂 moduleExists 杩斿洖 false锛堟ā鎷熼敊璇彁绀哄満鏅級
      *
      * Requirements: 3.5
      */
@@ -285,15 +285,15 @@ class LifecycleCommandsTest extends TestCase
     {
         $moduleName = 'NonExistentModule';
 
-        // moduleExists 应返回 false
+        // moduleExists 搴旇繑鍥?false
         $this->assertFalse($this->generator->moduleExists($moduleName));
     }
 
     /**
-     * 测试 removeDirectory 逻辑：递归删除包含文件和子目录的模块目录
+     * 娴嬭瘯 removeDirectory 閫昏緫锛氶€掑綊鍒犻櫎鍖呭惈鏂囦欢鍜屽瓙鐩綍鐨勬ā鍧楃洰褰?
      *
-     * 通过反射调用 DeleteModuleCommand 的 removeDirectory 私有方法，
-     * 验证其能正确递归删除目录结构。
+     * 閫氳繃鍙嶅皠璋冪敤 DeleteModuleCommand 鐨?removeDirectory 绉佹湁鏂规硶锛?
+     * 楠岃瘉鍏惰兘姝ｇ‘閫掑綊鍒犻櫎鐩綍缁撴瀯銆?
      *
      * Requirements: 3.3, 3.6
      */
@@ -301,13 +301,13 @@ class LifecycleCommandsTest extends TestCase
     {
         $command = new DeleteModuleCommand();
 
-        // 创建嵌套目录结构模拟模块目录
+        // 鍒涘缓宓屽鐩綍缁撴瀯妯℃嫙妯″潡鐩綍
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'module_to_delete';
         mkdir($modulePath . DIRECTORY_SEPARATOR . 'controller', 0755, true);
         mkdir($modulePath . DIRECTORY_SEPARATOR . 'model', 0755, true);
         mkdir($modulePath . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations', 0755, true);
 
-        // 创建一些文件
+        // 鍒涘缓涓€浜涙枃浠?
         file_put_contents($modulePath . DIRECTORY_SEPARATOR . 'module.json', '{"name": "Test"}');
         file_put_contents($modulePath . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'Index.php', '<?php');
         file_put_contents($modulePath . DIRECTORY_SEPARATOR . 'model' . DIRECTORY_SEPARATOR . 'User.php', '<?php');
@@ -316,23 +316,23 @@ class LifecycleCommandsTest extends TestCase
             '<?php'
         );
 
-        // 确认目录和文件存在
+        // 纭鐩綍鍜屾枃浠跺瓨鍦?
         $this->assertDirectoryExists($modulePath);
         $this->assertFileExists($modulePath . DIRECTORY_SEPARATOR . 'module.json');
         $this->assertFileExists($modulePath . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'Index.php');
 
-        // 通过反射调用 removeDirectory 私有方法
+        // 閫氳繃鍙嶅皠璋冪敤 removeDirectory 绉佹湁鏂规硶
         $reflection = new \ReflectionClass($command);
         $method = $reflection->getMethod('removeDirectory');
         $method->setAccessible(true);
         $method->invoke($command, $modulePath);
 
-        // 验证目录已被完全删除
+        // 楠岃瘉鐩綍宸茶瀹屽叏鍒犻櫎
         $this->assertDirectoryDoesNotExist($modulePath);
     }
 
     /**
-     * 测试 removeDirectory 对不存在的目录不会报错
+     * 娴嬭瘯 removeDirectory 瀵逛笉瀛樺湪鐨勭洰褰曚笉浼氭姤閿?
      *
      * Requirements: 3.3
      */
@@ -341,20 +341,20 @@ class LifecycleCommandsTest extends TestCase
         $command = new DeleteModuleCommand();
         $nonExistentPath = $this->tempDir . DIRECTORY_SEPARATOR . 'non_existent_dir';
 
-        // 通过反射调用 removeDirectory，不应抛出异常
+        // 閫氳繃鍙嶅皠璋冪敤 removeDirectory锛屼笉搴旀姏鍑哄紓甯?
         $reflection = new \ReflectionClass($command);
         $method = $reflection->getMethod('removeDirectory');
         $method->setAccessible(true);
 
-        // 不应抛出任何异常
+        // 涓嶅簲鎶涘嚭浠讳綍寮傚父
         $method->invoke($command, $nonExistentPath);
         $this->assertDirectoryDoesNotExist($nonExistentPath);
     }
 
     /**
-     * 测试删除前后 moduleExists 状态变化
+     * 娴嬭瘯鍒犻櫎鍓嶅悗 moduleExists 鐘舵€佸彉鍖?
      *
-     * 模拟完整的删除流程：模块存在 → 删除目录 → 模块不存在
+     * 妯℃嫙瀹屾暣鐨勫垹闄ゆ祦绋嬶細妯″潡瀛樺湪 鈫?鍒犻櫎鐩綍 鈫?妯″潡涓嶅瓨鍦?
      *
      * Requirements: 3.3, 3.5, 3.6
      */
@@ -363,49 +363,49 @@ class LifecycleCommandsTest extends TestCase
         $moduleName = 'ModuleToDelete';
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . $moduleName;
 
-        // 创建模块目录
+        // 鍒涘缓妯″潡鐩綍
         mkdir($modulePath . DIRECTORY_SEPARATOR . 'controller', 0755, true);
         file_put_contents($modulePath . DIRECTORY_SEPARATOR . 'module.json', '{"name": "ModuleToDelete"}');
 
-        // 删除前：模块存在
+        // 鍒犻櫎鍓嶏細妯″潡瀛樺湪
         $this->assertTrue($this->generator->moduleExists($moduleName));
 
-        // 模拟删除操作（递归删除目录）
+        // 妯℃嫙鍒犻櫎鎿嶄綔锛堥€掑綊鍒犻櫎鐩綍锛?
         $this->removeDirectory($modulePath);
 
-        // 删除后：模块不存在
+        // 鍒犻櫎鍚庯細妯″潡涓嶅瓨鍦?
         $this->assertFalse($this->generator->moduleExists($moduleName));
     }
 
     /**
-     * 测试名称转换在生命周期命令中的使用
+     * 娴嬭瘯鍚嶇О杞崲鍦ㄧ敓鍛藉懆鏈熷懡浠や腑鐨勪娇鐢?
      *
-     * 验证 studlyCase 转换与 moduleExists 检查的配合使用，
-     * 这是 Enable/Disable/Delete 命令共用的执行流程。
+     * 楠岃瘉 studlyCase 杞崲涓?moduleExists 妫€鏌ョ殑閰嶅悎浣跨敤锛?
+     * 杩欐槸 Enable/Disable/Delete 鍛戒护鍏辩敤鐨勬墽琛屾祦绋嬨€?
      *
      * Requirements: 3.1, 3.2, 3.3, 3.5
      */
     public function testNameConversionForLifecycleCommands(): void
     {
-        // 创建 UserCenter 模块目录
+        // 鍒涘缓 UserCenter 妯″潡鐩綍
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'UserCenter';
         mkdir($modulePath, 0755, true);
 
-        // 模拟命令流程：kebab-case 输入 → studlyCase 转换 → 检查存在性
+        // 妯℃嫙鍛戒护娴佺▼锛歬ebab-case 杈撳叆 鈫?studlyCase 杞崲 鈫?妫€鏌ュ瓨鍦ㄦ€?
         $studlyName = $this->generator->studlyCase('user-center');
         $this->assertEquals('UserCenter', $studlyName);
         $this->assertTrue($this->generator->moduleExists($studlyName));
 
-        // snake_case 输入同样可以转换
+        // snake_case 杈撳叆鍚屾牱鍙互杞崲
         $studlyName2 = $this->generator->studlyCase('user_center');
         $this->assertEquals('UserCenter', $studlyName2);
         $this->assertTrue($this->generator->moduleExists($studlyName2));
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== 杈呭姪鏂规硶 ====================
 
     /**
-     * 创建基础 Stub 文件
+     * 鍒涘缓鍩虹 Stub 鏂囦欢
      */
     private function createStubFiles(): void
     {
@@ -416,7 +416,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 创建可测试的 StubResolver 实例
+     * 鍒涘缓鍙祴璇曠殑 StubResolver 瀹炰緥
      */
     private function createStubResolver(): StubResolver
     {
@@ -430,7 +430,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 创建可测试的 ModuleGenerator 实例（覆盖 getModulePath 使用临时目录）
+     * 鍒涘缓鍙祴璇曠殑 ModuleGenerator 瀹炰緥锛堣鐩?getModulePath 浣跨敤涓存椂鐩綍锛?
      */
     private function createGenerator(StubResolver $stubResolver): ModuleGenerator
     {
@@ -452,7 +452,7 @@ class LifecycleCommandsTest extends TestCase
     }
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

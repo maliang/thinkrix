@@ -31,6 +31,7 @@ class ModuleGenerator
         'database/migrations',
         'database/seeders',
         'route',
+        'resources/module',
     ];
 
     /**
@@ -65,6 +66,7 @@ class ModuleGenerator
         'command'     => 'command.stub',
     ];
 
+    /** 初始化当前对象及其依赖。 */
     public function __construct(?StubResolver $stubResolver = null)
     {
         $this->stubResolver = $stubResolver ?? new StubResolver();
@@ -169,11 +171,17 @@ class ModuleGenerator
         }
 
         // 基础占位符映射
+        $moduleNamespace = $this->moduleNamespace($modulePath, $moduleName);
         $replacements = [
             '{{MODULE_NAME}}' => $moduleName,
             '{{TITLE}}'       => $options['title'] ?? $moduleName,
             '{{LOWER_NAME}}'  => $lowerName,
-            '{{NAMESPACE}}'   => "Modules\\{$moduleName}",
+            '{{REGISTRY_ID}}' => $options['id'] ?? $lowerName,
+            '{{DESCRIPTION}}' => $options['description'] ?? (($options['title'] ?? $moduleName) . ' module'),
+            '{{TYPE}}'        => $options['type'] ?? 'native',
+            '{{AUTHOR}}'      => $options['author'] ?? '',
+            '{{AUTHOR_URL}}'  => $options['author_url'] ?? '',
+            '{{NAMESPACE}}'   => $moduleNamespace,
             '{{CLASS_NAME}}'  => $moduleName,
             '{{TABLE_NAME}}'  => '',
             '{{TIMESTAMP}}'   => date('YmdHis'),
@@ -197,6 +205,8 @@ class ModuleGenerator
             );
         }
 
+        $this->writeDefaultArtwork($modulePath, $moduleName, (string) ($options['title'] ?? $moduleName));
+
         // 非 plain 模式下生成示例文件
         if (!$isPlain) {
             // 生成配置文件
@@ -219,7 +229,7 @@ class ModuleGenerator
 
             // 生成示例控制器
             $controllerReplacements = array_merge($replacements, [
-                '{{NAMESPACE}}' => "Modules\\{$moduleName}\\controller",
+                '{{NAMESPACE}}' => $moduleNamespace . "\\controller",
                 '{{CLASS_NAME}}' => 'Index',
             ]);
             $controllerContent = $this->stubResolver->resolve('controller.stub', $controllerReplacements);
@@ -260,6 +270,19 @@ class ModuleGenerator
         return true;
     }
 
+        /** 将数据写入指定存储位置。 */
+    protected function writeDefaultArtwork(string $modulePath, string $moduleName, string $title): void
+    {
+        $resourcePath = $modulePath . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'module';
+        if (!is_dir($resourcePath)) {
+            mkdir($resourcePath, 0755, true);
+        }
+
+        $initial = strtoupper(substr($moduleName, 0, 1));
+        file_put_contents($resourcePath . DIRECTORY_SEPARATOR . 'logo.svg', '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><rect width="160" height="160" rx="12" fill="#00aee8"/><text x="80" y="98" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" font-weight="700" fill="#fff">' . htmlspecialchars($initial, ENT_QUOTES, 'UTF-8') . '</text></svg>');
+        file_put_contents($resourcePath . DIRECTORY_SEPARATOR . 'thumbnail.svg', '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320"><rect width="640" height="320" rx="12" fill="#f0f8ff"/><rect x="48" y="48" width="120" height="120" rx="10" fill="#00aee8"/><text x="108" y="128" text-anchor="middle" font-family="Arial, sans-serif" font-size="54" font-weight="700" fill="#fff">' . htmlspecialchars($initial, ENT_QUOTES, 'UTF-8') . '</text><text x="200" y="112" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#122033">' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</text><text x="200" y="160" font-family="Arial, sans-serif" font-size="22" fill="#5b6f86">Thinkrix standard Trix module</text></svg>');
+    }
+
     /**
      * 在指定模块内生成资源文件
      *
@@ -290,10 +313,10 @@ class ModuleGenerator
         $className = $this->studlyCase($name);
 
         // 确定命名空间（migration 类型不需要命名空间目录）
-        $namespace = "Modules\\{$moduleName}\\{$directory}";
+        $namespace = $this->moduleNamespace($modulePath, $moduleName) . "\\{$directory}";
         if ($type === 'migration' || $type === 'seeder') {
             // migration 和 seeder 使用 database 子目录，命名空间保持到 database 层
-            $namespace = "Modules\\{$moduleName}\\database";
+            $namespace = $this->moduleNamespace($modulePath, $moduleName) . "\\database";
         }
 
         // 构建表名（snake_case）
@@ -371,5 +394,13 @@ class ModuleGenerator
         }
 
         return $className . '.php';
+    }
+
+        /** 执行 moduleNamespace 方法对应的具体职责。 */
+    protected function moduleNamespace(string $modulePath, string $moduleName): string
+    {
+        $parent = basename(dirname($modulePath));
+
+        return ($parent !== '' ? $parent : 'Modules') . "\\{$moduleName}";
     }
 }

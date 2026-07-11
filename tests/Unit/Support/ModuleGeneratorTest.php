@@ -9,7 +9,7 @@ use Thinkrix\Support\ModuleGenerator;
 use Thinkrix\Support\StubResolver;
 
 /**
- * ModuleGenerator 单元测试
+ * ModuleGenerator 鍗曞厓娴嬭瘯
  */
 class ModuleGeneratorTest extends TestCase
 {
@@ -22,7 +22,7 @@ class ModuleGeneratorTest extends TestCase
     {
         parent::setUp();
 
-        // 创建临时目录模拟项目结构
+        // 鍒涘缓涓存椂鐩綍妯℃嫙椤圭洰缁撴瀯
         $this->tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'module_generator_test_' . uniqid();
         $this->packageStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'modules';
         $this->customStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'project' . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'thinkrix-modules';
@@ -30,13 +30,13 @@ class ModuleGeneratorTest extends TestCase
         mkdir($this->packageStubDir, 0755, true);
         mkdir($this->tempDir . DIRECTORY_SEPARATOR . 'app', 0755, true);
 
-        // 创建基础 stub 模板
+        // 鍒涘缓鍩虹 stub 妯℃澘
         $this->createStubFiles();
 
-        // 使用可测试的 StubResolver
+        // 浣跨敤鍙祴璇曠殑 StubResolver
         $stubResolver = $this->createStubResolver();
 
-        // 使用可测试的 ModuleGenerator（覆盖 getModulePath 使用临时目录）
+        // 浣跨敤鍙祴璇曠殑 ModuleGenerator锛堣鐩?getModulePath 浣跨敤涓存椂鐩綍锛?
         $this->generator = $this->createGenerator($stubResolver);
     }
 
@@ -46,10 +46,10 @@ class ModuleGeneratorTest extends TestCase
         parent::tearDown();
     }
 
-    // ==================== studlyCase 测试 ====================
+    // ==================== studlyCase 娴嬭瘯 ====================
 
     /**
-     * 测试连字符分隔的名称转换
+     * 娴嬭瘯杩炲瓧绗﹀垎闅旂殑鍚嶇О杞崲
      */
     public function testStudlyCaseConvertsHyphenSeparated(): void
     {
@@ -57,7 +57,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试下划线分隔的名称转换
+     * 娴嬭瘯涓嬪垝绾垮垎闅旂殑鍚嶇О杞崲
      */
     public function testStudlyCaseConvertsUnderscoreSeparated(): void
     {
@@ -65,7 +65,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试空格分隔的名称转换
+     * 娴嬭瘯绌烘牸鍒嗛殧鐨勫悕绉拌浆鎹?
      */
     public function testStudlyCaseConvertsSpaceSeparated(): void
     {
@@ -73,7 +73,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试混合分隔符的名称转换
+     * 娴嬭瘯娣峰悎鍒嗛殧绗︾殑鍚嶇О杞崲
      */
     public function testStudlyCaseConvertsMixedSeparators(): void
     {
@@ -81,7 +81,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试已经是 StudlyCase 的名称保持不变
+     * 娴嬭瘯宸茬粡鏄?StudlyCase 鐨勫悕绉颁繚鎸佷笉鍙?
      */
     public function testStudlyCasePreservesAlreadyStudly(): void
     {
@@ -89,7 +89,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试全大写输入
+     * 娴嬭瘯鍏ㄥぇ鍐欒緭鍏?
      */
     public function testStudlyCaseHandlesUpperCase(): void
     {
@@ -97,7 +97,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试单个单词
+     * 娴嬭瘯鍗曚釜鍗曡瘝
      */
     public function testStudlyCaseHandlesSingleWord(): void
     {
@@ -105,7 +105,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试包含数字的名称
+     * 娴嬭瘯鍖呭惈鏁板瓧鐨勫悕绉?
      */
     public function testStudlyCaseHandlesNumbers(): void
     {
@@ -113,7 +113,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试输出以大写字母开头
+     * 娴嬭瘯杈撳嚭浠ュぇ鍐欏瓧姣嶅紑澶?
      */
     public function testStudlyCaseOutputStartsWithUppercase(): void
     {
@@ -122,7 +122,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试输出仅包含字母和数字
+     * 娴嬭瘯杈撳嚭浠呭寘鍚瓧姣嶅拰鏁板瓧
      */
     public function testStudlyCaseOutputOnlyAlphanumeric(): void
     {
@@ -130,10 +130,10 @@ class ModuleGeneratorTest extends TestCase
         $this->assertMatchesRegularExpression('/^[A-Za-z0-9]+$/', $result);
     }
 
-    // ==================== moduleExists 测试 ====================
+    // ==================== moduleExists 娴嬭瘯 ====================
 
     /**
-     * 测试模块存在返回 true
+     * 娴嬭瘯妯″潡瀛樺湪杩斿洖 true
      */
     public function testModuleExistsReturnsTrueWhenExists(): void
     {
@@ -144,17 +144,17 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试模块不存在返回 false
+     * 娴嬭瘯妯″潡涓嶅瓨鍦ㄨ繑鍥?false
      */
     public function testModuleExistsReturnsFalseWhenNotExists(): void
     {
         $this->assertFalse($this->generator->moduleExists('NonExistent'));
     }
 
-    // ==================== getModulePath 测试 ====================
+    // ==================== getModulePath 娴嬭瘯 ====================
 
     /**
-     * 测试获取模块路径格式正确
+     * 娴嬭瘯鑾峰彇妯″潡璺緞鏍煎紡姝ｇ‘
      */
     public function testGetModulePathReturnsCorrectPath(): void
     {
@@ -163,10 +163,10 @@ class ModuleGeneratorTest extends TestCase
         $this->assertEquals($expected, $path);
     }
 
-    // ==================== createModule 测试 ====================
+    // ==================== createModule 娴嬭瘯 ====================
 
     /**
-     * 测试标准模式创建模块目录结构
+     * 娴嬭瘯鏍囧噯妯″紡鍒涘缓妯″潡鐩綍缁撴瀯
      */
     public function testCreateModuleCreatesStandardDirectories(): void
     {
@@ -190,7 +190,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试标准模式生成 module.json
+     * 娴嬭瘯鏍囧噯妯″紡鐢熸垚 module.json
      */
     public function testCreateModuleGeneratesModuleJson(): void
     {
@@ -204,7 +204,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试标准模式生成示例文件
+     * 娴嬭瘯鏍囧噯妯″紡鐢熸垚绀轰緥鏂囦欢
      */
     public function testCreateModuleGeneratesSampleFiles(): void
     {
@@ -217,7 +217,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试 plain 模式不生成示例文件
+     * 娴嬭瘯 plain 妯″紡涓嶇敓鎴愮ず渚嬫枃浠?
      */
     public function testCreateModulePlainModeOnlyCreatesDirectories(): void
     {
@@ -225,14 +225,14 @@ class ModuleGeneratorTest extends TestCase
 
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Blog';
 
-        // 目录应该存在
+        // 鐩綍搴旇瀛樺湪
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'controller');
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'model');
 
-        // module.json 始终生成
+        // module.json 濮嬬粓鐢熸垚
         $this->assertFileExists($modulePath . DIRECTORY_SEPARATOR . 'module.json');
 
-        // 示例文件不应存在
+        // 绀轰緥鏂囦欢涓嶅簲瀛樺湪
         $configFile = $modulePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
         $routeFile = $modulePath . DIRECTORY_SEPARATOR . 'route' . DIRECTORY_SEPARATOR . 'app.php';
         $controllerFile = $modulePath . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'Index.php';
@@ -242,11 +242,11 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试同名模块已存在时返回 false
+     * 娴嬭瘯鍚屽悕妯″潡宸插瓨鍦ㄦ椂杩斿洖 false
      */
     public function testCreateModuleReturnsFalseWhenAlreadyExists(): void
     {
-        // 先手动创建目录
+        // 鍏堟墜鍔ㄥ垱寤虹洰褰?
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Blog';
         mkdir($modulePath, 0755, true);
 
@@ -256,7 +256,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试名称自动转换为 StudlyCase
+     * 娴嬭瘯鍚嶇О鑷姩杞崲涓?StudlyCase
      */
     public function testCreateModuleConvertsNameToStudlyCase(): void
     {
@@ -266,14 +266,14 @@ class ModuleGeneratorTest extends TestCase
         $this->assertDirectoryExists($modulePath);
     }
 
-    // ==================== generateResource 测试 ====================
+    // ==================== generateResource 娴嬭瘯 ====================
 
     /**
-     * 测试生成控制器资源
+     * 娴嬭瘯鐢熸垚鎺у埗鍣ㄨ祫婧?
      */
     public function testGenerateResourceController(): void
     {
-        // 先创建模块
+        // 鍏堝垱寤烘ā鍧?
         $this->generator->createModule('blog');
 
         $filePath = $this->generator->generateResource('blog', 'controller', 'User');
@@ -283,14 +283,14 @@ class ModuleGeneratorTest extends TestCase
         $this->assertStringContainsString('controller', $filePath);
         $this->assertStringContainsString('User.php', $filePath);
 
-        // 检查命名空间
+        // 妫€鏌ュ懡鍚嶇┖闂?
         $content = file_get_contents($filePath);
-        $this->assertStringContainsString('Modules\\Blog\\controller', $content);
+        $this->assertStringContainsString('app\\Blog\\controller', $content);
         $this->assertStringContainsString('User', $content);
     }
 
     /**
-     * 测试生成模型资源
+     * 娴嬭瘯鐢熸垚妯″瀷璧勬簮
      */
     public function testGenerateResourceModel(): void
     {
@@ -305,7 +305,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试生成迁移资源（带时间戳前缀）
+     * 娴嬭瘯鐢熸垚杩佺Щ璧勬簮锛堝甫鏃堕棿鎴冲墠缂€锛?
      */
     public function testGenerateResourceMigrationWithTimestamp(): void
     {
@@ -315,13 +315,13 @@ class ModuleGeneratorTest extends TestCase
 
         $this->assertNotEmpty($filePath);
         $this->assertFileExists($filePath);
-        // 迁移文件名应包含时间戳和表名
+        // 杩佺Щ鏂囦欢鍚嶅簲鍖呭惈鏃堕棿鎴冲拰琛ㄥ悕
         $filename = basename($filePath);
         $this->assertMatchesRegularExpression('/^\d{14}_create_create_posts_table\.php$/', $filename);
     }
 
     /**
-     * 测试目标模块不存在时返回空字符串
+     * 娴嬭瘯鐩爣妯″潡涓嶅瓨鍦ㄦ椂杩斿洖绌哄瓧绗︿覆
      */
     public function testGenerateResourceReturnsEmptyWhenModuleNotExists(): void
     {
@@ -331,7 +331,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试无效资源类型返回空字符串
+     * 娴嬭瘯鏃犳晥璧勬簮绫诲瀷杩斿洖绌哄瓧绗︿覆
      */
     public function testGenerateResourceReturnsEmptyForInvalidType(): void
     {
@@ -343,7 +343,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 测试生成命令资源
+     * 娴嬭瘯鐢熸垚鍛戒护璧勬簮
      */
     public function testGenerateResourceCommand(): void
     {
@@ -355,14 +355,14 @@ class ModuleGeneratorTest extends TestCase
         $this->assertFileExists($filePath);
 
         $content = file_get_contents($filePath);
-        $this->assertStringContainsString('Modules\\Blog\\command', $content);
+        $this->assertStringContainsString('app\\Blog\\command', $content);
         $this->assertStringContainsString('SyncData', $content);
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== 杈呭姪鏂规硶 ====================
 
     /**
-     * 创建基础 Stub 文件
+     * 鍒涘缓鍩虹 Stub 鏂囦欢
      */
     private function createStubFiles(): void
     {
@@ -452,7 +452,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 创建可测试的 StubResolver 实例
+     * 鍒涘缓鍙祴璇曠殑 StubResolver 瀹炰緥
      */
     private function createStubResolver(): StubResolver
     {
@@ -466,7 +466,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 创建可测试的 ModuleGenerator 实例（覆盖 getModulePath 使用临时目录）
+     * 鍒涘缓鍙祴璇曠殑 ModuleGenerator 瀹炰緥锛堣鐩?getModulePath 浣跨敤涓存椂鐩綍锛?
      */
     private function createGenerator(StubResolver $stubResolver): ModuleGenerator
     {
@@ -488,7 +488,7 @@ class ModuleGeneratorTest extends TestCase
     }
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

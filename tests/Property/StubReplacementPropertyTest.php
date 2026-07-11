@@ -10,15 +10,15 @@ use PHPUnit\Framework\TestCase;
 use Thinkrix\Support\StubResolver;
 
 /**
- * StubResolver 占位符替换完整性属性测试
+ * StubResolver 鍗犱綅绗︽浛鎹㈠畬鏁存€у睘鎬ф祴璇?
  *
- * // Feature: laravel-modules, Property 4: Stub 占位符替换完整性
+ * // Feature: laravel-modules, Property 4: Stub 鍗犱綅绗︽浛鎹㈠畬鏁存€?
  *
  * **Validates: Requirements 6.3**
  *
- * 对任意包含已知占位符的模板字符串和对应的替换映射，
- * resolve() 的输出中不应再包含任何映射中定义的占位符标记，
- * 且输出应包含所有替换值。
+ * 瀵逛换鎰忓寘鍚凡鐭ュ崰浣嶇鐨勬ā鏉垮瓧绗︿覆鍜屽搴旂殑鏇挎崲鏄犲皠锛?
+ * resolve() 鐨勮緭鍑轰腑涓嶅簲鍐嶅寘鍚换浣曟槧灏勪腑瀹氫箟鐨勫崰浣嶇鏍囪锛?
+ * 涓旇緭鍑哄簲鍖呭惈鎵€鏈夋浛鎹㈠€笺€?
  */
 class StubReplacementPropertyTest extends TestCase
 {
@@ -37,7 +37,7 @@ class StubReplacementPropertyTest extends TestCase
         $this->customStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'project' . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'thinkrix-modules';
 
         mkdir($this->packageStubDir, 0755, true);
-        // 自定义目录不需要创建，用于回退测试
+        // 鑷畾涔夌洰褰曚笉闇€瑕佸垱寤猴紝鐢ㄤ簬鍥為€€娴嬭瘯
     }
 
     protected function tearDown(): void
@@ -47,27 +47,27 @@ class StubReplacementPropertyTest extends TestCase
     }
 
     /**
-     * Property 4: resolve() 输出不包含任何占位符标记，且包含所有替换值
+     * Property 4: resolve() 杈撳嚭涓嶅寘鍚换浣曞崰浣嶇鏍囪锛屼笖鍖呭惈鎵€鏈夋浛鎹㈠€?
      *
-     * // Feature: laravel-modules, Property 4: Stub 占位符替换完整性
+     * // Feature: laravel-modules, Property 4: Stub 鍗犱綅绗︽浛鎹㈠畬鏁存€?
      */
     public function testAllPlaceholdersAreReplacedAndValuesPresent(): void
     {
         $this->limitTo(100);
 
-        // 生成随机的替换值（字母数字字符串，保证非空且不含占位符语法）
+        // 鐢熸垚闅忔満鐨勬浛鎹㈠€硷紙瀛楁瘝鏁板瓧瀛楃涓诧紝淇濊瘉闈炵┖涓斾笉鍚崰浣嶇璇硶锛?
         $valueGenerator = Generators::filter(
             fn($v) => strlen($v) > 0 && !str_contains($v, '{{') && !str_contains($v, '}}'),
             Generators::string()
         );
 
         $this->forAll(
-            $valueGenerator, // MODULE_NAME 替换值
-            $valueGenerator, // LOWER_NAME 替换值
-            $valueGenerator, // NAMESPACE 替换值
-            $valueGenerator, // CLASS_NAME 替换值
-            $valueGenerator, // TABLE_NAME 替换值
-            $valueGenerator  // TIMESTAMP 替换值
+            $valueGenerator, // MODULE_NAME 鏇挎崲鍊?
+            $valueGenerator, // LOWER_NAME 鏇挎崲鍊?
+            $valueGenerator, // NAMESPACE 鏇挎崲鍊?
+            $valueGenerator, // CLASS_NAME 鏇挎崲鍊?
+            $valueGenerator, // TABLE_NAME 鏇挎崲鍊?
+            $valueGenerator  // TIMESTAMP 鏇挎崲鍊?
         )->then(function (
             string $moduleName,
             string $lowerName,
@@ -76,7 +76,7 @@ class StubReplacementPropertyTest extends TestCase
             string $tableName,
             string $timestamp
         ): void {
-            // 定义占位符和替换映射
+            // 瀹氫箟鍗犱綅绗﹀拰鏇挎崲鏄犲皠
             $replacements = [
                 '{{MODULE_NAME}}' => $moduleName,
                 '{{LOWER_NAME}}'  => $lowerName,
@@ -86,7 +86,7 @@ class StubReplacementPropertyTest extends TestCase
                 '{{TIMESTAMP}}'   => $timestamp,
             ];
 
-            // 构建包含所有占位符的模板内容
+            // 鏋勫缓鍖呭惈鎵€鏈夊崰浣嶇鐨勬ā鏉垮唴瀹?
             $templateContent = "namespace {{NAMESPACE}};\n"
                 . "class {{CLASS_NAME}} {\n"
                 . "    // Module: {{MODULE_NAME}}\n"
@@ -95,38 +95,38 @@ class StubReplacementPropertyTest extends TestCase
                 . "    // Time: {{TIMESTAMP}}\n"
                 . "}\n";
 
-            // 将模板写入测试 Stub 文件
+            // 灏嗘ā鏉垮啓鍏ユ祴璇?Stub 鏂囦欢
             $stubName = 'pbt_test_' . uniqid() . '.stub';
             file_put_contents($this->packageStubDir . DIRECTORY_SEPARATOR . $stubName, $templateContent);
 
             $resolver = $this->createResolver();
             $result = $resolver->resolve($stubName, $replacements);
 
-            // 断言：输出不应包含任何定义的占位符标记
+            // 鏂█锛氳緭鍑轰笉搴斿寘鍚换浣曞畾涔夌殑鍗犱綅绗︽爣璁?
             foreach (array_keys($replacements) as $placeholder) {
                 $this->assertStringNotContainsString(
                     $placeholder,
                     $result,
-                    "输出中不应包含占位符 [{$placeholder}]"
+                    "杈撳嚭涓笉搴斿寘鍚崰浣嶇 [{$placeholder}]"
                 );
             }
 
-            // 断言：输出应包含所有替换值
+            // 鏂█锛氳緭鍑哄簲鍖呭惈鎵€鏈夋浛鎹㈠€?
             foreach ($replacements as $placeholder => $value) {
                 $this->assertStringContainsString(
                     $value,
                     $result,
-                    "输出中应包含替换值 [{$value}]（对应占位符 {$placeholder}）"
+                    "杈撳嚭涓簲鍖呭惈鏇挎崲鍊?[{$value}]锛堝搴斿崰浣嶇 {$placeholder}锛?
                 );
             }
 
-            // 清理此次迭代创建的 Stub 文件
+            // 娓呯悊姝ゆ杩唬鍒涘缓鐨?Stub 鏂囦欢
             @unlink($this->packageStubDir . DIRECTORY_SEPARATOR . $stubName);
         });
     }
 
     /**
-     * 创建可测试的 StubResolver 实例（注入测试目录路径）
+     * 鍒涘缓鍙祴璇曠殑 StubResolver 瀹炰緥锛堟敞鍏ユ祴璇曠洰褰曡矾寰勶級
      */
     private function createResolver(): StubResolver
     {
@@ -143,7 +143,7 @@ class StubReplacementPropertyTest extends TestCase
     }
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

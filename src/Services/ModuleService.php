@@ -4,6 +4,8 @@ namespace Thinkrix\Services;
 
 use think\facade\Event;
 use Thinkrix\Models\Module;
+use Thinkrix\Modules\Manifest\ModuleManifest;
+use Thinkrix\Modules\Manifest\ModuleManifestLoader;
 
 /**
  * ModuleService - 模块服务
@@ -66,6 +68,7 @@ class ModuleService extends BaseService
         return array_map(fn($p) => $root . $p . DIRECTORY_SEPARATOR, $paths);
     }
 
+        /** 同步本地模块信息与持久化状态。 */
     public function syncModules(): void
     {
         $scanPaths = $this->getModulePaths();
@@ -92,8 +95,8 @@ class ModuleService extends BaseService
                 $logo = '';
                 $config = [];
 
-                $json = json_decode(file_get_contents($moduleJsonPath), true);
-                $json = is_array($json) ? $json : [];
+                // 优先读取 Trix module.json；旧 Thinkrix module.json 会在 loader 中归一化。
+                $json = $this->readModuleConfig($dir) ?? [];
                 $title = $json['title'] ?? $json['name'] ?? $name;
                 $description = $json['description'] ?? '';
                 $version = $json['version'] ?? '1.0.0';
@@ -102,7 +105,7 @@ class ModuleService extends BaseService
                 $logo = $json['logo'] ?? '';
                 $config = $json;
 
-                $module = Module::where('name', $name)->find() ?? new Module(['name' => $name, 'enabled' => false]);
+                $module = Module::where('name', $name)->find() ?? new Module(['name' => $name, 'enabled' => true]);
                 $module->save([
                     'title' => $title,
                     'description' => $description,
@@ -171,7 +174,7 @@ class ModuleService extends BaseService
         if (!$module) {
             $modulePath = $this->findModulePath($name);
             if (!$modulePath) { return false; }
-            $json = $this->readModuleJson($modulePath);
+            $json = $this->readModuleConfig($modulePath);
             if ($json === null) { return false; }
             $module = new Module([
                 'name' => $name,
@@ -192,7 +195,7 @@ class ModuleService extends BaseService
         if (!$modulePath) { return false; }
 
         // 注册菜单和权限
-        $json = $this->readModuleJson($modulePath) ?? [];
+        $json = $this->readModuleConfig($modulePath) ?? [];
         $this->registerMenus($json, $name);
         $this->registerPermissions($json, $name);
 
@@ -231,6 +234,7 @@ class ModuleService extends BaseService
         return true;
     }
 
+        /** 查找并返回匹配的业务对象。 */
     protected function findModulePath(string $name): ?string
     {
         $paths = config('thinkrix.modules.paths', ['Modules', 'app']);
@@ -242,6 +246,7 @@ class ModuleService extends BaseService
         return null;
     }
 
+        /** 注册当前模块贡献的数据。 */
     protected function registerMenus(array $moduleJson, string $moduleName): void
     {
         $menus = $moduleJson['menus'] ?? [];
@@ -249,6 +254,14 @@ class ModuleService extends BaseService
         $menuModel = config('thinkrix.models.menu', \Thinkrix\Models\Menu::class);
         $guard = config('thinkrix.guard', 'admin');
         foreach ($menus as $menu) {
+            if (!isset($menu['name']) && isset($menu['key'])) {
+                $menu['name'] = $menu['key'];
+            }
+            if (isset($menu['permission']) && !isset($menu['permissions'])) {
+                $menu['permissions'] = [$menu['permission']];
+            }
+            unset($menu['key'], $menu['parent'], $menu['permission']);
+
             $menu['guard_name'] = $guard;
             $menu['module'] = $moduleName;
             $exists = $menuModel::where('name', $menu['name'])->where('guard_name', $guard)->find();
@@ -256,6 +269,7 @@ class ModuleService extends BaseService
         }
     }
 
+        /** 注册当前模块贡献的数据。 */
     protected function registerPermissions(array $moduleJson, string $moduleName): void
     {
         $permissions = $moduleJson['permissions'] ?? [];
@@ -263,6 +277,8 @@ class ModuleService extends BaseService
         $permissionModel = config('thinkrix.models.permission', \Thinkrix\Models\Permission::class);
         $guard = config('thinkrix.guard', 'admin');
         foreach ($permissions as $perm) {
+            unset($perm['group']);
+
             $perm['guard_name'] = $guard;
             $perm['module'] = $moduleName;
             $exists = $permissionModel::where('name', $perm['name'])->where('guard_name', $guard)->find();
@@ -270,22 +286,53 @@ class ModuleService extends BaseService
         }
     }
 
+    /** 执行指定模块的数据库迁移。 */
     protected function runModuleMigrate(string $name, bool $rollback = false): void
     {
         $arg = $rollback ? ' --rollback' : '';
         passthru('php think thinkrix:module-migrate ' . escapeshellarg($name) . $arg, $exitCode);
     }
 
+    /** 执行指定模块的数据填充。 */
     protected function runModuleSeed(string $name): void
     {
         passthru('php think thinkrix:module-seed ' . escapeshellarg($name), $exitCode);
     }
 
+        /** 从指定来源读取数据。 */
     protected function readModuleJson(string $modulePath): ?array
     {
-        $path = $modulePath . DIRECTORY_SEPARATOR . 'module.json';
-        if (!file_exists($path)) { return null; }
-        $json = json_decode(file_get_contents($path), true);
-        return is_array($json) ? $json : null;
+        return $this->readModuleConfig($modulePath);
+    }
+
+        /** 从指定来源读取数据。 */
+    protected function readModuleConfig(string $modulePath): ?array
+    {
+        $manifest = (new ModuleManifestLoader())->loadFromPath($modulePath);
+
+        if (!$manifest) {
+            return null;
+        }
+
+        // 将 Trix manifest 展平为 Thinkrix 原有模块配置形态，避免后台列表和安装流程分叉。
+        return $this->manifestToModuleConfig($manifest);
+    }
+
+    /**
+     * 执行 manifestToModuleConfig 方法对应的具体职责。
+     * @return array<string, mixed>
+     */
+    protected function manifestToModuleConfig(ModuleManifest $manifest): array
+    {
+        $manifestData = $manifest->toArray();
+
+        return array_merge($manifestData, [
+            'title' => $manifest->name() ?: ($manifestData['title'] ?? ''),
+            'description' => $manifestData['description'] ?? '',
+            'version' => $manifest->version() ?: ($manifestData['version'] ?? '1.0.0'),
+            'menus' => $manifest->menus(),
+            'permissions' => $manifest->permissions(),
+            'trix_manifest' => $manifestData,
+        ]);
     }
 }

@@ -1,10 +1,33 @@
 {
+    "schema_version": "trix.module.v1",
+    "id": "{{REGISTRY_ID}}",
     "name": "{{MODULE_NAME}}",
     "alias": "{{LOWER_NAME}}",
     "title": "{{TITLE}}",
-    "description": "",
+    "description": "{{DESCRIPTION}}",
     "version": "1.0.0",
-    "author": "",
+    "type": "{{TYPE}}",
+    "author": "{{AUTHOR}}",
+    "author_url": "{{AUTHOR_URL}}",
+    "logo": "resources/module/logo.svg",
+    "thumbnail": "resources/module/thumbnail.svg",
+    "license": "MIT",
+    "runtime": {
+        "language": "php",
+        "framework": "thinkphp"
+    },
+    "adapter": {
+        "language": "php",
+        "framework": "thinkphp",
+        "framework_constraint": "^8.0",
+        "status": "stable"
+    },
+    "provides_contracts": [],
+    "requires_contracts": [],
+    "config": {},
+    "security": {
+        "signed": false
+    },
     "providers": [],
     "enabled": false,
     "middleware": {

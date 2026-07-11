@@ -10,10 +10,10 @@ use Thinkrix\Support\ModuleGenerator;
 use Thinkrix\Support\StubResolver;
 
 /**
- * MakeModuleCommand 单元测试
+ * MakeModuleCommand 鍗曞厓娴嬭瘯
  *
- * 由于 MakeModuleCommand 是 ModuleGenerator 的薄包装层，
- * 本测试重点验证命令配置正确性和通过生成器的集成行为。
+ * 鐢变簬 MakeModuleCommand 鏄?ModuleGenerator 鐨勮杽鍖呰灞傦紝
+ * 鏈祴璇曢噸鐐归獙璇佸懡浠ら厤缃纭€у拰閫氳繃鐢熸垚鍣ㄧ殑闆嗘垚琛屼负銆?
  *
  * Requirements: 1.1, 1.2, 1.3, 1.4, 1.6
  */
@@ -28,7 +28,7 @@ class MakeModuleCommandTest extends TestCase
     {
         parent::setUp();
 
-        // 创建临时目录模拟项目结构
+        // 鍒涘缓涓存椂鐩綍妯℃嫙椤圭洰缁撴瀯
         $this->tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'make_module_cmd_test_' . uniqid();
         $this->packageStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'modules';
         $this->customStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'project' . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'thinkrix-modules';
@@ -36,10 +36,10 @@ class MakeModuleCommandTest extends TestCase
         mkdir($this->packageStubDir, 0755, true);
         mkdir($this->tempDir . DIRECTORY_SEPARATOR . 'app', 0755, true);
 
-        // 创建基础 stub 模板
+        // 鍒涘缓鍩虹 stub 妯℃澘
         $this->createStubFiles();
 
-        // 使用可测试的 StubResolver 和 ModuleGenerator
+        // 浣跨敤鍙祴璇曠殑 StubResolver 鍜?ModuleGenerator
         $stubResolver = $this->createStubResolver();
         $this->generator = $this->createGenerator($stubResolver);
     }
@@ -50,10 +50,10 @@ class MakeModuleCommandTest extends TestCase
         parent::tearDown();
     }
 
-    // ==================== 命令配置测试 ====================
+    // ==================== 鍛戒护閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试命令名称配置正确
+     * 娴嬭瘯鍛戒护鍚嶇О閰嶇疆姝ｇ‘
      */
     public function testCommandNameIsCorrect(): void
     {
@@ -62,7 +62,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试命令描述已配置
+     * 娴嬭瘯鍛戒护鎻忚堪宸查厤缃?
      */
     public function testCommandHasDescription(): void
     {
@@ -71,7 +71,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试命令定义了 name 参数
+     * 娴嬭瘯鍛戒护瀹氫箟浜?name 鍙傛暟
      */
     public function testCommandHasNameArgument(): void
     {
@@ -84,7 +84,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试命令定义了 --plain 选项
+     * 娴嬭瘯鍛戒护瀹氫箟浜?--plain 閫夐」
      */
     public function testCommandHasPlainOption(): void
     {
@@ -95,7 +95,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试命令定义了 --title 选项
+     * 娴嬭瘯鍛戒护瀹氫箟浜?--title 閫夐」
      */
     public function testCommandHasTitleOption(): void
     {
@@ -105,15 +105,15 @@ class MakeModuleCommandTest extends TestCase
         $this->assertTrue($definition->hasOption('title'));
     }
 
-    // ==================== 标准模式目录结构生成测试 ====================
+    // ==================== 鏍囧噯妯″紡鐩綍缁撴瀯鐢熸垚娴嬭瘯 ====================
 
     /**
-     * 测试标准模式创建完整目录结构（模拟命令执行逻辑）
+     * 娴嬭瘯鏍囧噯妯″紡鍒涘缓瀹屾暣鐩綍缁撴瀯锛堟ā鎷熷懡浠ゆ墽琛岄€昏緫锛?
      *
-     * 验证通过 ModuleGenerator::createModule() 生成的标准目录结构包含：
+     * 楠岃瘉閫氳繃 ModuleGenerator::createModule() 鐢熸垚鐨勬爣鍑嗙洰褰曠粨鏋勫寘鍚細
      * controller, model, service, config, database/migrations, database/seeders, route, module.json
      *
-     * 注意：createModule 内部会调用 studlyCase，所以直接传入原始名称即可
+     * 娉ㄦ剰锛歝reateModule 鍐呴儴浼氳皟鐢?studlyCase锛屾墍浠ョ洿鎺ヤ紶鍏ュ師濮嬪悕绉板嵆鍙?
      *
      * Requirements: 1.1, 1.2
      */
@@ -128,7 +128,7 @@ class MakeModuleCommandTest extends TestCase
 
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'UserCenter';
 
-        // 验证标准目录结构
+        // 楠岃瘉鏍囧噯鐩綍缁撴瀯
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'controller');
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'model');
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'service');
@@ -137,19 +137,19 @@ class MakeModuleCommandTest extends TestCase
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'seeders');
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'route');
 
-        // 验证 module.json 文件存在
+        // 楠岃瘉 module.json 鏂囦欢瀛樺湪
         $this->assertFileExists($modulePath . DIRECTORY_SEPARATOR . 'module.json');
 
-        // 验证标准模式下的示例文件存在
+        // 楠岃瘉鏍囧噯妯″紡涓嬬殑绀轰緥鏂囦欢瀛樺湪
         $this->assertFileExists($modulePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php');
         $this->assertFileExists($modulePath . DIRECTORY_SEPARATOR . 'route' . DIRECTORY_SEPARATOR . 'app.php');
         $this->assertFileExists($modulePath . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'Index.php');
     }
 
-    // ==================== --plain 选项最小结构测试 ====================
+    // ==================== --plain 閫夐」鏈€灏忕粨鏋勬祴璇?====================
 
     /**
-     * 测试 --plain 选项仅生成最小结构（目录 + module.json，不含示例文件）
+     * 娴嬭瘯 --plain 閫夐」浠呯敓鎴愭渶灏忕粨鏋勶紙鐩綍 + module.json锛屼笉鍚ず渚嬫枃浠讹級
      *
      * Requirements: 1.6
      */
@@ -167,7 +167,7 @@ class MakeModuleCommandTest extends TestCase
 
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Blog';
 
-        // 目录结构仍然存在
+        // 鐩綍缁撴瀯浠嶇劧瀛樺湪
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'controller');
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'model');
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'service');
@@ -176,25 +176,25 @@ class MakeModuleCommandTest extends TestCase
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'seeders');
         $this->assertDirectoryExists($modulePath . DIRECTORY_SEPARATOR . 'route');
 
-        // module.json 始终存在
+        // module.json 濮嬬粓瀛樺湪
         $this->assertFileExists($modulePath . DIRECTORY_SEPARATOR . 'module.json');
 
-        // 示例文件不应存在
+        // 绀轰緥鏂囦欢涓嶅簲瀛樺湪
         $this->assertFileDoesNotExist($modulePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php');
         $this->assertFileDoesNotExist($modulePath . DIRECTORY_SEPARATOR . 'route' . DIRECTORY_SEPARATOR . 'app.php');
         $this->assertFileDoesNotExist($modulePath . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'Index.php');
     }
 
     /**
-     * 测试 --plain 模式下 module.json 内容正确
+     * 娴嬭瘯 --plain 妯″紡涓?module.json 鍐呭姝ｇ‘
      *
-     * 使用原始输入名称传入 createModule（内部会自动转换为 StudlyCase）
+     * 浣跨敤鍘熷杈撳叆鍚嶇О浼犲叆 createModule锛堝唴閮ㄤ細鑷姩杞崲涓?StudlyCase锛?
      *
      * Requirements: 1.6
      */
     public function testPlainModeModuleJsonContainsModuleName(): void
     {
-        // 使用带分隔符的原始名称，createModule 内部会转为 StudlyCase
+        // 浣跨敤甯﹀垎闅旂鐨勫師濮嬪悕绉帮紝createModule 鍐呴儴浼氳浆涓?StudlyCase
         $this->generator->createModule('test-module', ['plain' => true]);
 
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'TestModule';
@@ -204,12 +204,12 @@ class MakeModuleCommandTest extends TestCase
         $this->assertStringContainsString('testmodule', $content);
     }
 
-    // ==================== 同名模块已存在时的错误处理测试 ====================
+    // ==================== 鍚屽悕妯″潡宸插瓨鍦ㄦ椂鐨勯敊璇鐞嗘祴璇?====================
 
     /**
-     * 测试同名模块已存在时 createModule 返回 false
+     * 娴嬭瘯鍚屽悕妯″潡宸插瓨鍦ㄦ椂 createModule 杩斿洖 false
      *
-     * 在命令中此返回值会触发错误输出并返回退出码 1
+     * 鍦ㄥ懡浠や腑姝よ繑鍥炲€间細瑙﹀彂閿欒杈撳嚭骞惰繑鍥為€€鍑虹爜 1
      *
      * Requirements: 1.4
      */
@@ -217,20 +217,20 @@ class MakeModuleCommandTest extends TestCase
     {
         $moduleName = 'ExistingModule';
 
-        // 预创建模块目录
+        // 棰勫垱寤烘ā鍧楃洰褰?
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . $moduleName;
         mkdir($modulePath, 0755, true);
 
-        // moduleExists 应返回 true
+        // moduleExists 搴旇繑鍥?true
         $this->assertTrue($this->generator->moduleExists($moduleName));
 
-        // createModule 应返回 false
+        // createModule 搴旇繑鍥?false
         $result = $this->generator->createModule($moduleName);
         $this->assertFalse($result);
     }
 
     /**
-     * 测试同名模块存在时不会修改现有目录内容
+     * 娴嬭瘯鍚屽悕妯″潡瀛樺湪鏃朵笉浼氫慨鏀圭幇鏈夌洰褰曞唴瀹?
      *
      * Requirements: 1.4
      */
@@ -240,46 +240,46 @@ class MakeModuleCommandTest extends TestCase
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . $moduleName;
         mkdir($modulePath, 0755, true);
 
-        // 在模块目录中创建一个标记文件
+        // 鍦ㄦā鍧楃洰褰曚腑鍒涘缓涓€涓爣璁版枃浠?
         $markerFile = $modulePath . DIRECTORY_SEPARATOR . 'marker.txt';
         file_put_contents($markerFile, 'original content');
 
-        // 尝试创建同名模块
+        // 灏濊瘯鍒涘缓鍚屽悕妯″潡
         $this->generator->createModule($moduleName);
 
-        // 标记文件应保持不变
+        // 鏍囪鏂囦欢搴斾繚鎸佷笉鍙?
         $this->assertFileExists($markerFile);
         $this->assertEquals('original content', file_get_contents($markerFile));
 
-        // 不应生成 module.json（因为操作被终止）
+        // 涓嶅簲鐢熸垚 module.json锛堝洜涓烘搷浣滆缁堟锛?
         $this->assertFileDoesNotExist($modulePath . DIRECTORY_SEPARATOR . 'module.json');
     }
 
     /**
-     * 测试命令执行流程中模块存在检测使用 StudlyCase 名称
+     * 娴嬭瘯鍛戒护鎵ц娴佺▼涓ā鍧楀瓨鍦ㄦ娴嬩娇鐢?StudlyCase 鍚嶇О
      *
      * Requirements: 1.3, 1.4
      */
     public function testModuleExistsCheckUsesStudlyCaseName(): void
     {
-        // 创建 UserCenter 目录
+        // 鍒涘缓 UserCenter 鐩綍
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'UserCenter';
         mkdir($modulePath, 0755, true);
 
-        // 模拟命令流程：先转换名称，再检查存在性
+        // 妯℃嫙鍛戒护娴佺▼锛氬厛杞崲鍚嶇О锛屽啀妫€鏌ュ瓨鍦ㄦ€?
         $studlyName = $this->generator->studlyCase('user-center');
         $this->assertEquals('UserCenter', $studlyName);
         $this->assertTrue($this->generator->moduleExists($studlyName));
 
-        // 创建应失败
+        // 鍒涘缓搴斿け璐?
         $result = $this->generator->createModule($studlyName);
         $this->assertFalse($result);
     }
 
-    // ==================== 名称转换测试（命令特定场景） ====================
+    // ==================== 鍚嶇О杞崲娴嬭瘯锛堝懡浠ょ壒瀹氬満鏅級 ====================
 
     /**
-     * 测试 kebab-case 输入（user-center → UserCenter）
+     * 娴嬭瘯 kebab-case 杈撳叆锛坲ser-center 鈫?UserCenter锛?
      *
      * Requirements: 1.3
      */
@@ -290,7 +290,7 @@ class MakeModuleCommandTest extends TestCase
 
         $this->assertEquals('UserCenter', $moduleName);
 
-        // 验证生成的目录使用转换后的名称
+        // 楠岃瘉鐢熸垚鐨勭洰褰曚娇鐢ㄨ浆鎹㈠悗鐨勫悕绉?
         $this->generator->createModule($moduleName);
         $this->assertDirectoryExists(
             $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'UserCenter'
@@ -298,7 +298,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试 snake_case 输入（user_center → UserCenter）
+     * 娴嬭瘯 snake_case 杈撳叆锛坲ser_center 鈫?UserCenter锛?
      *
      * Requirements: 1.3
      */
@@ -316,7 +316,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试空格分隔输入（user center → UserCenter）
+     * 娴嬭瘯绌烘牸鍒嗛殧杈撳叆锛坲ser center 鈫?UserCenter锛?
      *
      * Requirements: 1.3
      */
@@ -329,7 +329,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试单个单词输入（blog → Blog）
+     * 娴嬭瘯鍗曚釜鍗曡瘝杈撳叆锛坆log 鈫?Blog锛?
      *
      * Requirements: 1.3
      */
@@ -347,7 +347,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试多段连字符输入（my-awesome-module → MyAwesomeModule）
+     * 娴嬭瘯澶氭杩炲瓧绗﹁緭鍏ワ紙my-awesome-module 鈫?MyAwesomeModule锛?
      *
      * Requirements: 1.3
      */
@@ -360,7 +360,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试包含数字的名称（module2-test → Module2Test）
+     * 娴嬭瘯鍖呭惈鏁板瓧鐨勫悕绉帮紙module2-test 鈫?Module2Test锛?
      *
      * Requirements: 1.3
      */
@@ -372,40 +372,40 @@ class MakeModuleCommandTest extends TestCase
         $this->assertEquals('Module2Test', $moduleName);
     }
 
-    // ==================== 命令执行流程集成测试 ====================
+    // ==================== 鍛戒护鎵ц娴佺▼闆嗘垚娴嬭瘯 ====================
 
     /**
-     * 测试完整的命令执行流程（模拟）：输入名称 → StudlyCase → 检查 → 创建
+     * 娴嬭瘯瀹屾暣鐨勫懡浠ゆ墽琛屾祦绋嬶紙妯℃嫙锛夛細杈撳叆鍚嶇О 鈫?StudlyCase 鈫?妫€鏌?鈫?鍒涘缓
      *
-     * 注意：createModule 内部会再次调用 studlyCase，所以传入原始名称即可
+     * 娉ㄦ剰锛歝reateModule 鍐呴儴浼氬啀娆¤皟鐢?studlyCase锛屾墍浠ヤ紶鍏ュ師濮嬪悕绉板嵆鍙?
      *
      * Requirements: 1.1, 1.3
      */
     public function testCommandExecutionFlowWithNameConversion(): void
     {
-        // 模拟命令接收 'user-center' 输入
+        // 妯℃嫙鍛戒护鎺ユ敹 'user-center' 杈撳叆
         $inputName = 'user-center';
 
-        // 步骤 1：转换名称（命令层行为）
+        // 姝ラ 1锛氳浆鎹㈠悕绉帮紙鍛戒护灞傝涓猴級
         $moduleName = $this->generator->studlyCase($inputName);
         $this->assertEquals('UserCenter', $moduleName);
 
-        // 步骤 2：检查模块是否存在
+        // 姝ラ 2锛氭鏌ユā鍧楁槸鍚﹀瓨鍦?
         $this->assertFalse($this->generator->moduleExists($moduleName));
 
-        // 步骤 3：使用原始名称创建模块（createModule 内部会执行 studlyCase）
+        // 姝ラ 3锛氫娇鐢ㄥ師濮嬪悕绉板垱寤烘ā鍧楋紙createModule 鍐呴儴浼氭墽琛?studlyCase锛?
         $result = $this->generator->createModule($inputName, [
             'plain' => false,
             'title' => $moduleName,
         ]);
         $this->assertTrue($result);
 
-        // 步骤 4：验证模块现在存在（使用 StudlyCase 名称检查）
+        // 姝ラ 4锛氶獙璇佹ā鍧楃幇鍦ㄥ瓨鍦紙浣跨敤 StudlyCase 鍚嶇О妫€鏌ワ級
         $this->assertTrue($this->generator->moduleExists($moduleName));
     }
 
     /**
-     * 测试 module.json 包含正确的模块名称（标准模式）
+     * 娴嬭瘯 module.json 鍖呭惈姝ｇ‘鐨勬ā鍧楀悕绉帮紙鏍囧噯妯″紡锛?
      *
      * Requirements: 1.1, 1.2
      */
@@ -426,13 +426,13 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 测试标准模式下控制器命名空间正确
+     * 娴嬭瘯鏍囧噯妯″紡涓嬫帶鍒跺櫒鍛藉悕绌洪棿姝ｇ‘
      *
      * Requirements: 1.2
      */
     public function testStandardModeControllerHasCorrectNamespace(): void
     {
-        // 使用带分隔符的原始名称，createModule 内部会转为 StudlyCase
+        // 浣跨敤甯﹀垎闅旂鐨勫師濮嬪悕绉帮紝createModule 鍐呴儴浼氳浆涓?StudlyCase
         $this->generator->createModule('user-center', [
             'plain' => false,
             'title' => 'UserCenter',
@@ -447,10 +447,10 @@ class MakeModuleCommandTest extends TestCase
         $this->assertStringContainsString('app\\UserCenter\\controller', $content);
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== 杈呭姪鏂规硶 ====================
 
     /**
-     * 创建基础 Stub 文件
+     * 鍒涘缓鍩虹 Stub 鏂囦欢
      */
     private function createStubFiles(): void
     {
@@ -540,7 +540,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 创建可测试的 StubResolver 实例
+     * 鍒涘缓鍙祴璇曠殑 StubResolver 瀹炰緥
      */
     private function createStubResolver(): StubResolver
     {
@@ -554,7 +554,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 创建可测试的 ModuleGenerator 实例（覆盖 getModulePath 使用临时目录）
+     * 鍒涘缓鍙祴璇曠殑 ModuleGenerator 瀹炰緥锛堣鐩?getModulePath 浣跨敤涓存椂鐩綍锛?
      */
     private function createGenerator(StubResolver $stubResolver): ModuleGenerator
     {
@@ -576,7 +576,7 @@ class MakeModuleCommandTest extends TestCase
     }
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

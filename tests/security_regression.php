@@ -54,8 +54,8 @@ assertSource(str_contains($adminNotifications, "'user_id' => \$userId"), 'Cross-
 assertSource(!str_contains($adminNotifications, "'user_id' => null"), 'Cross-guard notifications must not create shared read-state rows.');
 assertSource(str_contains($adminNotifications, "'from_guard' => \$currentGuard"), 'Sent notifications must record the sender guard.');
 assertSource(str_contains($adminNotifications, "->where('from_guard', config('thinkrix.guard', 'admin'))"), 'Sent notification history must constrain the sender guard.');
-assertSource(str_contains($notifications, '共享广播不支持单用户修改已读状态'), 'Legacy shared broadcasts must not share read-state mutations.');
-assertSource(str_contains($notifications, '共享广播不能由单个接收用户删除'), 'Legacy shared broadcasts must not be deleted by one recipient.');
+assertSource(str_contains($notifications, '共享广播不支持单用户修改已读状态。'), 'Legacy shared broadcasts must not share read-state mutations.');
+assertSource(str_contains($notifications, '共享广播不能由单个接收用户删除。'), 'Legacy shared broadcasts must not be deleted by one recipient.');
 
 $routes = source($root . '/src/routes.php');
 assertSource(substr_count($routes, 'CheckPermission::class') >= 4, 'High-risk administration routes must mount permission middleware.');

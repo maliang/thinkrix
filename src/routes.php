@@ -156,6 +156,10 @@ Route::group($prefix, function () use (
         Route::group('modules', function () use ($moduleController) {
             Route::get('/', "{$moduleController}@index")
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, '*=module.installed.list', 'market=module.market.list', 'market_ui=module.market.list');
+            Route::get('market/modules', "{$moduleController}@marketModules")
+                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.market.list');
+            Route::get('market/projects', "{$moduleController}@marketProjects")
+                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.market.list');
             Route::put('<name>/enable', "{$moduleController}@enable")
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.enable');
             Route::put('<name>/disable', "{$moduleController}@disable")

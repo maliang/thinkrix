@@ -30,7 +30,12 @@ class MakeModuleCommand extends BaseModuleCommand
             ->setDescription('创建新的模块骨架')
             ->addArgument('name', Argument::REQUIRED, '模块名称（支持 StudlyCase、snake_case、kebab-case）')
             ->addOption('plain', null, Option::VALUE_NONE, '仅生成最小目录结构，不包含示例文件')
-            ->addOption('title', null, Option::VALUE_OPTIONAL, '模块显示标题');
+            ->addOption('title', null, Option::VALUE_OPTIONAL, '模块显示标题')
+            ->addOption('id', null, Option::VALUE_OPTIONAL, 'Trix registry id，默认使用模块别名')
+            ->addOption('description', null, Option::VALUE_OPTIONAL, '模块描述')
+            ->addOption('type', null, Option::VALUE_OPTIONAL, 'Trix 模块类型', 'native')
+            ->addOption('author', null, Option::VALUE_OPTIONAL, '模块作者')
+            ->addOption('author-url', null, Option::VALUE_OPTIONAL, '模块作者地址');
     }
 
     /**
@@ -61,6 +66,11 @@ class MakeModuleCommand extends BaseModuleCommand
         $options = [
             'plain' => $isPlain,
             'title' => $title,
+            'id' => $input->getOption('id') ?: strtolower($moduleName),
+            'description' => $input->getOption('description') ?: "{$title} module",
+            'type' => $input->getOption('type') ?: 'native',
+            'author' => $input->getOption('author') ?: '',
+            'author_url' => $input->getOption('author-url') ?: '',
         ];
 
         // 调用生成器创建模块
@@ -76,6 +86,9 @@ class MakeModuleCommand extends BaseModuleCommand
         $moduleService->syncModules();
 
         $output->writeln("<info>Module [{$moduleName}] created successfully.</info>");
+        $output->writeln('<comment>Manifest: ' . $generator->getModulePath($moduleName) . DIRECTORY_SEPARATOR . 'module.json</comment>');
+        $output->writeln('<comment>Logo: ' . $generator->getModulePath($moduleName) . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'module' . DIRECTORY_SEPARATOR . 'logo.svg</comment>');
+        $output->writeln('<comment>Thumbnail: ' . $generator->getModulePath($moduleName) . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'module' . DIRECTORY_SEPARATOR . 'thumbnail.svg</comment>');
 
         return 0;
     }

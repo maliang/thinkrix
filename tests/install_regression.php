@@ -30,6 +30,7 @@ check(
 );
 
 $install = source('src/Commands/InstallCommand.php');
+$thinkrixConfig = source('config/thinkrix.php');
 foreach (['dict_groups', 'dict_items', 'notification_categories', 'notification_messages'] as $table) {
     check(
         str_contains($install, "CREATE TABLE IF NOT EXISTS `{$table}`"),
@@ -53,7 +54,11 @@ check(str_contains($install, '$this->app->db->execute('), 'InstallCommand fallba
 check(str_contains($install, '$this->app->db->name('), 'InstallCommand queries must use the application database instance.');
 check(str_contains($install, 'Setting::setValue('), 'InstallCommand must use the ORM-compatible setting write API.');
 check(
-    preg_match("/'footer'\s*=>\s*\[\s*'visible'\s*=>\s*false,/s", $install) === 1,
+    str_contains($install, "Setting::where('key', 'theme')->find()"),
+    'InstallCommand must preserve an existing theme setting.'
+);
+check(
+    preg_match("/'footer'\s*=>\s*\[\s*'visible'\s*=>\s*false,/s", $thinkrixConfig) === 1,
     'InstallCommand must hide the global footer by default.'
 );
 check(!str_contains($install, "\$password = 'password'"), 'InstallCommand must not create a fixed default password.');
@@ -163,7 +168,8 @@ foreach (glob($root . DIRECTORY_SEPARATOR . 'stubs/backend/*.stub') as $stubPath
 
 $readme = source('README.md');
 check(
-    !str_contains($readme, '完整实现了 Lartrix 的全部功能'),
+    !str_contains($readme, '完整实现了 Lartrix 的全部功能')
+        && !str_contains($readme, 'full Lartrix feature parity'),
     'README must not claim full Lartrix feature parity.'
 );
 

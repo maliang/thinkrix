@@ -12,10 +12,10 @@ use Thinkrix\Support\ModuleGenerator;
 use Thinkrix\Support\StubResolver;
 
 /**
- * 迁移命令单元测试
+ * 杩佺Щ鍛戒护鍗曞厓娴嬭瘯
  *
- * 测试 MigrateCommand 和 SeedCommand 的配置正确性、
- * 迁移文件检测逻辑、以及排序行为。
+ * 娴嬭瘯 MigrateCommand 鍜?SeedCommand 鐨勯厤缃纭€с€?
+ * 杩佺Щ鏂囦欢妫€娴嬮€昏緫銆佷互鍙婃帓搴忚涓恒€?
  *
  * Requirements: 4.1-4.6
  */
@@ -30,7 +30,7 @@ class MigrateCommandsTest extends TestCase
         $this->tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'migrate_cmd_test_' . uniqid();
         mkdir($this->tempDir . DIRECTORY_SEPARATOR . 'app', 0755, true);
 
-        // 创建可测试的 StubResolver 和 ModuleGenerator
+        // 鍒涘缓鍙祴璇曠殑 StubResolver 鍜?ModuleGenerator
         $stubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'stubs';
         mkdir($stubDir, 0755, true);
 
@@ -65,10 +65,10 @@ class MigrateCommandsTest extends TestCase
         parent::tearDown();
     }
 
-    // ==================== MigrateCommand 配置测试 ====================
+    // ==================== MigrateCommand 閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试 MigrateCommand 命令名称
+     * 娴嬭瘯 MigrateCommand 鍛戒护鍚嶇О
      *
      * Requirements: 4.1
      */
@@ -79,7 +79,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MigrateCommand 有描述信息
+     * 娴嬭瘯 MigrateCommand 鏈夋弿杩颁俊鎭?
      *
      * Requirements: 4.1
      */
@@ -90,7 +90,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MigrateCommand 有可选的 module 参数
+     * 娴嬭瘯 MigrateCommand 鏈夊彲閫夌殑 module 鍙傛暟
      *
      * Requirements: 4.1, 4.2
      */
@@ -103,7 +103,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MigrateCommand 有 --rollback 选项
+     * 娴嬭瘯 MigrateCommand 鏈?--rollback 閫夐」
      *
      * Requirements: 4.4
      */
@@ -115,7 +115,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MigrateCommand 有 --refresh 选项
+     * 娴嬭瘯 MigrateCommand 鏈?--refresh 閫夐」
      *
      * Requirements: 4.5
      */
@@ -127,7 +127,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试 MigrateCommand 继承 BaseModuleCommand
+     * 娴嬭瘯 MigrateCommand 缁ф壙 BaseModuleCommand
      *
      * Requirements: 4.1
      */
@@ -137,10 +137,10 @@ class MigrateCommandsTest extends TestCase
         $this->assertInstanceOf(BaseModuleCommand::class, $cmd);
     }
 
-    // ==================== SeedCommand 配置测试 ====================
+    // ==================== SeedCommand 閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试 SeedCommand 命令名称
+     * 娴嬭瘯 SeedCommand 鍛戒护鍚嶇О
      *
      * Requirements: 4.3
      */
@@ -151,7 +151,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试 SeedCommand 有描述信息
+     * 娴嬭瘯 SeedCommand 鏈夋弿杩颁俊鎭?
      *
      * Requirements: 4.3
      */
@@ -162,7 +162,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试 SeedCommand 有必填的 module 参数
+     * 娴嬭瘯 SeedCommand 鏈夊繀濉殑 module 鍙傛暟
      *
      * Requirements: 4.3
      */
@@ -175,7 +175,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试 SeedCommand 继承 BaseModuleCommand
+     * 娴嬭瘯 SeedCommand 缁ф壙 BaseModuleCommand
      *
      * Requirements: 4.3
      */
@@ -185,29 +185,29 @@ class MigrateCommandsTest extends TestCase
         $this->assertInstanceOf(BaseModuleCommand::class, $cmd);
     }
 
-    // ==================== 迁移文件检测逻辑测试 ====================
+    // ==================== 杩佺Щ鏂囦欢妫€娴嬮€昏緫娴嬭瘯 ====================
 
     /**
-     * 测试迁移目录检测——模块存在且有 migrations 目录
+     * 娴嬭瘯杩佺Щ鐩綍妫€娴嬧€斺€旀ā鍧楀瓨鍦ㄤ笖鏈?migrations 鐩綍
      *
      * Requirements: 4.1
      */
     public function testMigrationDirectoryDetection(): void
     {
-        // 创建含迁移目录的模块
+        // 鍒涘缓鍚縼绉荤洰褰曠殑妯″潡
         $modulePath = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Blog';
         $migrationDir = $modulePath . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations';
         mkdir($migrationDir, 0755, true);
 
-        // 验证模块存在
+        // 楠岃瘉妯″潡瀛樺湪
         $this->assertTrue($this->generator->moduleExists('Blog'));
 
-        // 验证迁移目录存在
+        // 楠岃瘉杩佺Щ鐩綍瀛樺湪
         $this->assertDirectoryExists($migrationDir);
     }
 
     /**
-     * 测试迁移文件按时间戳排序
+     * 娴嬭瘯杩佺Щ鏂囦欢鎸夋椂闂存埑鎺掑簭
      *
      * Requirements: 4.1
      */
@@ -217,7 +217,7 @@ class MigrateCommandsTest extends TestCase
         $migrationDir = $modulePath . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations';
         mkdir($migrationDir, 0755, true);
 
-        // 创建乱序的时间戳前缀迁移文件
+        // 鍒涘缓涔卞簭鐨勬椂闂存埑鍓嶇紑杩佺Щ鏂囦欢
         file_put_contents($migrationDir . DIRECTORY_SEPARATOR . '20240301000000_create_posts_table.php', '<?php return new class {};');
         file_put_contents($migrationDir . DIRECTORY_SEPARATOR . '20240101000000_create_users_table.php', '<?php return new class {};');
         file_put_contents($migrationDir . DIRECTORY_SEPARATOR . '20240201000000_create_comments_table.php', '<?php return new class {};');
@@ -225,14 +225,14 @@ class MigrateCommandsTest extends TestCase
         $files = glob($migrationDir . DIRECTORY_SEPARATOR . '*.php');
         sort($files);
 
-        // 排序后应按时间戳顺序排列
+        // 鎺掑簭鍚庡簲鎸夋椂闂存埑椤哄簭鎺掑垪
         $this->assertStringContainsString('20240101', basename($files[0]));
         $this->assertStringContainsString('20240201', basename($files[1]));
         $this->assertStringContainsString('20240301', basename($files[2]));
     }
 
     /**
-     * 测试 Seeder 目录检测
+     * 娴嬭瘯 Seeder 鐩綍妫€娴?
      *
      * Requirements: 4.3
      */
@@ -247,7 +247,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试模块无迁移目录时的情况
+     * 娴嬭瘯妯″潡鏃犺縼绉荤洰褰曟椂鐨勬儏鍐?
      *
      * Requirements: 4.6
      */
@@ -263,7 +263,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试模块迁移目录为空时返回空数组
+     * 娴嬭瘯妯″潡杩佺Щ鐩綍涓虹┖鏃惰繑鍥炵┖鏁扮粍
      *
      * Requirements: 4.6
      */
@@ -278,7 +278,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试 rollback 选项应使用反转的文件顺序
+     * 娴嬭瘯 rollback 閫夐」搴斾娇鐢ㄥ弽杞殑鏂囦欢椤哄簭
      *
      * Requirements: 4.4
      */
@@ -295,7 +295,7 @@ class MigrateCommandsTest extends TestCase
         $files = glob($migrationDir . DIRECTORY_SEPARATOR . '*.php');
         sort($files);
 
-        // rollback 时应反转顺序（最新的先回滚）
+        // rollback 鏃跺簲鍙嶈浆椤哄簭锛堟渶鏂扮殑鍏堝洖婊氾級
         $reversed = array_reverse($files);
         $this->assertStringContainsString('20240301', basename($reversed[0]));
         $this->assertStringContainsString('20240201', basename($reversed[1]));
@@ -303,7 +303,7 @@ class MigrateCommandsTest extends TestCase
     }
 
     /**
-     * 测试 refresh 操作——先反转回滚再正序执行
+     * 娴嬭瘯 refresh 鎿嶄綔鈥斺€斿厛鍙嶈浆鍥炴粴鍐嶆搴忔墽琛?
      *
      * Requirements: 4.5
      */
@@ -319,18 +319,18 @@ class MigrateCommandsTest extends TestCase
         $files = glob($migrationDir . DIRECTORY_SEPARATOR . '*.php');
         sort($files);
 
-        // refresh 操作：先反转回滚
+        // refresh 鎿嶄綔锛氬厛鍙嶈浆鍥炴粴
         $reversed = array_reverse($files);
         $this->assertStringContainsString('20240201', basename($reversed[0]));
         $this->assertStringContainsString('20240101', basename($reversed[1]));
 
-        // 再正序执行
+        // 鍐嶆搴忔墽琛?
         $this->assertStringContainsString('20240101', basename($files[0]));
         $this->assertStringContainsString('20240201', basename($files[1]));
     }
 
     /**
-     * 测试仅检测 .php 后缀的迁移文件
+     * 娴嬭瘯浠呮娴?.php 鍚庣紑鐨勮縼绉绘枃浠?
      *
      * Requirements: 4.1
      */
@@ -340,7 +340,7 @@ class MigrateCommandsTest extends TestCase
         $migrationDir = $modulePath . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations';
         mkdir($migrationDir, 0755, true);
 
-        // 创建混合后缀文件
+        // 鍒涘缓娣峰悎鍚庣紑鏂囦欢
         file_put_contents($migrationDir . DIRECTORY_SEPARATOR . '20240101000000_create_users_table.php', '<?php return new class {};');
         file_put_contents($migrationDir . DIRECTORY_SEPARATOR . 'README.md', '# Notes');
         file_put_contents($migrationDir . DIRECTORY_SEPARATOR . '.gitkeep', '');
@@ -350,10 +350,10 @@ class MigrateCommandsTest extends TestCase
         $this->assertStringContainsString('create_users_table.php', basename($files[0]));
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== 杈呭姪鏂规硶 ====================
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

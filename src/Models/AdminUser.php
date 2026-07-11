@@ -62,7 +62,8 @@ class AdminUser extends Model
     {
         $roleModel = config('thinkrix.models.role', Role::class);
         return $this->belongsToMany($roleModel, 'model_has_roles', 'role_id', 'model_id')
-            ->wherePivot('model_type', static::class);
+            ->wherePivot('model_type', static::class)
+            ->where('guard_name', config('thinkrix.guard', 'admin'));
     }
 
     /**

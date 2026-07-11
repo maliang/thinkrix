@@ -13,9 +13,9 @@ use Thinkrix\Support\StubResolver;
 use ReflectionMethod;
 
 /**
- * 路由管理与配置发布命令单元测试
+ * 璺敱绠＄悊涓庨厤缃彂甯冨懡浠ゅ崟鍏冩祴璇?
  *
- * 测试路由列表输出、Stub 发布到正确目录、配置发布与文件复制。
+ * 娴嬭瘯璺敱鍒楄〃杈撳嚭銆丼tub 鍙戝竷鍒版纭洰褰曘€侀厤缃彂甯冧笌鏂囦欢澶嶅埗銆?
  *
  * Requirements: 5.4, 6.1, 7.3
  */
@@ -29,7 +29,7 @@ class RouteAndPublishCommandsTest extends TestCase
     {
         parent::setUp();
 
-        // 创建临时目录模拟项目结构
+        // 鍒涘缓涓存椂鐩綍妯℃嫙椤圭洰缁撴瀯
         $this->tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'route_publish_test_' . uniqid();
         $this->packageStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'modules';
         $this->customStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'project' . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'thinkrix-modules';
@@ -43,10 +43,10 @@ class RouteAndPublishCommandsTest extends TestCase
         parent::tearDown();
     }
 
-    // ==================== RouteListCommand 配置测试 ====================
+    // ==================== RouteListCommand 閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试 RouteListCommand 命令名称正确
+     * 娴嬭瘯 RouteListCommand 鍛戒护鍚嶇О姝ｇ‘
      *
      * Requirements: 5.4
      */
@@ -57,7 +57,7 @@ class RouteAndPublishCommandsTest extends TestCase
     }
 
     /**
-     * 测试 RouteListCommand 有必需的 module 参数
+     * 娴嬭瘯 RouteListCommand 鏈夊繀闇€鐨?module 鍙傛暟
      *
      * Requirements: 5.4
      */
@@ -71,7 +71,7 @@ class RouteAndPublishCommandsTest extends TestCase
     }
 
     /**
-     * 测试 RouteListCommand 有描述信息
+     * 娴嬭瘯 RouteListCommand 鏈夋弿杩颁俊鎭?
      *
      * Requirements: 5.4
      */
@@ -82,7 +82,7 @@ class RouteAndPublishCommandsTest extends TestCase
     }
 
     /**
-     * 测试 RouteListCommand 继承 BaseModuleCommand
+     * 娴嬭瘯 RouteListCommand 缁ф壙 BaseModuleCommand
      *
      * Requirements: 5.4
      */
@@ -93,7 +93,7 @@ class RouteAndPublishCommandsTest extends TestCase
     }
 
     /**
-     * 测试 parseRouteDefinitions 解析 Route::get 模式
+     * 娴嬭瘯 parseRouteDefinitions 瑙ｆ瀽 Route::get 妯″紡
      *
      * Requirements: 5.4
      */
@@ -111,7 +111,7 @@ class RouteAndPublishCommandsTest extends TestCase
     }
 
     /**
-     * 测试 parseRouteDefinitions 解析 Route::post 模式
+     * 娴嬭瘯 parseRouteDefinitions 瑙ｆ瀽 Route::post 妯″紡
      *
      * Requirements: 5.4
      */
@@ -129,7 +129,7 @@ class RouteAndPublishCommandsTest extends TestCase
     }
 
     /**
-     * 测试 parseRouteDefinitions 解析多种 HTTP 方法
+     * 娴嬭瘯 parseRouteDefinitions 瑙ｆ瀽澶氱 HTTP 鏂规硶
      *
      * Requirements: 5.4
      */
@@ -156,7 +156,7 @@ PHP;
     }
 
     /**
-     * 测试 parseRouteDefinitions 对 group 模式返回空数组
+     * 娴嬭瘯 parseRouteDefinitions 瀵?group 妯″紡杩斿洖绌烘暟缁?
      *
      * Requirements: 5.4
      */
@@ -168,7 +168,7 @@ PHP;
 
         $content = <<<'PHP'
 Route::group('api', function () {
-    // 嵌套路由
+    // 宓屽璺敱
 });
 PHP;
 
@@ -178,7 +178,7 @@ PHP;
     }
 
     /**
-     * 测试 parseRouteDefinitions 对空内容返回空数组
+     * 娴嬭瘯 parseRouteDefinitions 瀵圭┖鍐呭杩斿洖绌烘暟缁?
      *
      * Requirements: 5.4
      */
@@ -193,10 +193,10 @@ PHP;
         $this->assertEmpty($result);
     }
 
-    // ==================== PublishStubsCommand 配置测试 ====================
+    // ==================== PublishStubsCommand 閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试 PublishStubsCommand 命令名称正确
+     * 娴嬭瘯 PublishStubsCommand 鍛戒护鍚嶇О姝ｇ‘
      *
      * Requirements: 6.1
      */
@@ -207,7 +207,7 @@ PHP;
     }
 
     /**
-     * 测试 PublishStubsCommand 有描述信息
+     * 娴嬭瘯 PublishStubsCommand 鏈夋弿杩颁俊鎭?
      *
      * Requirements: 6.1
      */
@@ -218,7 +218,7 @@ PHP;
     }
 
     /**
-     * 测试 PublishStubsCommand 没有必需参数
+     * 娴嬭瘯 PublishStubsCommand 娌℃湁蹇呴渶鍙傛暟
      *
      * Requirements: 6.1
      */
@@ -228,13 +228,13 @@ PHP;
         $definition = $command->getDefinition();
         $arguments = $definition->getArguments();
 
-        // 命令不应有任何必需参数
+        // 鍛戒护涓嶅簲鏈変换浣曞繀闇€鍙傛暟
         $requiredArguments = array_filter($arguments, fn($arg) => $arg->isRequired());
         $this->assertEmpty($requiredArguments, 'PublishStubsCommand should have no required arguments');
     }
 
     /**
-     * 测试 PublishStubsCommand 继承 BaseModuleCommand
+     * 娴嬭瘯 PublishStubsCommand 缁ф壙 BaseModuleCommand
      *
      * Requirements: 6.1
      */
@@ -245,13 +245,13 @@ PHP;
     }
 
     /**
-     * 测试 StubResolver::publishStubs 将文件复制到自定义目录
+     * 娴嬭瘯 StubResolver::publishStubs 灏嗘枃浠跺鍒跺埌鑷畾涔夌洰褰?
      *
      * Requirements: 6.1
      */
     public function testStubResolverPublishStubsCopiesFilesToCustomDir(): void
     {
-        // 创建测试 stub 文件
+        // 鍒涘缓娴嬭瘯 stub 鏂囦欢
         file_put_contents(
             $this->packageStubDir . DIRECTORY_SEPARATOR . 'controller.stub',
             "<?php\nnamespace {{NAMESPACE}};\nclass {{CLASS_NAME}} {}\n"
@@ -265,7 +265,7 @@ PHP;
             "<?php\nnamespace {{NAMESPACE}};\nclass {{CLASS_NAME}} {}\n"
         );
 
-        // 创建可测试的 StubResolver 实例
+        // 鍒涘缓鍙祴璇曠殑 StubResolver 瀹炰緥
         $stubResolver = new class($this->packageStubDir, $this->customStubDir) extends StubResolver {
             public function __construct(string $defaultPath, string $customPath)
             {
@@ -274,19 +274,19 @@ PHP;
             }
         };
 
-        // 执行发布
+        // 鎵ц鍙戝竷
         $published = $stubResolver->publishStubs();
 
-        // 验证结果
+        // 楠岃瘉缁撴灉
         $this->assertNotEmpty($published);
         $this->assertCount(3, $published);
 
-        // 验证文件确实被复制到自定义目录
+        // 楠岃瘉鏂囦欢纭疄琚鍒跺埌鑷畾涔夌洰褰?
         $this->assertArrayHasKey('controller.stub', $published);
         $this->assertArrayHasKey('model.stub', $published);
         $this->assertArrayHasKey('service.stub', $published);
 
-        // 验证目标文件存在
+        // 楠岃瘉鐩爣鏂囦欢瀛樺湪
         foreach ($published as $filename => $targetPath) {
             $this->assertFileExists($targetPath);
             $this->assertStringContainsString($this->customStubDir, $targetPath);
@@ -294,13 +294,13 @@ PHP;
     }
 
     /**
-     * 测试 StubResolver::publishStubs 在无 stub 文件时返回空数组
+     * 娴嬭瘯 StubResolver::publishStubs 鍦ㄦ棤 stub 鏂囦欢鏃惰繑鍥炵┖鏁扮粍
      *
      * Requirements: 6.1
      */
     public function testStubResolverPublishStubsReturnsEmptyWhenNoStubs(): void
     {
-        // 创建一个空的 stub 目录
+        // 鍒涘缓涓€涓┖鐨?stub 鐩綍
         $emptyStubDir = $this->tempDir . DIRECTORY_SEPARATOR . 'empty_stubs';
         mkdir($emptyStubDir, 0755, true);
 
@@ -318,19 +318,19 @@ PHP;
     }
 
     /**
-     * 测试 StubResolver::publishStubs 不覆盖已存在的自定义文件
+     * 娴嬭瘯 StubResolver::publishStubs 涓嶈鐩栧凡瀛樺湪鐨勮嚜瀹氫箟鏂囦欢
      *
      * Requirements: 6.1
      */
     public function testStubResolverPublishStubsDoesNotOverwriteExisting(): void
     {
-        // 创建默认 stub 文件
+        // 鍒涘缓榛樿 stub 鏂囦欢
         file_put_contents(
             $this->packageStubDir . DIRECTORY_SEPARATOR . 'controller.stub',
             "default content"
         );
 
-        // 创建已存在的自定义 stub 文件
+        // 鍒涘缓宸插瓨鍦ㄧ殑鑷畾涔?stub 鏂囦欢
         mkdir($this->customStubDir, 0755, true);
         file_put_contents(
             $this->customStubDir . DIRECTORY_SEPARATOR . 'controller.stub',
@@ -347,15 +347,15 @@ PHP;
 
         $stubResolver->publishStubs();
 
-        // 验证自定义文件内容未被覆盖
+        // 楠岃瘉鑷畾涔夋枃浠跺唴瀹规湭琚鐩?
         $content = file_get_contents($this->customStubDir . DIRECTORY_SEPARATOR . 'controller.stub');
         $this->assertEquals("custom content", $content);
     }
 
-    // ==================== PublishConfigCommand 配置测试 ====================
+    // ==================== PublishConfigCommand 閰嶇疆娴嬭瘯 ====================
 
     /**
-     * 测试 PublishConfigCommand 命令名称正确
+     * 娴嬭瘯 PublishConfigCommand 鍛戒护鍚嶇О姝ｇ‘
      *
      * Requirements: 7.3
      */
@@ -366,7 +366,7 @@ PHP;
     }
 
     /**
-     * 测试 PublishConfigCommand 有必需的 module 参数
+     * 娴嬭瘯 PublishConfigCommand 鏈夊繀闇€鐨?module 鍙傛暟
      *
      * Requirements: 7.3
      */
@@ -380,7 +380,7 @@ PHP;
     }
 
     /**
-     * 测试 PublishConfigCommand 有描述信息
+     * 娴嬭瘯 PublishConfigCommand 鏈夋弿杩颁俊鎭?
      *
      * Requirements: 7.3
      */
@@ -391,7 +391,7 @@ PHP;
     }
 
     /**
-     * 测试 PublishConfigCommand 继承 BaseModuleCommand
+     * 娴嬭瘯 PublishConfigCommand 缁ф壙 BaseModuleCommand
      *
      * Requirements: 7.3
      */
@@ -402,13 +402,13 @@ PHP;
     }
 
     /**
-     * 测试配置文件可被正确读取与复制
+     * 娴嬭瘯閰嶇疆鏂囦欢鍙姝ｇ‘璇诲彇涓庡鍒?
      *
      * Requirements: 7.3
      */
     public function testConfigFileCanBeReadAndCopied(): void
     {
-        // 模拟模块配置文件
+        // 妯℃嫙妯″潡閰嶇疆鏂囦欢
         $moduleConfigDir = $this->tempDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Blog' . DIRECTORY_SEPARATOR . 'config';
         mkdir($moduleConfigDir, 0755, true);
 
@@ -424,23 +424,23 @@ PHP;
         $sourceFile = $moduleConfigDir . DIRECTORY_SEPARATOR . 'config.php';
         file_put_contents($sourceFile, $configContent);
 
-        // 模拟目标目录
+        // 妯℃嫙鐩爣鐩綍
         $targetDir = $this->tempDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'modules';
         mkdir($targetDir, 0755, true);
 
         $targetFile = $targetDir . DIRECTORY_SEPARATOR . 'blog.php';
 
-        // 执行复制（模拟 PublishConfigCommand 的核心逻辑）
+        // 鎵ц澶嶅埗锛堟ā鎷?PublishConfigCommand 鐨勬牳蹇冮€昏緫锛?
         copy($sourceFile, $targetFile);
 
-        // 验证文件被正确复制
+        // 楠岃瘉鏂囦欢琚纭鍒?
         $this->assertFileExists($targetFile);
 
-        // 验证内容一致
+        // 楠岃瘉鍐呭涓€鑷?
         $copiedContent = file_get_contents($targetFile);
         $this->assertEquals($configContent, $copiedContent);
 
-        // 验证配置可被正确加载
+        // 楠岃瘉閰嶇疆鍙姝ｇ‘鍔犺浇
         $config = include $targetFile;
         $this->assertIsArray($config);
         $this->assertEquals('Blog', $config['name']);
@@ -449,36 +449,36 @@ PHP;
     }
 
     /**
-     * 测试配置文件复制会覆盖已存在的文件
+     * 娴嬭瘯閰嶇疆鏂囦欢澶嶅埗浼氳鐩栧凡瀛樺湪鐨勬枃浠?
      *
      * Requirements: 7.3
      */
     public function testConfigFileCopyOverwritesExisting(): void
     {
-        // 创建源配置文件
+        // 鍒涘缓婧愰厤缃枃浠?
         $sourceDir = $this->tempDir . DIRECTORY_SEPARATOR . 'source';
         mkdir($sourceDir, 0755, true);
         $sourceFile = $sourceDir . DIRECTORY_SEPARATOR . 'config.php';
         file_put_contents($sourceFile, "<?php\nreturn ['version' => '2.0.0'];");
 
-        // 创建已存在的目标文件
+        // 鍒涘缓宸插瓨鍦ㄧ殑鐩爣鏂囦欢
         $targetDir = $this->tempDir . DIRECTORY_SEPARATOR . 'target';
         mkdir($targetDir, 0755, true);
         $targetFile = $targetDir . DIRECTORY_SEPARATOR . 'blog.php';
         file_put_contents($targetFile, "<?php\nreturn ['version' => '1.0.0'];");
 
-        // 执行覆盖复制
+        // 鎵ц瑕嗙洊澶嶅埗
         copy($sourceFile, $targetFile);
 
-        // 验证内容已更新
+        // 楠岃瘉鍐呭宸叉洿鏂?
         $config = include $targetFile;
         $this->assertEquals('2.0.0', $config['version']);
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== 杈呭姪鏂规硶 ====================
 
     /**
-     * 递归删除目录
+     * 閫掑綊鍒犻櫎鐩綍
      */
     private function removeDirectory(string $dir): void
     {

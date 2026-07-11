@@ -46,16 +46,21 @@ class ListModuleCommand extends BaseModuleCommand
         // 构建表格行数据
         $rows = [];
         foreach ($modules as $module) {
+            $config = $module['config'] ?? [];
+            $manifest = is_array($config) ? ($config['trix_manifest'] ?? null) : null;
+            $adapterStatus = is_array($manifest) ? ($manifest['adapter']['status'] ?? '') : '';
+
             $rows[] = [
                 $module['name'] ?? '',
                 ($module['enabled'] ?? false) ? '<info>Enabled</info>' : '<comment>Disabled</comment>',
                 $module['version'] ?? '1.0.0',
+                $adapterStatus,
             ];
         }
 
         // 使用 ThinkPHP Table 类以表格形式输出模块信息
         $table = new Table();
-        $table->setHeader(['Name', 'Status', 'Version']);
+        $table->setHeader(['Name', 'Status', 'Version', 'ThinkPHP Adapter']);
         $table->setRows($rows);
 
         $this->table($table);

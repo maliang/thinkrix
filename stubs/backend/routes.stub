@@ -29,4 +29,5 @@ Route::group('{{API_PREFIX}}', function () {
         Route::get('system', '{{namespace}}\System@headerRight');
     })->middleware(\Thinkrix\Middleware\Authenticate::class);
 })->middleware(\app\{{NAME}}\middleware\BackendContext::class)
+    ->middleware(\Thinkrix\Middleware\EnsureModuleEnabled::class, '{{NAME}}')
     ->middleware(\Thinkrix\Middleware\HandleApiException::class);
