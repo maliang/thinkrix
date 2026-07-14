@@ -82,18 +82,19 @@ class RegistryStagedManifestVerifierTest extends TestCase
     private function manifest(string $id, string $version, string $framework, string $status): string
     {
         return json_encode([
-            'schema_version' => 'trix.module.v1',
-            'id' => $id,
             'name' => 'CMS',
-            'version' => $version,
-            'type' => 'contract',
-            'adapter' => [
-                'language' => 'php',
-                'framework' => $framework,
-                'status' => $status,
-            ],
-            'security' => [
-                'writes_files' => true,
+            'trix' => [
+                'schema_version' => 'trix.module.v1',
+                'id' => $id,
+                'name' => 'CMS',
+                'version' => $version,
+                'type' => 'contract',
+                'adapter' => [
+                    'language' => 'php',
+                    'framework' => $framework,
+                    'status' => $status,
+                ],
+                'security' => ['writes_files' => true],
             ],
         ], JSON_THROW_ON_ERROR);
     }

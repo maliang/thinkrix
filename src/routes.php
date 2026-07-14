@@ -13,6 +13,8 @@ $roleController = config('thinkrix.controllers.role', \Thinkrix\Controllers\Role
 $permissionController = config('thinkrix.controllers.permission', \Thinkrix\Controllers\PermissionController::class);
 $menuController = config('thinkrix.controllers.menu', \Thinkrix\Controllers\MenuController::class);
 $moduleController = config('thinkrix.controllers.module', \Thinkrix\Controllers\ModuleController::class);
+$moduleMarketController = config('thinkrix.controllers.module_market', \Thinkrix\Controllers\ModuleMarketController::class);
+$modulePublishController = config('thinkrix.controllers.module_publish', \Thinkrix\Controllers\ModulePublishController::class);
 $settingController = config('thinkrix.controllers.setting', \Thinkrix\Controllers\SettingController::class);
 $systemController = config('thinkrix.controllers.system', \Thinkrix\Controllers\SystemController::class);
 $homeController = config('thinkrix.controllers.home', \Thinkrix\Controllers\HomeController::class);
@@ -32,6 +34,8 @@ Route::group($prefix, function () use (
     $permissionController,
     $menuController,
     $moduleController,
+    $moduleMarketController,
+    $modulePublishController,
     $settingController,
     $systemController,
     $homeController,
@@ -56,6 +60,8 @@ Route::group($prefix, function () use (
         $permissionController,
         $menuController,
         $moduleController,
+        $moduleMarketController,
+        $modulePublishController,
         $settingController,
         $systemController,
         $homeController,
@@ -153,21 +159,31 @@ Route::group($prefix, function () use (
             ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'system.menu.delete');
 
         // 模块管理
-        Route::group('modules', function () use ($moduleController) {
+        Route::group('modules', function () use ($moduleController, $moduleMarketController, $modulePublishController) {
             Route::get('/', "{$moduleController}@index")
-                ->middleware(\Thinkrix\Middleware\CheckPermission::class, '*=module.installed.list', 'market=module.market.list', 'market_ui=module.market.list');
-            Route::get('market/modules', "{$moduleController}@marketModules")
+                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.list');
+            Route::get('market/ui', "{$moduleMarketController}@ui")
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.market.list');
-            Route::get('market/projects', "{$moduleController}@marketProjects")
+            Route::get('market/modules', "{$moduleMarketController}@modules")
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.market.list');
+            Route::get('market/projects', "{$moduleMarketController}@projects")
+                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.market.list');
+            Route::post('market/modules/<id>/install', "{$moduleMarketController}@installModule")
+                ->pattern(['id' => '[A-Za-z0-9._-]+'])->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.market.install');
+            Route::post('market/projects/<id>/install', "{$moduleMarketController}@installProject")
+                ->pattern(['id' => '[A-Za-z0-9._-]+'])->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.market.install');
+            Route::post('projects/publish', "{$modulePublishController}@project")
+                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.market.publish');
             Route::put('<name>/enable', "{$moduleController}@enable")
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.enable');
             Route::put('<name>/disable', "{$moduleController}@disable")
                 ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.disable');
             Route::put('<name>/install', "{$moduleController}@install")
-                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.list');
+                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.install');
             Route::put('<name>/uninstall', "{$moduleController}@uninstall")
-                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.list');
+                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.installed.uninstall');
+            Route::post('<name>/publish', "{$modulePublishController}@module")
+                ->middleware(\Thinkrix\Middleware\CheckPermission::class, 'module.market.publish');
         });
 
         // 设置管理

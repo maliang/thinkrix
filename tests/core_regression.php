@@ -123,6 +123,8 @@ check(
 );
 
 $moduleController = source('src/Controllers/ModuleController.php');
+$moduleManagementSchema = source('src/Schema/Pages/ModuleManagementSchema.php');
+$moduleMarketSchema = source('src/Schema/Pages/ModuleMarketSchema.php');
 check(
     !str_contains($moduleController, "->page('{{")
         && !str_contains($moduleController, "->pageSize('{{")
@@ -130,29 +132,27 @@ check(
     'ModuleController pagination helpers must receive raw expressions to avoid nested template braces.'
 );
 check(
-    str_contains($moduleController, "->props(['src' => '{{ slotData.row.logo }}', 'size' => 32, 'objectFit' => 'contain'])")
-        && !str_contains($moduleController, 'routePrefix + "/modules/" + slotData.row.name + "/logo"'),
-    'ModuleController installed module list must use the stored static logo URL directly instead of routing through /api/admin/modules/{name}/logo.'
+    !str_contains($moduleController, 'marketModules(')
+        && !str_contains($moduleController, 'marketProjects(')
+        && !str_contains($moduleController, 'marketCardGrid')
+        && !str_contains($moduleController, 'publishLocal'),
+    'ModuleController must only own local module lifecycle and logo responsibilities.'
 );
 check(
-    str_contains($moduleController, "'marketModuleType' => 'all'")
-        && str_contains($moduleController, "'marketProjectType' => 'all'")
-        && str_contains($moduleController, "['label' => '全部', 'value' => 'all']")
-        && str_contains($moduleController, "'language' => 'php', 'framework' => 'thinkphp'")
-        && str_contains($moduleController, 'normalizeMarketType'),
-    'ModuleController market modal must default category selects to selected "all" and send php/thinkphp adapter params.'
+    str_contains($moduleManagementSchema, "'marketModuleType' => 'all'")
+        && str_contains($moduleManagementSchema, "'marketProjectType' => 'all'")
+        && str_contains($moduleManagementSchema, "'language' => 'php', 'framework' => 'thinkphp'"),
+    'ModuleManagementSchema market modal must default categories to all and send php/thinkphp adapter params.'
 );
 
 check(
-    str_contains($moduleController, "'marketModulePageSize' => 16")
-        && str_contains($moduleController, "'marketProjectPageSize' => 16")
-        && str_contains($moduleController, "page_size' => 16")
-        && str_contains($moduleController, 'marketCardGrid')
-        && str_contains($moduleController, 'marketDetailModal')
-        && str_contains($moduleController, "'content-style' => ['height' => '682px'")
-        && str_contains($moduleController, "'flex' => '0 0 48px'")
-        && str_contains($moduleController, 'type_label'),
-    'ModuleController market modal must use card grid, fixed 16-item pagination, internal footer pagination, translated type labels and a detail modal.'
+    str_contains($moduleManagementSchema, "'marketModulePageSize' => 16")
+        && str_contains($moduleManagementSchema, "'marketProjectPageSize' => 16")
+        && str_contains($moduleMarketSchema, "'content-style' => ['height' => '682px'")
+        && str_contains($moduleMarketSchema, "'gridTemplateColumns' => 'repeat(4, minmax(0, 1fr))'")
+        && str_contains($moduleMarketSchema, "'flex' => '0 0 48px'")
+        && str_contains($moduleMarketSchema, 'type_label'),
+    'ModuleMarketSchema must use four-column cards, fixed 16-item pagination, internal footer and translated type labels.'
 );
 
 $themeConfig = source('config/thinkrix.php');

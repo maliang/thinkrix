@@ -21,16 +21,23 @@ class RegistryStagedPackageInstaller
             return $this->failure('source_missing', 'Staged package source directory does not exist.');
         }
 
+        if ($this->containsSymbolicLink($sourcePath)) {
+            return $this->failure('symbolic_link_blocked', 'Staged package source contains a symbolic link.');
+        }
+
         if (file_exists($targetPath)) {
             return $this->failure('target_exists', 'Target module directory already exists.');
         }
 
         $targetParent = dirname($targetPath);
-        if (!is_dir($targetParent)) {
-            mkdir($targetParent, 0775, true);
+        if (!is_dir($targetParent) && !mkdir($targetParent, 0775, true) && !is_dir($targetParent)) {
+            return $this->failure('target_parent_create_failed', 'Target parent directory could not be created.');
         }
 
-        $this->copyDirectory($sourcePath, $targetPath);
+        if (!$this->copyDirectory($sourcePath, $targetPath)) {
+            $this->removeDirectory($targetPath);
+            return $this->failure('copy_failed', 'Staged package could not be copied completely.');
+        }
 
         return [
             'installed' => true,
@@ -41,12 +48,14 @@ class RegistryStagedPackageInstaller
     }
 
         /** 递归复制目录及其文件。 */
-    private function copyDirectory(string $source, string $target): void
+    private function copyDirectory(string $source, string $target): bool
     {
-        mkdir($target, 0775, true);
+        if (!is_dir($target) && !mkdir($target, 0775, true) && !is_dir($target)) {
+            return false;
+        }
         $items = scandir($source);
         if ($items === false) {
-            return;
+            return false;
         }
 
         foreach ($items as $item) {
@@ -57,13 +66,48 @@ class RegistryStagedPackageInstaller
             $sourcePath = $source . DIRECTORY_SEPARATOR . $item;
             $targetPath = $target . DIRECTORY_SEPARATOR . $item;
 
+            if (is_link($sourcePath)) {
+                return false;
+            }
+
             if (is_dir($sourcePath)) {
-                $this->copyDirectory($sourcePath, $targetPath);
+                if (!$this->copyDirectory($sourcePath, $targetPath)) {
+                    return false;
+                }
                 continue;
             }
 
-            copy($sourcePath, $targetPath);
+            if (!copy($sourcePath, $targetPath)) {
+                return false;
+            }
         }
+
+        return true;
+    }
+
+    /** 递归检查待复制目录中的符号链接。 */
+    private function containsSymbolicLink(string $directory): bool
+    {
+        foreach (scandir($directory) ?: [] as $item) {
+            if ($item === '.' || $item === '..') { continue; }
+            $path = $directory . DIRECTORY_SEPARATOR . $item;
+            if (is_link($path) || (is_dir($path) && $this->containsSymbolicLink($path))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 清理复制失败后产生的不完整目标目录。 */
+    private function removeDirectory(string $directory): void
+    {
+        if (!is_dir($directory)) { return; }
+        foreach (scandir($directory) ?: [] as $item) {
+            if ($item === '.' || $item === '..') { continue; }
+            $path = $directory . DIRECTORY_SEPARATOR . $item;
+            is_dir($path) && !is_link($path) ? $this->removeDirectory($path) : @unlink($path);
+        }
+        @rmdir($directory);
     }
 
     /**

@@ -55,6 +55,9 @@ return [
         'system' => \Thinkrix\Controllers\SystemController::class,
         'home' => \Thinkrix\Controllers\HomeController::class,
         'upload' => \Thinkrix\Controllers\UploadController::class,
+        'module' => \Thinkrix\Controllers\ModuleController::class,
+        'module_market' => \Thinkrix\Controllers\ModuleMarketController::class,
+        'module_publish' => \Thinkrix\Controllers\ModulePublishController::class,
     ],
 
     /*
@@ -191,21 +194,11 @@ return [
     */
     'module_market' => [
         'enabled' => env('THINKRIX_MODULE_MARKET_ENABLED', true),
-        'api_url' => env('THINKRIX_MODULE_MARKET_URL', 'https://market.lartrix.com/api/market'),
+        'url' => env('THINKRIX_MODULE_MARKET_URL', 'http://www.trixmore.lav/api'),
+        'auth_key' => env('TRIX_AUTH_KEY', ''),
+        'signature_key' => env('THINKRIX_MODULE_MARKET_SIGNATURE_KEY', ''),
         'timeout' => env('THINKRIX_MODULE_MARKET_TIMEOUT', 30),
         'cache_ttl' => env('THINKRIX_MODULE_MARKET_CACHE_TTL', 3600),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Trix 模块注册表配置
-    | 用于 thinkrix:module-install 的 registry 适配器解析、下载和签名校验
-    |--------------------------------------------------------------------------
-    */
-    'module_registry' => [
-        'url' => env('THINKRIX_MODULE_REGISTRY_URL', ''),
-        'auth_key' => env('TRIX_AUTH_KEY', ''),
-        'signature_key' => env('THINKRIX_MODULE_REGISTRY_SIGNATURE_KEY', ''),
     ],
 
     /*

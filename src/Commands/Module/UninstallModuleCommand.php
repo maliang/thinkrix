@@ -34,21 +34,23 @@ class UninstallModuleCommand extends BaseModuleCommand
 
         if (empty($names)) {
             $allModules = Module::where('enabled', true)->select();
+            $failed = false;
             foreach ($allModules as $m) {
-                $this->uninstallSingle($m->name, $moduleService, $output);
+                $failed = !$this->uninstallSingle($m->name, $moduleService, $output) || $failed;
             }
-            return 0;
+            return $failed ? 1 : 0;
         }
 
+        $failed = false;
         foreach ($names as $name) {
             $moduleName = $this->getGenerator()->studlyCase($name);
-            $this->uninstallSingle($moduleName, $moduleService, $output);
+            $failed = !$this->uninstallSingle($moduleName, $moduleService, $output) || $failed;
         }
 
-        return 0;
+        return $failed ? 1 : 0;
     }
 
-    protected function uninstallSingle(string $moduleName, ModuleService $moduleService, Output $output): void
+    protected function uninstallSingle(string $moduleName, ModuleService $moduleService, Output $output): bool
     {
         $output->info("正在卸载模块: {$moduleName}...");
         $result = $moduleService->uninstall($moduleName);
@@ -58,5 +60,7 @@ class UninstallModuleCommand extends BaseModuleCommand
         } else {
             $output->writeln("<error>Module [{$moduleName}] uninstallation failed.</error>");
         }
+
+        return $result;
     }
 }

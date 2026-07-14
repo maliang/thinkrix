@@ -10,7 +10,7 @@ use think\Model;
  *
  * 提供基于 Token 的认证功能，替代 Laravel Sanctum
  */
-class AuthService extends BaseService
+class AuthService
 {
     /**
      * 用户模型类

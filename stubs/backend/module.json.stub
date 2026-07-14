@@ -1,6 +1,18 @@
 {
     "name": "{{NAME}}",
-    "title": "{{TITLE}}",
-    "description": "Thinkrix secondary backend",
-    "version": "1.0.0"
+    "alias": "{{NAME}}",
+    "providers": [],
+    "enabled": false,
+    "middleware": {"route": [], "global": []},
+    "listeners": {},
+    "trix": {
+        "schema_version": "trix.module.v1",
+        "id": "local.{{NAME}}",
+        "name": "{{TITLE}}",
+        "description": "Thinkrix secondary backend",
+        "version": "1.0.0",
+        "type": "native",
+        "adapter": {"language": "php", "framework": "thinkphp", "status": "stable"},
+        "security": {"writes_files": true}
+    }
 }

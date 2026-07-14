@@ -7,6 +7,9 @@ use think\Service;
 use Thinkrix\Services\AuthService;
 use Thinkrix\Services\DataDictService;
 use Thinkrix\Services\ModuleService;
+use Thinkrix\Services\ModuleManagementService;
+use Thinkrix\Services\ModuleMarketService;
+use Thinkrix\Services\ModulePublishService;
 use Thinkrix\Services\PermissionService;
 use Thinkrix\Services\RealtimeService;
 use Thinkrix\Services\TranslationService;
@@ -39,6 +42,9 @@ class ThinkrixService extends Service
         $this->app->config->set($extend, 'lang.extend_list');
         $this->app->bind(DataDictService::class, DataDictService::class);
         $this->app->bind(ModuleService::class, ModuleService::class);
+        $this->app->bind(ModuleManagementService::class, ModuleManagementService::class);
+        $this->app->bind(ModuleMarketService::class, ModuleMarketService::class);
+        $this->app->bind(ModulePublishService::class, ModulePublishService::class);
         $this->app->bind(PermissionService::class, PermissionService::class);
         $this->app->bind(RealtimeService::class, RealtimeService::class);
         $this->app->bind(TranslationService::class, TranslationService::class);
@@ -59,6 +65,8 @@ class ThinkrixService extends Service
         'thinkrix:make-backend' => \Thinkrix\Commands\MakeBackendCommand::class,
         'thinkrix:remove-backend' => \Thinkrix\Commands\RemoveBackendCommand::class,
         'thinkrix:project-install' => \Thinkrix\Commands\ProjectInstallCommand::class,
+        'thinkrix:project-make' => \Thinkrix\Commands\ProjectMakeCommand::class,
+        'thinkrix:project-publish' => \Thinkrix\Commands\ProjectPublishCommand::class,
         // 模块管理命令
         'thinkrix:module-list' => \Thinkrix\Commands\Module\ListModuleCommand::class,
         'thinkrix:module-make' => \Thinkrix\Commands\Module\MakeModuleCommand::class,

@@ -56,21 +56,21 @@ class StudlyCasePropertyTest extends TestCase
                 // (c) 闀垮害澶т簬 0
                 $this->assertNotEmpty(
                     $result,
-                    "studlyCase('$input') 搴斾骇鐢熼潪绌鸿緭鍑?
+                    "studlyCase('$input') 搴斾骇鐢熼潪绌鸿緭鍑?"
                 );
 
                 // (a) 浠ュぇ鍐欏瓧姣嶅紑澶?
                 $this->assertMatchesRegularExpression(
                     '/^[A-Z]/',
                     $result,
-                    "studlyCase('$input') = '$result' 搴斾互澶у啓瀛楁瘝寮€澶?
+                    "studlyCase('$input') = '$result' 搴斾互澶у啓瀛楁瘝寮€澶?"
                 );
 
                 // (b) 浠呭寘鍚瓧姣嶅拰鏁板瓧
                 $this->assertMatchesRegularExpression(
                     '/^[A-Za-z0-9]+$/',
                     $result,
-                    "studlyCase('$input') = '$result' 搴斾粎鍖呭惈瀛楁瘝鍜屾暟瀛?
+                    "studlyCase('$input') = '$result' 搴斾粎鍖呭惈瀛楁瘝鍜屾暟瀛?"
                 );
             });
     }
@@ -110,14 +110,14 @@ class StudlyCasePropertyTest extends TestCase
                 $this->assertMatchesRegularExpression(
                     '/^[A-Z]/',
                     $result,
-                    "studlyCase('$input') = '$result' 搴斾互澶у啓瀛楁瘝寮€澶?
+                    "studlyCase('$input') = '$result' 搴斾互澶у啓瀛楁瘝寮€澶?"
                 );
 
                 // (b) 浠呭寘鍚瓧姣嶅拰鏁板瓧
                 $this->assertMatchesRegularExpression(
                     '/^[A-Za-z0-9]+$/',
                     $result,
-                    "studlyCase('$input') = '$result' 搴斾粎鍖呭惈瀛楁瘝鍜屾暟瀛?
+                    "studlyCase('$input') = '$result' 搴斾粎鍖呭惈瀛楁瘝鍜屾暟瀛?"
                 );
             });
     }

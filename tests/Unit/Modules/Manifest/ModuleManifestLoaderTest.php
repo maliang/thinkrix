@@ -28,15 +28,19 @@ class ModuleManifestLoaderTest extends TestCase
     public function it_loads_module_json_manifest(): void
     {
         $this->writeJson('module.json', [
-            'schema_version' => 'trix.module.v1',
-            'id' => 'official.members',
             'name' => 'Members',
-            'version' => '1.0.0',
-            'type' => 'contract',
-            'adapter' => [
-                'language' => 'php',
-                'framework' => 'thinkphp',
-                'status' => 'compatible',
+            'enabled' => false,
+            'trix' => [
+                'schema_version' => 'trix.module.v1',
+                'id' => 'official.members',
+                'name' => 'Members',
+                'version' => '1.0.0',
+                'type' => 'contract',
+                'adapter' => [
+                    'language' => 'php',
+                    'framework' => 'thinkphp',
+                    'status' => 'compatible',
+                ],
             ],
         ]);
 
@@ -47,7 +51,7 @@ class ModuleManifestLoaderTest extends TestCase
     }
 
     /** @test */
-    public function it_normalizes_legacy_module_json_for_thinkphp(): void
+    public function it_does_not_treat_native_root_fields_as_trix_protocol(): void
     {
         $this->writeJson('module.json', [
             'name' => 'Members',
@@ -57,11 +61,7 @@ class ModuleManifestLoaderTest extends TestCase
 
         $manifest = (new ModuleManifestLoader())->loadFromPath($this->tempPath);
 
-        $this->assertNotNull($manifest);
-        $this->assertSame('legacy.members', $manifest->id());
-        $this->assertSame('Members Module', $manifest->name());
-        $this->assertSame('compatible', $manifest->adapterStatus());
-        $this->assertSame('thinkphp', $manifest->adapterFramework());
+        $this->assertNull($manifest);
     }
 
     /** @test */
@@ -76,28 +76,14 @@ class ModuleManifestLoaderTest extends TestCase
     }
 
     /** @test */
-    public function it_loads_shared_example_manifests(): void
+    public function it_rejects_invalid_nested_trix_manifest(): void
     {
-        $examplesRoot = dirname(__DIR__, 5) . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . 'modules';
-        $loader = new ModuleManifestLoader();
+        $this->writeJson('module.json', ['name' => 'Members', 'trix' => ['schema_version' => 'bad']]);
 
-        $dashboard = $loader->loadFromPath($examplesRoot . DIRECTORY_SEPARATOR . 'pure-schema-dashboard');
-        $cms = $loader->loadFromPath($examplesRoot . DIRECTORY_SEPARATOR . 'contract-cms');
-        $audit = $loader->loadFromPath($examplesRoot . DIRECTORY_SEPARATOR . 'native-laravel-audit');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('trix.schema_version');
 
-        $this->assertNotNull($dashboard);
-        $this->assertSame('pure_schema', $dashboard->type());
-        $this->assertSame('stable', $dashboard->adapterStatus());
-
-        $this->assertNotNull($cms);
-        $this->assertSame('official.cms', $cms->id());
-        $this->assertSame('stable', $cms->adapterStatus());
-        $this->assertSame('laravel', $cms->adapterFramework());
-
-        $this->assertNotNull($audit);
-        $this->assertSame('official.laravel-audit', $audit->id());
-        $this->assertSame('stable', $audit->adapterStatus());
-        $this->assertSame('laravel', $audit->adapterFramework());
+        (new ModuleManifestLoader())->loadFromPath($this->tempPath);
     }
 
     /**

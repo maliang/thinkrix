@@ -165,18 +165,12 @@ if ($missingTranslationKeys !== []) {
     exit(1);
 }
 
-$moduleControllerReflection = new ReflectionClass(Thinkrix\Controllers\ModuleController::class);
-$moduleController = $moduleControllerReflection->newInstanceWithoutConstructor();
-$installedUi = $moduleControllerReflection->getMethod('installedUi');
-$installedUi->setAccessible(true);
-$moduleSchema = $installedUi->invoke($moduleController)['data'];
-$moduleContent = $moduleSchema['children'][0] ?? [];
-$moduleTable = $moduleContent['children'][1] ?? [];
+$marketSchema = new Thinkrix\Schema\Pages\ModuleMarketSchema(new Thinkrix\Support\ModuleMarketTypes());
+$moduleSchema = (new Thinkrix\Schema\Pages\ModuleManagementSchema($marketSchema))->installed()['data'];
+$moduleTable = $moduleSchema['children'][1] ?? [];
 
 if (($moduleSchema['props']['style']['height'] ?? null) !== '100%'
     || ($moduleSchema['props']['contentStyle']['display'] ?? null) !== 'flex'
-    || ($moduleContent['props']['vertical'] ?? null) !== true
-    || ($moduleContent['props']['style']['height'] ?? null) !== '100%'
     || ($moduleTable['props']['flexHeight'] ?? null) !== true
     || ($moduleTable['props']['style']['flex'] ?? null) !== '1 1 0%') {
     fwrite(STDERR, "Module management table must use the same full-height flex layout as CrudPage.\n");

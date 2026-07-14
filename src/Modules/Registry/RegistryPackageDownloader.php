@@ -26,17 +26,19 @@ class RegistryPackageDownloader
             return $this->failure('package_url_missing', 'Registry adapter does not provide package_url.');
         }
 
+        $checksum = (string) ($adapter['checksum'] ?? '');
+        if ($checksum === '') {
+            return $this->failure('checksum_missing', 'Registry adapter package must provide a sha256 checksum.');
+        }
+
         $content = $this->fetch($packageUrl);
         if ($content === null) {
             return $this->failure('package_fetch_failed', 'Registry adapter package could not be downloaded.');
         }
 
-        $checksum = (string) ($adapter['checksum'] ?? '');
-        if ($checksum !== '') {
-            $checksumResult = $this->verifyChecksum($content, $checksum);
-            if ($checksumResult !== null) {
-                return $checksumResult;
-            }
+        $checksumResult = $this->verifyChecksum($content, $checksum);
+        if ($checksumResult !== null) {
+            return $checksumResult;
         }
 
         $signatureReason = null;
@@ -55,15 +57,41 @@ class RegistryPackageDownloader
         }
 
         $cachePath = $this->cachePath();
-        if (!is_dir($cachePath)) {
-            mkdir($cachePath, 0775, true);
+        if (is_link($cachePath)) {
+            return $this->failure('cache_link_blocked', 'Registry package cache directory must not be a symbolic link.');
+        }
+        if (!is_dir($cachePath) && !mkdir($cachePath, 0700, true) && !is_dir($cachePath)) {
+            return $this->failure('cache_create_failed', 'Registry package cache directory could not be created.');
+        }
+        $cacheRoot = realpath($cachePath);
+        if (!is_string($cacheRoot)) {
+            return $this->failure('cache_path_invalid', 'Registry package cache directory could not be resolved.');
         }
 
         $language = (string) ($adapter['language'] ?? 'language');
         $framework = (string) ($adapter['framework'] ?? 'framework');
-        $filename = $this->safeName($moduleId . '-' . $version . '-' . $language . '-' . $framework) . '.zip';
+        $filename = $this->safeName($moduleId . '-' . $version . '-' . $language . '-' . $framework)
+            . '-' . bin2hex(random_bytes(8)) . '.zip';
         $path = $cachePath . DIRECTORY_SEPARATOR . $filename;
-        file_put_contents($path, $content);
+        $handle = @fopen($path, 'x+b');
+        if ($handle === false || !flock($handle, LOCK_EX)) {
+            if (is_resource($handle)) { fclose($handle); }
+            return $this->failure('cache_write_failed', 'Registry package could not be written to cache.');
+        }
+        $resolvedPath = realpath($path);
+        if (!is_string($resolvedPath) || !str_starts_with($resolvedPath, $cacheRoot . DIRECTORY_SEPARATOR)) {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+            return $this->failure('cache_path_outside_root', 'Registry package cache file escaped its configured root.');
+        }
+        $written = fwrite($handle, $content);
+        fflush($handle);
+        flock($handle, LOCK_UN);
+        fclose($handle);
+        if ($written !== strlen($content)) {
+            @unlink($path);
+            return $this->failure('cache_write_failed', 'Registry package could not be written to cache.');
+        }
 
         return [
             'downloaded' => true,
@@ -106,11 +134,13 @@ class RegistryPackageDownloader
      */
     private function verifyChecksum(string $content, string $checksum): ?array
     {
-        if (!str_starts_with($checksum, 'sha256:')) {
+        if (preg_match('/^[a-f0-9]{64}$/i', $checksum) === 1) {
+            $expected = $checksum;
+        } elseif (str_starts_with($checksum, 'sha256:')) {
+            $expected = substr($checksum, strlen('sha256:'));
+        } else {
             return $this->failure('checksum_unsupported', 'Only sha256 checksums are supported.');
         }
-
-        $expected = substr($checksum, strlen('sha256:'));
         $actual = hash('sha256', $content);
 
         if (!hash_equals(strtolower($expected), strtolower($actual))) {

@@ -9,6 +9,7 @@ use think\Model;
  *
  * @property int $id
  * @property string $name
+ * @property string|null $registry_id
  * @property string|null $title
  * @property string|null $description
  * @property string|null $version
@@ -35,7 +36,7 @@ class Module extends Model
     ];
 
     protected $fillable = [
-        'name', 'title', 'description', 'version', 'author', 'website', 'logo', 'enabled', 'config',
+        'name', 'registry_id', 'title', 'description', 'version', 'author', 'website', 'logo', 'enabled', 'config',
     ];
 
     /**

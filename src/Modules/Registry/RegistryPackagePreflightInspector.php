@@ -35,6 +35,11 @@ class RegistryPackagePreflightInspector
                 return $this->failure('unsafe_path', "Registry package contains unsafe path: {$name}");
             }
 
+            if ($this->isSymbolicLink($zip, $index)) {
+                $zip->close();
+                return $this->failure('symbolic_link_blocked', "Registry package contains symbolic link: {$name}");
+            }
+
             $entries[] = $normalized;
             if ($this->isManifestPath($normalized)) {
                 $manifest = $normalized;
@@ -67,7 +72,7 @@ class RegistryPackagePreflightInspector
     private function isUnsafePath(string $path): bool
     {
         // 阻断绝对路径、Windows 盘符路径和目录穿越，避免 ZIP slip 覆盖项目文件。
-        if ($path === '' || str_starts_with($path, '/') || str_starts_with($path, '\\')) {
+        if ($path === '' || str_contains($path, "\0") || str_starts_with($path, '/') || str_starts_with($path, '\\')) {
             return true;
         }
 
@@ -78,6 +83,18 @@ class RegistryPackagePreflightInspector
         $segments = explode('/', $path);
 
         return in_array('..', $segments, true);
+    }
+
+    /** 根据 ZIP Unix mode 判断条目是否为符号链接。 */
+    private function isSymbolicLink(ZipArchive $zip, int $index): bool
+    {
+        $attributes = 0;
+        $operations = 0;
+        if (!$zip->getExternalAttributesIndex($index, $operations, $attributes)) {
+            return false;
+        }
+
+        return (($attributes >> 16) & 0xF000) === 0xA000;
     }
 
     /**

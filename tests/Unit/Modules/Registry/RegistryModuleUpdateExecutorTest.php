@@ -108,21 +108,24 @@ class RegistryModuleUpdateExecutorTest extends TestCase
     private function manifest(string $version): string
     {
         return json_encode([
-            'schema_version' => 'trix.module.v1',
-            'id' => 'official.cms',
             'name' => 'CMS',
-            'version' => $version,
-            'type' => 'contract',
-            'adapter' => [
-                'language' => 'php',
-                'framework' => 'thinkphp',
-                'status' => 'compatible',
-                'package_type' => 'composer',
-            ],
-            'security' => [
-                'writes_files' => true,
-                'runs_commands' => false,
-                'external_network' => false,
+            'trix' => [
+                'schema_version' => 'trix.module.v1',
+                'id' => 'official.cms',
+                'name' => 'CMS',
+                'version' => $version,
+                'type' => 'contract',
+                'adapter' => [
+                    'language' => 'php',
+                    'framework' => 'thinkphp',
+                    'status' => 'compatible',
+                    'package_type' => 'composer',
+                ],
+                'security' => [
+                    'writes_files' => true,
+                    'runs_commands' => false,
+                    'external_network' => false,
+                ],
             ],
         ], JSON_THROW_ON_ERROR);
     }

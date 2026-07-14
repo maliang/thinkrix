@@ -35,21 +35,26 @@ class RegistryStagedManifestVerifier
             return $this->failure('manifest_json_invalid', 'Staged package manifest must be a JSON object.');
         }
 
-        $errors = ModuleManifestValidator::validateForAdapter($data, $this->language, $this->framework);
+        $trix = $data['trix'] ?? null;
+        if (!is_array($trix)) {
+            return $this->failure('manifest_protocol_missing', 'Staged package module.json must contain a trix object.');
+        }
+
+        $errors = ModuleManifestValidator::validateForAdapter($trix, $this->language, $this->framework);
         if ($errors !== []) {
             return [
                 'ok' => false,
                 'reason' => 'manifest_adapter_invalid',
                 'message' => 'Staged package manifest does not support the current adapter.',
-                'manifest_id' => is_string($data['id'] ?? null) ? $data['id'] : null,
-                'manifest_version' => is_string($data['version'] ?? null) ? $data['version'] : null,
+                'manifest_id' => is_string($trix['id'] ?? null) ? $trix['id'] : null,
+                'manifest_version' => is_string($trix['version'] ?? null) ? $trix['version'] : null,
                 'adapter_status' => null,
-                'security' => is_array($data['security'] ?? null) ? $data['security'] : [],
+                'security' => is_array($trix['security'] ?? null) ? $trix['security'] : [],
                 'errors' => $errors,
             ];
         }
 
-        $manifestObject = ModuleManifest::fromArray($data);
+        $manifestObject = ModuleManifest::fromArray($trix);
         if ($manifestObject->id() !== $expectedId) {
             return $this->failure('module_id_mismatch', 'Staged package manifest id does not match registry module id.', $manifestObject);
         }

@@ -7,6 +7,7 @@ use think\console\Output;
 use think\console\input\Argument;
 use think\console\input\Option;
 use Thinkrix\Modules\Registry\RegistryInstalledPackageChecklist;
+use Thinkrix\Modules\Registry\RegistryClient;
 use Thinkrix\Modules\Registry\RegistryModuleReplacer;
 use Thinkrix\Modules\Registry\RegistryPackageDownloader;
 use Thinkrix\Modules\Registry\RegistryPackagePreflightInspector;
@@ -70,6 +71,7 @@ class InstallModuleCommand extends BaseModuleCommand
 
         // 不传参数则扫描所有模块目录
         if (empty($names)) {
+            $failed = false;
             $paths = config('thinkrix.modules.paths', ['Modules', 'app']);
             $root = app()->getRootPath();
             foreach ($paths as $p) {
@@ -81,18 +83,19 @@ class InstallModuleCommand extends BaseModuleCommand
                     $moduleDir = $dir . $item;
                     if (!is_dir($moduleDir)) { continue; }
                     if (!file_exists($moduleDir . DIRECTORY_SEPARATOR . 'module.json')) { continue; }
-                    $this->installSingle($item, $moduleService, $output, $registry, $download, $signatureKey);
+                    $failed = !$this->installSingle($item, $moduleService, $output, $registry, $download, $signatureKey) || $failed;
                 }
             }
-            return 0;
+            return $failed ? 1 : 0;
         }
 
+        $failed = false;
         foreach ($names as $name) {
             $moduleName = $this->normalizeModuleNameForInstall((string) $name, $registry);
-            $this->installSingle($moduleName, $moduleService, $output, $registry, $download, $signatureKey);
+            $failed = !$this->installSingle($moduleName, $moduleService, $output, $registry, $download, $signatureKey) || $failed;
         }
 
-        return 0;
+        return $failed ? 1 : 0;
     }
 
     /**
@@ -227,7 +230,7 @@ class InstallModuleCommand extends BaseModuleCommand
             return $option;
         }
 
-        return trim((string) config('thinkrix.module_registry.url', ''));
+        return trim((string) config('thinkrix.module_market.url', ''));
     }
 
         /** 处理 Registry 地址、认证或请求。 */
@@ -238,7 +241,7 @@ class InstallModuleCommand extends BaseModuleCommand
             return $option;
         }
 
-        return (string) config('thinkrix.module_registry.signature_key', '');
+        return (string) config('thinkrix.module_market.signature_key', '');
     }
 
         /** 将输入值归一化为内部标准格式。 */
@@ -252,21 +255,20 @@ class InstallModuleCommand extends BaseModuleCommand
     }
 
         /** 执行模块或项目安装流程。 */
-    protected function installSingle(string $moduleName, ModuleService $moduleService, Output $output, string $registry = '', bool $download = false, string $signatureKey = ''): void
+    protected function installSingle(string $moduleName, ModuleService $moduleService, Output $output, string $registry = '', bool $download = false, string $signatureKey = ''): bool
     {
         if ($registry !== '') {
-            $this->previewRegistryInstall($moduleName, $registry, $output, $download, $signatureKey);
-            return;
+            return $this->previewRegistryInstall($moduleName, $registry, $output, $download, $signatureKey);
         }
 
         $modulePath = $this->getGenerator()->getModulePath($moduleName);
         if (!is_dir($modulePath)) {
             $output->writeln("<error>Module [{$moduleName}] directory not found.</error>");
-            return;
+            return false;
         }
         if (!file_exists($modulePath . DIRECTORY_SEPARATOR . 'module.json')) {
             $output->writeln("<error>Module [{$moduleName}] module.json not found.</error>");
-            return;
+            return false;
         }
 
         $output->info("正在安装模块: {$moduleName}...");
@@ -277,30 +279,33 @@ class InstallModuleCommand extends BaseModuleCommand
         } else {
             $output->writeln("<error>Module [{$moduleName}] installation failed.</error>");
         }
+
+        return $result;
     }
 
     /** 查询 Registry 模块版本，并按需完成下载、预检和暂存。 */
-    protected function previewRegistryInstall(string $moduleId, string $registry, Output $output, bool $download = false, string $signatureKey = ''): void
+    protected function previewRegistryInstall(string $moduleId, string $registry, Output $output, bool $download = false, string $signatureKey = ''): bool
     {
         $url = rtrim($registry, '/') . '/registry/modules/' . rawurlencode($moduleId) . '/versions?page_size=1&language=php&framework=thinkphp';
-        $body = @file_get_contents($url);
-
-        if ($body === false) {
+        $client = new RegistryClient($registry, trim((string) config('thinkrix.module_market.auth_key', '')));
+        $lookup = $client->getJson('/registry/modules/' . rawurlencode($moduleId) . '/versions', [
+            'page_size' => 1, 'language' => 'php', 'framework' => 'thinkphp']);
+        if (!$lookup['ok']) {
             $output->writeln("<error>Registry module [{$moduleId}] lookup failed.</error>");
-            return;
+            return false;
         }
 
         // Registry 返回的是“模块版本 + 当前 adapter”，安装器只接受 php/thinkphp。
-        $payload = json_decode($body, true);
+        $payload = $lookup['data'];
         if (!is_array($payload)) {
             $output->writeln("<error>Registry module [{$moduleId}] returned an invalid response.</error>");
-            return;
+            return false;
         }
 
         $result = (new RegistryVersionResolver('php', 'thinkphp'))->resolveLatest($payload);
         if (!$result['installable']) {
             $output->writeln('<error>' . $result['message'] . '</error>');
-            return;
+            return false;
         }
 
         $adapter = $result['adapter'];
@@ -315,11 +320,11 @@ class InstallModuleCommand extends BaseModuleCommand
 
         if (!$download) {
             $output->writeln('<comment>Registry adapter download was not requested. Re-run with --download to cache the package after checksum validation.</comment>');
-            return;
+            return true;
         }
 
         // 下载阶段只缓存 zip，并校验 checksum/signature；真正复制目录必须另走 --from-stage。
-        $downloadResult = (new RegistryPackageDownloader(signatureKey: $signatureKey))->download(
+        $downloadResult = (new RegistryPackageDownloader(fetcher: fn (string $url): ?string => $client->download($url), signatureKey: $signatureKey))->download(
             $adapter,
             $moduleId,
             (string) ($version['version'] ?? 'latest')
@@ -327,7 +332,7 @@ class InstallModuleCommand extends BaseModuleCommand
 
         if (!$downloadResult['downloaded']) {
             $output->writeln('<error>' . $downloadResult['message'] . '</error>');
-            return;
+            return false;
         }
 
         $output->writeln('<info>Package cached at: ' . $downloadResult['path'] . '</info>');
@@ -337,7 +342,7 @@ class InstallModuleCommand extends BaseModuleCommand
         $preflight = (new RegistryPackagePreflightInspector())->inspect((string) $downloadResult['path']);
         if (!$preflight['ok']) {
             $output->writeln('<error>' . $preflight['message'] . '</error>');
-            return;
+            return false;
         }
 
         $output->writeln('<info>Package preflight passed. Manifest: ' . $preflight['manifest'] . '</info>');
@@ -351,7 +356,7 @@ class InstallModuleCommand extends BaseModuleCommand
 
         if (!$stage['staged']) {
             $output->writeln('<error>' . $stage['message'] . '</error>');
-            return;
+            return false;
         }
 
         $output->writeln('<info>Package staged at: ' . $stage['path'] . '</info>');
@@ -364,11 +369,12 @@ class InstallModuleCommand extends BaseModuleCommand
 
         if (!$verify['ok']) {
             $output->writeln('<error>' . $verify['message'] . '</error>');
-            return;
+            return false;
         }
 
         $output->writeln('<info>Staged manifest verified for PHP/ThinkPHP adapter: ' . $verify['adapter_status'] . '</info>');
         $this->printSecurityWarnings(is_array($verify['security'] ?? null) ? $verify['security'] : [], $output);
         $output->writeln('<comment>Registry package is staged only. Install or enable the ThinkPHP adapter through the local module flow.</comment>');
+        return true;
     }
 }

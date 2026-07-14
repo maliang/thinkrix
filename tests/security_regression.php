@@ -75,6 +75,15 @@ assertSource(str_contains($permissionMiddleware, "\$permissionMap['*']"), 'Permi
 assertSource(!str_contains($permissionMiddleware, 'userHasAnyPermission($user, $permissions)'), 'Permission middleware must not authorize against unrelated action permissions.');
 assertSource(str_contains($routes, "'system.user.list'"), 'User reads and exports must require list permission.');
 assertSource(str_contains($routes, "'system.permission.list'"), 'Permission reads must require list permission.');
+assertSource(!str_contains($routes, 'market=module.market.list'), 'Installed module list must not accept legacy market permission aliases.');
+assertSource(str_contains($routes, "'module.installed.list'"), 'Installed module list must require its own list permission.');
+
+$installCommand = source($root . '/src/Commands/InstallCommand.php');
+assertSource(str_contains($installCommand, "'module.market.publish'"), 'Fresh installations must create the module market publish permission.');
+
+$projectPublish = source($root . '/src/Commands/ProjectPublishCommand.php');
+assertSource(substr_count($projectPublish, "'follow_location' => 0") >= 2, 'Project publish JSON and multipart requests must reject redirects.');
+assertSource(substr_count($projectPublish, "'max_redirects' => 0") >= 2, 'Project publish requests must not accept redirect chains.');
 
 $crud = source($root . '/src/Controllers/CrudController.php');
 assertSource(substr_count($crud, '$this->applyResourceScope(') >= 4, 'CRUD list/read/update/delete operations must support resource isolation scopes.');

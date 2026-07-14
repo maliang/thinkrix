@@ -334,6 +334,7 @@ class InstallCommand extends Command
             // 模块表
             "CREATE TABLE IF NOT EXISTS `modules` (
                 `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+                `registry_id` varchar(191) DEFAULT NULL COMMENT '生态模块唯一标识',
                 `name` varchar(100) NOT NULL COMMENT '模块名称',
                 `title` varchar(255) DEFAULT NULL COMMENT '模块标题',
                 `description` text COMMENT '描述',
@@ -346,7 +347,8 @@ class InstallCommand extends Command
                 `created_at` datetime DEFAULT NULL,
                 `updated_at` datetime DEFAULT NULL,
                 PRIMARY KEY (`id`),
-                UNIQUE KEY `uk_name` (`name`)
+                UNIQUE KEY `uk_name` (`name`),
+                UNIQUE KEY `uk_registry_id` (`registry_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='模块表';",
 
             // Token 表（替代 Laravel Sanctum）
@@ -504,10 +506,13 @@ class InstallCommand extends Command
                     ['name' => 'module.installed.list', 'title' => '模块列表', 'sort' => 1],
                     ['name' => 'module.installed.enable', 'title' => '启用模块', 'sort' => 2],
                     ['name' => 'module.installed.disable', 'title' => '禁用模块', 'sort' => 3],
+                    ['name' => 'module.installed.install', 'title' => '安装模块', 'sort' => 4],
+                    ['name' => 'module.installed.uninstall', 'title' => '卸载模块', 'sort' => 5],
                 ]],
                 ['name' => 'module.market', 'title' => '模块市场', 'sort' => 2, 'children' => [
                     ['name' => 'module.market.list', 'title' => '市场列表', 'sort' => 1],
                     ['name' => 'module.market.install', 'title' => '安装模块', 'sort' => 2],
+                    ['name' => 'module.market.publish', 'title' => '发布模块和项目', 'sort' => 3],
                 ]],
             ]],
         ];

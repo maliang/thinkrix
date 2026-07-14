@@ -10,7 +10,7 @@ use think\Model;
 /**
  * PermissionService - 权限服务
  */
-class PermissionService extends BaseService
+class PermissionService
 {
     /**
      * 获取权限树（按模块分组）

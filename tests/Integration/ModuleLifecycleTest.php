@@ -444,6 +444,11 @@ class ModuleLifecycleTest extends TestCase
      */
     private function createStubFiles(): void
     {
+        file_put_contents(
+            $this->packageStubDir . DIRECTORY_SEPARATOR . 'composer.json.stub',
+            '{"name":"thinkrix/{{LOWER_NAME}}","autoload":{"psr-4":{"app\\\\{{MODULE_NAME}}\\\\":""}}}'
+        );
+
         $stubs = [
             'module.json.stub' => '{"name": "{{MODULE_NAME}}", "alias": "{{LOWER_NAME}}", "enabled": true}',
             'config.stub' => "<?php\n// {{MODULE_NAME}} config\nreturn [];",

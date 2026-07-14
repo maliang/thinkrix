@@ -9,10 +9,12 @@ use think\console\input\Argument;
 use think\console\input\Option;
 use Thinkrix\Modules\Project\ProjectInstallPlanStore;
 use Thinkrix\Modules\Registry\RegistryInstalledPackageChecklist;
+use Thinkrix\Modules\Registry\RegistryClient;
 use Thinkrix\Modules\Registry\RegistryPackageDownloader;
 use Thinkrix\Modules\Registry\RegistryPackageStager;
 use Thinkrix\Modules\Registry\RegistryStagedManifestVerifier;
 use Thinkrix\Modules\Registry\RegistryStagedPackageInstaller;
+use Thinkrix\Services\ModuleService;
 
 /** 按项目清单安装依赖模块，并落地项目配置与契约绑定。 */
 class ProjectInstallCommand extends Command
@@ -45,19 +47,15 @@ class ProjectInstallCommand extends Command
 
         $projectId = (string) ($plan['project'] ?? $input->getArgument('project') ?? 'project');
         $version = (string) ($plan['version'] ?? $input->getOption('version') ?? 'version');
-        $paths = (new ProjectInstallPlanStore())->save($projectId, $version, $plan);
-
-        // install-plan、项目覆盖配置、契约绑定分别落地，运行时可按需读取其中一部分。
-        $output->writeln('<info>Project install plan saved: ' . $paths['install_plan'] . '</info>');
-        $output->writeln('<comment>Project config: ' . $paths['project_config'] . '</comment>');
-        $output->writeln('<comment>Contract bindings: ' . $paths['contract_bindings'] . '</comment>');
-
         if (($plan['install']['allowed'] ?? false) !== true) {
             $message = (string) ($plan['install']['reason'] ?? 'Project install plan is not allowed.');
             $output->writeln('<error>' . $message . '</error>');
             $this->writeAudit($input, $projectId, $version, 'blocked', ['message' => $message]);
             return 1;
         }
+
+        $configPath = (new ProjectInstallPlanStore())->apply($plan);
+        $output->writeln('<info>Project runtime config applied: ' . $configPath . '</info>');
 
         $tasks = $this->buildTasks($input, $plan);
         $this->printTasks($tasks, $output);
@@ -186,14 +184,19 @@ class ProjectInstallCommand extends Command
     private function executeTask(Input $input, Output $output, array $task): array
     {
         if (!$task['allowed']) {
-            $output->writeln('<error>Skipped blocked module: ' . $task['id'] . '</error>');
-            return ['ok' => false, 'reason' => 'blocked'];
+            $required = (bool) ($task['required'] ?? true);
+            $output->writeln(($required ? '<error>' : '<comment>') . 'Skipped blocked module: ' . $task['id'] . ($required ? '</error>' : '</comment>'));
+            return ['ok' => !$required, 'reason' => $required ? 'blocked' : 'optional_blocked'];
         }
 
         if (file_exists((string) $task['target'])) {
             // 一键项目安装默认不覆盖旧模块，升级必须走 module-update 的备份/审计流程。
-            $output->writeln('<comment>Target exists, skipped without overwrite: ' . $task['target'] . '</comment>');
-            return ['ok' => true, 'reason' => 'target_exists'];
+            $output->writeln('<comment>Target exists, files were not overwritten: ' . $task['target'] . '</comment>');
+            $service = new ModuleService();
+            $service->syncModules();
+            return $service->install(basename((string) $task['target']))
+                ? ['ok' => true, 'reason' => 'target_exists_lifecycle_verified']
+                : ['ok' => false, 'reason' => 'target_exists_lifecycle_failed'];
         }
 
         $download = (new RegistryPackageDownloader(fetcher: fn (string $url): ?string => $this->fetchPackage($input, $url)))
@@ -227,15 +230,21 @@ class ProjectInstallCommand extends Command
             $output->writeln('<comment>- ' . $todo . '</comment>');
         }
 
+        $service = new ModuleService();
+        $service->syncModules();
+        $moduleName = basename((string) $task['target']);
+        if (!$service->install($moduleName)) {
+            $output->writeln('<error>Module lifecycle installation failed: ' . $moduleName . '</error>');
+            return ['ok' => false, 'reason' => 'lifecycle_install_failed'];
+        }
+
         return ['ok' => true, 'reason' => null];
     }
 
         /** 从远端服务获取并解析数据。 */
     private function fetchPackage(Input $input, string $url): ?string
     {
-        $content = $this->httpGet($input, $url);
-
-        return is_string($content) ? $content : null;
+        return (new RegistryClient($this->registryUrl($input), $this->registryAuthKey($input), 60))->download($url);
     }
 
     /**
@@ -244,21 +253,13 @@ class ProjectInstallCommand extends Command
      */
     private function getJson(Input $input, string $url): array
     {
-        $decoded = json_decode((string) $this->httpGet($input, $url), true);
-
-        return is_array($decoded) ? $decoded : [];
-    }
-
-    /** 发送携带 Registry 认证信息的 HTTP GET 请求。 */
-    private function httpGet(Input $input, string $url): string|false
-    {
-        $headers = "Accept: application/json\r\n";
-        $authKey = $this->registryAuthKey($input);
-        if ($authKey !== '') {
-            $headers .= 'Authorization: Bearer ' . $authKey . "\r\n";
-        }
-
-        return @file_get_contents($url, false, stream_context_create(['http' => ['header' => $headers, 'timeout' => 60]]));
+        $registry = $this->registryUrl($input);
+        $endpoint = str_starts_with($url, $registry) ? substr($url, strlen($registry)) : $url;
+        $parts = parse_url($endpoint);
+        $query = [];
+        if (is_array($parts) && isset($parts['query'])) { parse_str($parts['query'], $query); }
+        $result = (new RegistryClient($registry, $this->registryAuthKey($input), 60))->getJson((string) ($parts['path'] ?? $endpoint), $query);
+        return $result['ok'] ? $result['data'] : [];
     }
 
         /** 处理 Registry 地址、认证或请求。 */
@@ -266,7 +267,7 @@ class ProjectInstallCommand extends Command
     {
         $option = trim((string) ($input->getOption('registry') ?? ''));
 
-        return rtrim($option !== '' ? $option : (string) config('thinkrix.module_registry.url', ''), '/');
+        return rtrim($option !== '' ? $option : (string) config('thinkrix.module_market.url', ''), '/');
     }
 
         /** 处理 Registry 地址、认证或请求。 */
@@ -274,7 +275,7 @@ class ProjectInstallCommand extends Command
     {
         $option = trim((string) ($input->getOption('auth-key') ?? ''));
 
-        return $option !== '' ? $option : trim((string) config('thinkrix.module_registry.auth_key', ''));
+        return $option !== '' ? $option : trim((string) config('thinkrix.module_market.auth_key', ''));
     }
 
     /**

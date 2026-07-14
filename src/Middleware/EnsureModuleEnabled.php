@@ -22,7 +22,7 @@ class EnsureModuleEnabled
         $modules = Module::select();
 
         foreach ($modules as $module) {
-            // 路由可传本地模块名、Registry ID 或 manifest ID，统一归一化后比较。
+            // 路由可传本地模块名或 Registry ID，统一归一化后比较。
             $keys = $this->moduleKeys($module);
             if (empty(array_intersect_key($expected, $keys))) {
                 continue;
@@ -74,13 +74,9 @@ class EnsureModuleEnabled
      */
     private function moduleKeys(Module $module): array
     {
-        $config = is_array($module->config ?? null) ? $module->config : [];
-
         return $this->normalizeKeys(array_filter([
             $module->name ?? null,
-            $config['id'] ?? null,
-            $config['registry_id'] ?? null,
-            $config['trix_manifest']['id'] ?? null,
+            $module->registry_id ?? null,
         ], static fn ($value): bool => is_string($value) && trim($value) !== ''));
     }
 

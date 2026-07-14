@@ -28,7 +28,17 @@ Modules/Demo/
     └── en-us.php
 ```
 
-`module.json` provides metadata for the module management page.
+`module.json` serves two roles. Top-level fields such as `name`, `providers`, `middleware`, and `listeners` belong to the Thinkrix runtime. **Only `module.json.trix` is the Trix ecosystem protocol** and is used for publishing, installation, version checks, and adapter matching.
+
+## Market And Project Configuration
+
+All market settings live under `thinkrix.module_market`. The Auth Key uses `TRIX_AUTH_KEY` exclusively; legacy Registry/Auth Key environment names are no longer supported.
+
+The root `trix-project.json` is a publication manifest. After project installation, the only runtime project configuration is the atomically generated `config/trix-project.php`.
+
+Registry requests never follow redirects. Package downloads must have the same scheme, host, and port as `module_market.url`, and staging, copy, and replacement operations reject symbolic links recursively.
+
+Module endpoints are split by responsibility: `ModuleController` handles installed modules, `ModuleMarketController` handles market listing and installation, and `ModulePublishController` handles module/project publication.
 
 ## Menus And Permissions
 

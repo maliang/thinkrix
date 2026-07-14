@@ -24,6 +24,15 @@ class RegistryPackageDownloaderTest extends TestCase
         self::assertFileExists($result['path']);
         self::assertSame($content, file_get_contents($result['path']));
         self::assertStringContainsString('official.cms-1.0.0-php-thinkphp', basename($result['path']));
+
+        $second = $downloader->download([
+            'language' => 'php',
+            'framework' => 'thinkphp',
+            'package_url' => 'https://registry.example/packages/official.cms.zip',
+            'checksum' => 'sha256:' . hash('sha256', $content),
+        ], 'official.cms', '1.0.0');
+        self::assertTrue($second['downloaded']);
+        self::assertNotSame($result['path'], $second['path']);
     }
 
     public function testRejectsPackageWhenChecksumDoesNotMatch(): void

@@ -166,12 +166,13 @@ class MigrateCommandsTest extends TestCase
      *
      * Requirements: 4.3
      */
-    public function testSeedCommandHasRequiredModuleArgument(): void
+    public function testSeedCommandHasOptionalModuleArgument(): void
     {
         $cmd = new SeedCommand();
         $def = $cmd->getDefinition();
         $this->assertTrue($def->hasArgument('module'));
-        $this->assertTrue($def->getArgument('module')->isRequired());
+        $this->assertFalse($def->getArgument('module')->isRequired());
+        $this->assertTrue($def->getArgument('module')->isArray());
     }
 
     /**

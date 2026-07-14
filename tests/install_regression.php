@@ -254,6 +254,14 @@ check(str_contains($migrateCommand, 'ModuleMigrationRun'), 'Module migrations mu
 $seedCommand = source('src/Commands/Module/SeedCommand.php');
 check(str_contains($seedCommand, 'ModuleSeedRun'), 'Module seeders must use a path-aware think-migration runner.');
 
+$projectInstall = source('src/Commands/ProjectInstallCommand.php');
+$projectAllowedCheck = strpos($projectInstall, "(\$plan['install']['allowed'] ?? false) !== true");
+$projectConfigApply = strpos($projectInstall, '(new ProjectInstallPlanStore())->apply($plan)');
+check(
+    $projectAllowedCheck !== false && $projectConfigApply !== false && $projectAllowedCheck < $projectConfigApply,
+    'Rejected project plans must be blocked before config/trix-project.php is written.'
+);
+
 if ($failures !== []) {
     fwrite(STDERR, implode(PHP_EOL, $failures) . PHP_EOL);
     exit(1);

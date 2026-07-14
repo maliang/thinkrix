@@ -454,10 +454,15 @@ class MakeModuleCommandTest extends TestCase
      */
     private function createStubFiles(): void
     {
+        file_put_contents(
+            $this->packageStubDir . DIRECTORY_SEPARATOR . 'composer.json.stub',
+            '{"name":"thinkrix/{{LOWER_NAME}}","autoload":{"psr-4":{"app\\\\{{MODULE_NAME}}\\\\":""}}}'
+        );
+
         // module.json.stub
         file_put_contents(
             $this->packageStubDir . DIRECTORY_SEPARATOR . 'module.json.stub',
-            '{"name": "{{MODULE_NAME}}", "alias": "{{LOWER_NAME}}", "enabled": true}'
+            '{"name":"{{MODULE_NAME}}","alias":"{{LOWER_NAME}}","enabled":true,"trix":{"schema_version":"trix.module.v1","id":"local.{{LOWER_NAME}}","name":"{{MODULE_NAME}}","version":"1.0.0","adapter":{"language":"php","framework":"thinkphp"}}}'
         );
 
         // config.stub

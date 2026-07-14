@@ -131,7 +131,7 @@ class RegistryModuleUpdateExecutor
             return [];
         }
 
-        return is_array($data) ? $data : [];
+        return is_array($data['trix'] ?? null) ? $data['trix'] : [];
     }
 
     /**

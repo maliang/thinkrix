@@ -12,7 +12,7 @@ use Thinkrix\Modules\Manifest\ModuleManifestLoader;
  *
  * 在 ThinkPHP 中简化模块管理（替代 nwidart/laravel-modules）
  */
-class ModuleService extends BaseService
+class ModuleService
 {
     /**
      * 获取所有模块列表
@@ -107,6 +107,7 @@ class ModuleService extends BaseService
 
                 $module = Module::where('name', $name)->find() ?? new Module(['name' => $name, 'enabled' => true]);
                 $module->save([
+                    'registry_id' => $json['id'] ?? null,
                     'title' => $title,
                     'description' => $description,
                     'version' => $version,
@@ -178,6 +179,7 @@ class ModuleService extends BaseService
             if ($json === null) { return false; }
             $module = new Module([
                 'name' => $name,
+                'registry_id' => $json['id'] ?? null,
                 'enabled' => false,
                 'title' => $json['title'] ?? $name,
                 'description' => $json['description'] ?? '',
@@ -204,8 +206,28 @@ class ModuleService extends BaseService
         $module->save();
 
         // 独立进程执行迁移和填充（避免类名冲突）
-        $this->runModuleMigrate($name);
-        $this->runModuleSeed($name);
+        $migrated = $this->runModuleMigrate($name);
+        if (!$migrated || !$this->runModuleSeed($name)) {
+            if ($migrated) {
+                try {
+                    $rollbackOk = $this->runModuleMigrate($name, true);
+                } catch (\Throwable $rollbackError) {
+                    $rollbackOk = false;
+                    error_log($rollbackError->getMessage());
+                }
+                if (!$rollbackOk) {
+                    $config = is_array($module->config) ? $module->config : [];
+                    $config['lifecycle_error'] = 'install_rollback_failed';
+                    $module->config = $config;
+                    $module->save();
+                    error_log("Thinkrix module [{$name}] install rollback failed; manual database recovery is required.");
+                }
+            }
+            $this->removeModuleContributions($name);
+            $module->disable();
+            $module->save();
+            return false;
+        }
 
         Event::trigger('thinkrix.module.installed', $module);
         return true;
@@ -220,18 +242,31 @@ class ModuleService extends BaseService
         if (!$module) { return false; }
         if (!$module->enabled) { return true; }
 
-        $menuModel = config('thinkrix.models.menu', \Thinkrix\Models\Menu::class);
-        $menuModel::where('module', $name)->delete();
+        if (!$this->runModuleMigrate($name, true)) {
+            return false;
+        }
 
-        $permissionModel = config('thinkrix.models.permission', \Thinkrix\Models\Permission::class);
-        $permissionModel::where('module', $name)->delete();
-
-        $this->runModuleMigrate($name, true);
-
+        $this->removeModuleContributions($name);
         $module->disable();
         $module->save();
         Event::trigger('thinkrix.module.uninstalled', $module);
         return true;
+    }
+
+    /** 删除模块注册的菜单、权限及角色权限关联。 */
+    protected function removeModuleContributions(string $name): void
+    {
+        $menuModel = config('thinkrix.models.menu', \Thinkrix\Models\Menu::class);
+        $permissionModel = config('thinkrix.models.permission', \Thinkrix\Models\Permission::class);
+        $permissionIds = $permissionModel::where('module', $name)->column('id');
+
+        if ($permissionIds !== []) {
+            \think\facade\Db::table('role_has_permissions')->whereIn('permission_id', $permissionIds)->delete();
+            \think\facade\Db::table('model_has_permissions')->whereIn('permission_id', $permissionIds)->delete();
+        }
+
+        $menuModel::where('module', $name)->delete();
+        $permissionModel::where('module', $name)->delete();
     }
 
         /** 查找并返回匹配的业务对象。 */
@@ -287,16 +322,18 @@ class ModuleService extends BaseService
     }
 
     /** 执行指定模块的数据库迁移。 */
-    protected function runModuleMigrate(string $name, bool $rollback = false): void
+    protected function runModuleMigrate(string $name, bool $rollback = false): bool
     {
         $arg = $rollback ? ' --rollback' : '';
         passthru('php think thinkrix:module-migrate ' . escapeshellarg($name) . $arg, $exitCode);
+        return $exitCode === 0;
     }
 
     /** 执行指定模块的数据填充。 */
-    protected function runModuleSeed(string $name): void
+    protected function runModuleSeed(string $name): bool
     {
         passthru('php think thinkrix:module-seed ' . escapeshellarg($name), $exitCode);
+        return $exitCode === 0;
     }
 
         /** 从指定来源读取数据。 */
@@ -332,7 +369,6 @@ class ModuleService extends BaseService
             'version' => $manifest->version() ?: ($manifestData['version'] ?? '1.0.0'),
             'menus' => $manifest->menus(),
             'permissions' => $manifest->permissions(),
-            'trix_manifest' => $manifestData,
         ]);
     }
 }

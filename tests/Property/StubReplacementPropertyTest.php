@@ -116,7 +116,7 @@ class StubReplacementPropertyTest extends TestCase
                 $this->assertStringContainsString(
                     $value,
                     $result,
-                    "杈撳嚭涓簲鍖呭惈鏇挎崲鍊?[{$value}]锛堝搴斿崰浣嶇 {$placeholder}锛?
+                    "杈撳嚭涓簲鍖呭惈鏇挎崲鍊?[{$value}]锛堝搴斿崰浣嶇 {$placeholder}锛?"
                 );
             }
 

@@ -23,6 +23,10 @@ class RegistryPackageStagerTest extends TestCase
         self::assertFileExists($result['path'] . DIRECTORY_SEPARATOR . 'official.cms' . DIRECTORY_SEPARATOR . 'module.json');
         self::assertStringStartsWith($stagingRoot, $result['path']);
         self::assertSame('official.cms/module.json', $result['manifest']);
+
+        $second = (new RegistryPackageStager($stagingRoot))->stage($package, 'official.cms', '1.0.0');
+        self::assertTrue($second['staged']);
+        self::assertNotSame($result['path'], $second['path']);
     }
 
     public function testRejectsPackageWithUnsafePathsBeforeExtracting(): void

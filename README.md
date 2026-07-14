@@ -4,102 +4,53 @@
 
 Thinkrix 是 [Lartrix](https://github.com/lartrix/lartrix)（Laravel 版）的 ThinkPHP 移植版，两者功能同步。前端统一使用 [Trix](https://github.com/lartrix/trix)（Vue 3 + NaiveUI + vschema-ui），后端生态共享。
 
-> 模块生态说明：Trix Module Registry 采用“市场保存整体支持矩阵，包内 manifest 只声明当前 adapter”的模型。Thinkrix 支持 `php/thinkphp` adapter 协议兼容和精选官方模块，但不承诺所有 Laravel 商业模块同步实现。
+## 模块生态协议
 
-Registry 安装命令默认只解析模块版本和 ThinkPHP adapter，不下载、不解压、不安装远端包：
+当前版本包含破坏性升级，旧 Registry 配置名和旧的独立 manifest 约定不再兼容：
 
-```bash
-php think thinkrix:module-install official.cms --registry=https://registry.example.com
-```
-
-也可以在项目环境变量中配置默认 Registry。命令行未传 `--registry` 时会读取 `THINKRIX_MODULE_REGISTRY_URL`，未传 `--signature-key` 时会读取 `THINKRIX_MODULE_REGISTRY_SIGNATURE_KEY`：
+- 模块仍使用根目录 `module.json`，但**只有 `module.json.trix` 是 Trix 生态协议**。`name`、`providers`、`middleware` 等顶层字段属于 ThinkPHP 模块运行时，不会被当作 Trix 清单字段解析。
+- 模块市场配置统一位于 `config/thinkrix.php` 的 `module_market` 节点；市场 Auth Key 只使用环境变量 `TRIX_AUTH_KEY`，不再读取 `THINKRIX_MODULE_REGISTRY_*`、`TRIX_REGISTRY_*` 等旧名称。
+- 项目安装计划只会原子写入 `config/trix-project.php`。根目录 `trix-project.json` 是项目发布清单，不是安装后的运行时配置。
 
 ```env
-THINKRIX_MODULE_REGISTRY_URL=https://registry.example.com
-THINKRIX_MODULE_REGISTRY_SIGNATURE_KEY=your-signature-key
+THINKRIX_MODULE_MARKET_URL=https://registry.example.com/api
+TRIX_AUTH_KEY=your-auth-key
+THINKRIX_MODULE_MARKET_SIGNATURE_KEY=your-signature-key
 ```
 
-如果需要把 adapter 包缓存到本机，可以显式增加 `--download`：
+```json
+{
+  "name": "Demo",
+  "enabled": false,
+  "trix": {
+    "schema_version": "trix.module.v1",
+    "id": "vendor.demo",
+    "name": "Demo",
+    "version": "1.0.0",
+    "type": "module",
+    "adapter": {
+      "language": "php",
+      "language_version": ">=8.1",
+      "framework": "thinkphp",
+      "framework_version": ">=8.0",
+      "status": "stable"
+    }
+  }
+}
+```
+
+项目安装先解析 Registry 安装计划并生成 `config/trix-project.php`；加上 `--execute` 后，才会依次下载、校验、暂存、复核并复制缺失模块：
 
 ```bash
-php think thinkrix:module-install official.cms --registry=https://registry.example.com --download
+php think thinkrix:project-install vendor.project --dry-run
+php think thinkrix:project-install vendor.project --execute
 ```
 
-如果 Registry 返回 `signature`，并且本地传入 `--signature-key`，命令还会校验 `hmac-sha256:{base64}` 签名，签名载荷为 adapter checksum 字符串：
+安全边界是强制的：市场 HTTP 请求不跟随重定向；包下载地址必须与 `module_market.url` 的 scheme、host、port 同源；暂存、复制和更新替换前都会递归拒绝符号链接。Zip 预检还会拒绝目录穿越、绝对路径和 Windows 盘符路径，安装链路不会自动执行包内脚本。
 
-```bash
-php think thinkrix:module-install official.cms \
-  --registry=https://registry.example.com \
-  --download \
-  --signature-key="${TRIX_REGISTRY_SIGNATURE_KEY}"
-```
+模块接口按职责拆分：`ModuleController` 仅管理本地已安装模块及 Logo；`ModuleMarketController` 负责市场列表和模块/项目安装；`ModulePublishController` 负责模块与项目发布。宿主项目需要替换控制器时，应分别配置 `controllers.module`、`controllers.module_market` 和 `controllers.module_publish`。
 
-下载会先校验 `sha256:` checksum，成功后只写入本地缓存目录。缓存包仍需再通过 ThinkPHP/Thinkrix 本地模块流程安装或启用。
-
-缓存完成后 Thinkrix 会进行 zip 预检：检查包内路径是否包含 `../`、绝对路径或 Windows 盘符路径，并确认存在 `module.json`。预检通过后，包会解压到隔离 staging 目录，供后续人工审阅或本地模块流程使用；不会直接移动到正式模块目录，也不会执行包内脚本。
-
-staging 完成后，Thinkrix 会重新读取包内 manifest，核对模块 `id`、`version` 和 `php/thinkphp` adapter 状态是否与 Registry 返回一致。若不一致，流程会停止。
-
-确认 staging 内容后，可以显式复制到本地模块目录：
-
-```bash
-php think thinkrix:module-install official.cms \
-  --from-stage=/tmp/thinkrix-registry-staging/official.cms-1.0.0 \
-  --manifest=official.cms/module.json \
-  --version=1.0.0 \
-  --target-dir=/app/Modules/OfficialCms
-```
-
-该命令只复制文件。目标目录已存在时会拒绝，不会启用模块、不会执行迁移或 Seeder。
-
-复制完成后，命令会扫描模块中的 `composer.json`、Service/Provider、migration、Seeder，并输出人工待办清单和建议命令。这些命令只作为提示，不会自动执行。
-
-如果 manifest 的 `security` 声明包含 `writes_files`、`runs_commands`、`external_network` 或 `requires_secrets`，命令会输出安全审阅提示。第一阶段只提示风险，不自动执行包内脚本，也不自动批准高风险操作。
-
-模块版本更新必须先生成更新计划，再复用 Registry 安装器的下载、校验、staging 和 manifest 复核链路。第一阶段默认只允许升级，不允许降级，也不会自动覆盖正式模块目录。详细流程见 `docs/ecosystem/module-version-update-flow.md`。
-
-确认新版本目录后，推荐先使用专用更新命令做 dry-run：
-
-```bash
-php think thinkrix:module-update official.cms \
-  --current-dir=/app/Modules/OfficialCms \
-  --source-dir=/app/Modules/OfficialCmsNext \
-  --manifest=module.json \
-  --version=1.1.0 \
-  --dry-run \
-  --strict-security \
-  --audit-log=/app/runtime/trix-module-updates.jsonl
-```
-
-`--dry-run` 只输出更新计划，不要求备份目录，也不会移动任何文件。`--strict-security` 会在 manifest 声明写文件、运行命令、访问外网、需要密钥或使用 eval 时直接拒绝。`--audit-log` 会追加写入 JSON Lines 审计记录。确认计划无误后，再显式替换正式目录：
-
-```bash
-php think thinkrix:module-update official.cms \
-  --current-dir=/app/Modules/OfficialCms \
-  --source-dir=/app/Modules/OfficialCmsNext \
-  --manifest=module.json \
-  --version=1.1.0 \
-  --backup-dir=/app/Modules/.backup/OfficialCms-1.0.0 \
-  --strict-security \
-  --audit-log=/app/runtime/trix-module-updates.jsonl \
-  --confirm-replace
-```
-
-更新命令会先读取当前目录的 manifest 判断当前版本，默认只允许目标版本更高时继续；随后把旧目录移动到备份目录，再把新目录移动到正式目录。它仍不会自动执行 migration、Seeder、autoload 或包内脚本。
-
-如果确实需要降级，必须显式增加 `--allow-downgrade`。降级前先 dry-run，正式替换时仍必须提供备份目录和确认参数：
-
-```bash
-php think thinkrix:module-update official.cms \
-  --current-dir=/app/Modules/OfficialCms \
-  --source-dir=/app/Modules/OfficialCmsPrev \
-  --manifest=module.json \
-  --version=1.0.0 \
-  --dry-run \
-  --allow-downgrade \
-  --strict-security \
-  --audit-log=/app/runtime/trix-module-updates.jsonl
-```
+完整说明见 [模块开发与生态](docs/guide/modules.md)。
 
 ---
 

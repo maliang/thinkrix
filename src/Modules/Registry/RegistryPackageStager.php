@@ -29,11 +29,26 @@ class RegistryPackageStager
             ];
         }
 
-        $target = $this->targetPath($moduleId, $version);
-        if (is_dir($target)) {
-            $this->removeDirectory($target);
+        $root = $this->rootPath();
+        if (is_link($root)) {
+            return $this->failure('staging_root_link_blocked', 'Registry staging root must not be a symbolic link.');
         }
-        mkdir($target, 0775, true);
+        if (!is_dir($root) && !mkdir($root, 0700, true) && !is_dir($root)) {
+            return $this->failure('staging_root_create_failed', 'Registry staging root could not be created.');
+        }
+        $rootPath = realpath($root);
+        if (!is_string($rootPath)) {
+            return $this->failure('staging_root_invalid', 'Registry staging root could not be resolved.');
+        }
+
+        $target = $this->targetPath($moduleId, $version);
+        if (is_link($target) || !mkdir($target, 0700)) {
+            return $this->failure('staging_target_create_failed', 'Registry staging target could not be created safely.');
+        }
+        $targetPath = realpath($target);
+        if (!is_string($targetPath) || !str_starts_with($targetPath, $rootPath . DIRECTORY_SEPARATOR)) {
+            return $this->failure('staging_target_outside_root', 'Registry staging target escaped its configured root.');
+        }
 
         $zip = new ZipArchive();
         if ($zip->open($packagePath) !== true) {
@@ -45,6 +60,11 @@ class RegistryPackageStager
             return $this->failure('zip_extract_failed', 'Registry package could not be extracted to staging.');
         }
         $zip->close();
+
+        if ($this->containsSymbolicLink($target)) {
+            $this->removeDirectory($target);
+            return $this->failure('symbolic_link_blocked', 'Registry package extracted a symbolic link.');
+        }
 
         $manifestPath = $target . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, (string) $preflight['manifest']);
         if (!is_file($manifestPath)) {
@@ -63,7 +83,8 @@ class RegistryPackageStager
     /** 生成模块版本对应的暂存目录路径。 */
     private function targetPath(string $moduleId, string $version): string
     {
-        return $this->rootPath() . DIRECTORY_SEPARATOR . $this->safeName($moduleId . '-' . $version);
+        return $this->rootPath() . DIRECTORY_SEPARATOR . $this->safeName($moduleId . '-' . $version)
+            . '-' . bin2hex(random_bytes(8));
     }
 
     /** 解析模块包暂存根目录。 */
@@ -92,6 +113,10 @@ class RegistryPackageStager
             }
 
             $path = $directory . DIRECTORY_SEPARATOR . $item;
+            if (is_link($path)) {
+                unlink($path);
+                continue;
+            }
             if (is_dir($path)) {
                 $this->removeDirectory($path);
                 rmdir($path);
@@ -102,6 +127,22 @@ class RegistryPackageStager
         }
 
         rmdir($directory);
+    }
+
+    /** 递归检查暂存目录中的符号链接。 */
+    private function containsSymbolicLink(string $directory): bool
+    {
+        foreach (scandir($directory) ?: [] as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            $path = $directory . DIRECTORY_SEPARATOR . $item;
+            if (is_link($path) || (is_dir($path) && $this->containsSymbolicLink($path))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
